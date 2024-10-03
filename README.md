@@ -145,3 +145,8 @@
 **Relationships**:
 
 - Each **rating** is tied to one **booking**, **passenger**, **driver**, and **vehicle** (many-to-one relationship).
+
+
+# ERD
+![ERD](ERD.png)
+
