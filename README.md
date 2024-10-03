@@ -1,2 +1,3 @@
 # GoTrip
+## Business Rule
  
