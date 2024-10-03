@@ -121,6 +121,8 @@
     - All fields are **mandatory**.
 - **Relationships**:
     - Each payment is tied to one **booking**, **passenger**, and **driver** (many-to-one relationship).
+ 
+  ---
 
 ### **7. Ratings**
 
