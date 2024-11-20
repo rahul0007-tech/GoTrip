@@ -1,5 +1,5 @@
 """
-WSGI config for GoTrip project.
+WSGI config for goTrip project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GoTrip.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'goTrip.settings')
 
 application = get_wsgi_application()
