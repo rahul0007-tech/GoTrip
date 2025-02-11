@@ -104,12 +104,6 @@ class AcceptBookingView(APIView):
 
         return Response({"message": "Booking accepted successfully", "booking_id": booking.id}, status=status.HTTP_200_OK)
 
-
-
-
-
-
-
 class GetAcceptedDriversView(APIView):
     def post(self, request):
         token = request.headers.get('Authorization')
