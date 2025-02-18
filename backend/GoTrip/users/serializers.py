@@ -43,7 +43,7 @@ class PassengerLoginSerializer(serializers.ModelSerializer):
 class PassengerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Passenger
-        fields = ['id', 'email', 'name']
+        fields = ['id', 'email', 'name', 'phone', 'Created_at', 'updated_at']
 
 
 class CreateDriverSerializer(serializers.ModelSerializer):
@@ -89,27 +89,30 @@ class ChangePasswordSerilizer(serializers.Serializer):
     
 
 class SendPasswordResetEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255)
+    class Meta:
+        fields = ['email']
     def validate(self, attrs):
-        request = self.context.get('request')  # Get the request from context
-        user = request.user  # Extract authenticated user
+        email = attrs.get('email')
 
-        if not user or not user.is_authenticated:
-            raise ValidationError("User is not authenticated.")
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            uid = urlsafe_base64_encode(force_bytes(user.id))
+            token = PasswordResetTokenGenerator().make_token(user)
+            link = f'http://0.0.0.0:8000/user/reset-password/{uid}/{token}'
+            print(link)
 
-        uid = urlsafe_base64_encode(force_bytes(user.id))
-        token = PasswordResetTokenGenerator().make_token(user)
-        link = f'http://localhost:3000/api/user/reset/{uid}/{token}'
-        print(link)
+            body = f'Click the following link to reset your password: {link}'
+            data = {
+                'subject': 'Reset Your Password',
+                'body': body,
+                'to_email': user.email
+            }
 
-        body = f'Click the following link to reset your password: {link}'
-        data = {
-            'subject': 'Reset Your Password',
-            'body': body,
-            'to_email': user.email
-        }
-
-        Util.send_email(data)
-        return attrs
+            Util.send_email(data)
+            return attrs
+        else:
+            raise ValidationError("You are not a registered user yet")
         
 class PasswordResetSerializer(serializers.Serializer):
     oldPassword = serializers.CharField(max_length = 255, style={'input_type':'password'}, write_only = True)

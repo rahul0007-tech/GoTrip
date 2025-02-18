@@ -1,38 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-
-// class SignupController extends GetxController {
-//   var username = ''.obs;
-//   var email = ''.obs;
-//   var phoneNumber = ''.obs;
-//   var password = ''.obs;
-
-//   void signup() {
-//     if (username.isEmpty ||
-//         email.isEmpty ||
-//         phoneNumber.isEmpty ||
-//         password.isEmpty) {
-//       Get.snackbar(
-//         'Error',
-//         'All fields are required',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.redAccent,
-//         colorText: Colors.white,
-//       );
-//     } else {
-//       Get.snackbar(
-//         'Success',
-//         'Signup successful! Please verify your OTP.',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.green,
-//         colorText: Colors.white,
-//       );
-
-//       // Navigate to OTP page
-//       Get.toNamed('/otp');
-//     }
-//   }
-// }
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';

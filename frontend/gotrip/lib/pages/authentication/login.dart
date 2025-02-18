@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:gotrip/utils/app_colors.dart';
 import 'package:gotrip/utils/custom_button.dart';
 import 'package:gotrip/utils/custom_input.dart';
-import '../../controllers/login_controller.dart';
+import '../../controllers/passenger_login_controller.dart';
 
 class LoginPage extends StatelessWidget {
   final controller = Get.find<LoginController>();

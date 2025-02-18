@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gotrip/controllers/otp_controller.dart';
-import 'package:gotrip/controllers/signup_controller.dart';
+import 'package:gotrip/controllers/passenger_otp_controller.dart';
+import 'package:gotrip/controllers/passenger_signup_controller.dart';
 import 'routes/app_pages.dart';
-import 'bindings/signup_binding.dart';
-import 'bindings/otp_binding.dart';
+import 'bindings/passenger_signup_binding.dart';
+import 'bindings/passenger_otp_binding.dart';
 
 void main() {
   runApp(MyApp());

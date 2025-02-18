@@ -112,7 +112,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gotrip/controllers/otp_controller.dart';
+import 'package:gotrip/controllers/passenger_otp_controller.dart';
 import 'package:gotrip/utils/custom_button.dart';
 import 'package:gotrip/utils/custom_input.dart';
 

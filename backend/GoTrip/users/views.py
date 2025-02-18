@@ -1,4 +1,4 @@
-from .models import Passenger, Driver
+from .models import Passenger
 from .serializers import ChangePasswordSerilizer, CreatePassengerSerializer, DriverLoginSerializer, PassengerLoginSerializer, PassengerProfileSerializer, PasswordResetSerializer, SendPasswordResetEmailSerializer, VerifyOTPSerializer, CreateDriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,13 +6,9 @@ from rest_framework import status
 from django.core.mail import send_mail
 from django.conf import settings
 import random
-from rest_framework.exceptions import AuthenticationFailed
-from datetime import datetime, timezone, timedelta
-import jwt
 from django.contrib.auth import authenticate
-# from users.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # Create your views here.
 def get_tokens_for_user(user):
@@ -170,11 +166,9 @@ class LoginDriverView(APIView):
         return Response({'msg':'Login success'}, status= status.HTTP_200_OK)
     
 
-class SendPasswordEmailView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this
-
+class SendPasswordEmailView(APIView): 
     def post(self, request, format=None):
-        serializer = SendPasswordResetEmailSerializer(data={}, context={'request': request})  # Pass request in context
+        serializer = SendPasswordResetEmailSerializer(data=request.data)  # Pass request in context
         if serializer.is_valid(raise_exception=True):
             return Response({'msg': 'Password reset link sent. Please check your email.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
