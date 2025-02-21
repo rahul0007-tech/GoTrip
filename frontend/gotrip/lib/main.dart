@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/controllers/passenger_otp_controller.dart';
 import 'package:gotrip/controllers/passenger_signup_controller.dart';
+import 'package:gotrip/controllers/driver_signup_controller.dart';
 import 'routes/app_pages.dart';
+import 'bindings/driver_signup_binding.dart';
 import 'bindings/passenger_signup_binding.dart';
 import 'bindings/passenger_otp_binding.dart';
 
@@ -22,7 +24,8 @@ class MyApp extends StatelessWidget {
       getPages: AppPages.routes,
       initialBinding: BindingsBuilder(() {
         Get.put(SignupController());
-        Get.put(OTPController()); // ✅ Ensure OTPController is globally available
+        Get.put(DriverSignupController());
+        Get.put(OTPController());
       }),
     );
   }

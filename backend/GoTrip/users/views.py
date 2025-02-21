@@ -1,4 +1,5 @@
-from .models import Passenger
+from django.shortcuts import get_object_or_404
+from .models import Driver, Passenger
 from .serializers import ChangePasswordSerilizer, CreatePassengerSerializer, DriverLoginSerializer, PassengerLoginSerializer, PassengerProfileSerializer, PasswordResetSerializer, SendPasswordResetEmailSerializer, VerifyOTPSerializer, CreateDriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -113,12 +114,14 @@ class LoginPassengerView(APIView):
             password = serializer.data.get('password')
             user = authenticate(email= email, password=password)
             if user is not None:
+                passenger = get_object_or_404(Passenger, id = user.id)
+                if not passenger:
+                    return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
                 token = get_tokens_for_user(user)
                 return Response({'token':token,'msg':'Login success'}, status= status.HTTP_200_OK)
             else:
                 return Response({'errors':{'non_field_errors':['Email or Password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
-
-        return Response({'msg':'Login success'}, status= status.HTTP_200_OK)
+        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
     
 
 class PassengerProfileView(APIView):
@@ -158,12 +161,14 @@ class LoginDriverView(APIView):
             password = serializer.data.get('password')
             user = authenticate(email= email, password=password)
             if user is not None:
+                driver = get_object_or_404(Driver, id = user.id)
+                if not driver:
+                    return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
                 token = get_tokens_for_user(user)
                 return Response({'token':token,'msg':'Login success'}, status= status.HTTP_200_OK)
             else:
                 return Response({'errors':{'non_field_errors':['Email or Password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
-
-        return Response({'msg':'Login success'}, status= status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class SendPasswordEmailView(APIView): 

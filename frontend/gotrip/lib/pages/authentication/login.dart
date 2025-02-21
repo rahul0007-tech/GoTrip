@@ -60,7 +60,7 @@ class LoginPage extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       // Navigate to signup page
-                      Get.toNamed('/signup');
+                      Get.toNamed('/signup_choice');
                     },
                     child: Text(
                       "Don't have an account? Signup here",

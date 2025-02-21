@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gotrip/controllers/passenger_signup_controller.dart';
+import 'package:gotrip/controllers/driver_signup_controller.dart';
 import 'package:gotrip/utils/app_colors.dart';
 import 'package:gotrip/utils/custom_button.dart';
 import 'package:gotrip/utils/custom_input.dart';
 
-class SignupPage extends StatelessWidget {
-  final controller = Get.find<SignupController>();
+class DriverSignupPage extends StatelessWidget {
+  final controller = Get.find<DriverSignupController>();
 
-  SignupPage({super.key});
+  DriverSignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {

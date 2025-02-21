@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gotrip/controllers/passenger_signup_controller.dart';
 import 'package:gotrip/utils/app_colors.dart';
 import 'package:gotrip/utils/custom_button.dart';
 import 'package:gotrip/utils/custom_input.dart';
+import '../../controllers/driver_login_controller.dart';
 
-class SignupPage extends StatelessWidget {
-  final controller = Get.find<SignupController>();
+class DriverLoginPage extends StatelessWidget {
+  final controller = Get.find<DriverLoginController>();
 
-  SignupPage({super.key});
+  DriverLoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,37 +23,25 @@ class SignupPage extends StatelessWidget {
               children: [
                 Center(
                   child: Image.asset(
-                    'asset/images/trophy_icon.png',
+                    'asset/images/login_icon.png', // Add a login icon in assets
                     height: 100,
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'CREATE YOUR ACCOUNT',
+                  'Welcome Back!',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
                 SizedBox(height: 20),
-                CustomInput(
-                  labelText: 'Username',
-                  prefixIcon: Icons.person,
-                  onChanged: (value) => controller.username.value = value,
-                ),
-                SizedBox(height: 10),
                 CustomInput(
                   labelText: 'Email',
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) => controller.email.value = value,
-                ),
-                SizedBox(height: 10),
-                CustomInput(
-                  labelText: 'Phone number',
-                  prefixIcon: Icons.phone,
-                  keyboardType: TextInputType.phone,
-                  onChanged: (value) => controller.phoneNumber.value = value,
                 ),
                 SizedBox(height: 10),
                 CustomInput(
@@ -64,17 +52,18 @@ class SignupPage extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 CustomButton(
-                  label: "SIGNUP",
-                  onPressed: controller.signup,
+                  label: 'Login',
+                  onPressed: controller.login,
                 ),
                 SizedBox(height: 10),
                 Center(
                   child: TextButton(
                     onPressed: () {
-                      Get.toNamed('/login_choice');
+                      // Navigate to signup page
+                      Get.toNamed('/signup_choice');
                     },
                     child: Text(
-                      'already have an account? login instead',
+                      "Don't have an account? Signup here",
                       style: TextStyle(color: AppColors.primary),
                     ),
                   ),

@@ -1,12 +1,19 @@
 
 
 import 'package:get/get.dart';
+
 import 'package:gotrip/bindings/passenger_login_binding.dart';
+import 'package:gotrip/bindings/driver_login_binding.dart';
 import 'package:gotrip/bindings/passenger_signup_binding.dart';
-import 'package:gotrip/bindings/passenger_otp_binding.dart'; // ✅ Import OTPBinding
+import 'package:gotrip/bindings/driver_signup_binding.dart';
+import 'package:gotrip/bindings/passenger_otp_binding.dart';
+import 'package:gotrip/pages/authentication/login_choice.dart';
+import 'package:gotrip/pages/authentication/signup_choice.dart';
 import 'package:gotrip/pages/authentication/login.dart';
+import 'package:gotrip/pages/authentication/driver_login.dart';
 import 'package:gotrip/pages/authentication/otp_verification.dart';
 import 'package:gotrip/pages/authentication/signup.dart';
+import 'package:gotrip/pages/authentication/driver_signup.dart';
 import 'package:gotrip/pages/main_pages/homepage.dart';
 import 'package:gotrip/pages/main_pages/profilepage.dart';
 import 'package:gotrip/pages/main_pages/searchpage.dart';
@@ -16,12 +23,15 @@ import 'package:gotrip/bindings/passenger_profile_binding.dart';
 import 'package:gotrip/bindings/main_bindings.dart';
 
 class AppPages {
-  static const initial = '/signup'; // Start from signup page
+  static const initial = '/signup_choice'; // Start from signup page
 
-  static final routes = [
-    GetPage(name: '/signup', page: () => SignupPage(), binding: SignupBinding()),
+  static final routes = [GetPage(name: '/signup_choice', page: () => const SignupChoicePage(),),
+    GetPage(name: '/signup', page: () => SignupPage(), binding: SignupBinding(),),
+    GetPage(name: '/driver_signup', page: () => DriverSignupPage(), binding: DriverSignupBinding(),),
+    GetPage(name: '/login_choice', page: () => LoginChoicePage(),),
     GetPage(name: '/login', page: () => LoginPage(), binding: LoginBinding()),
-    GetPage(name: '/otp', page: () => OTPPage(), binding: OTPBinding()), // ✅ FIXED
+    GetPage(name: '/driver_login', page: () => DriverLoginPage(), binding: DriverLoginBinding()),
+    GetPage(name: '/otp', page: () => OTPPage(), binding: OTPBinding()),
     GetPage(name: '/main', page: () => MainPage(), binding: MainBinding(),),
     GetPage(name: '/home', page: () => HomePage()),
     GetPage(name: '/search', page: () => SearchPage()),
