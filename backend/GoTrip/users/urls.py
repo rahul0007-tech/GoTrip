@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ChnagePasswordView, CreatePassengerView, LoginPassengerView, PassengerProfileView, LogoutView, PasswordResetView, SendPasswordEmailView, VerifyOTPView, CreateDriverView, LoginDriverView
+from .views import ChnagePasswordView, CreatePassengerView, LoginPassengerView, PassengerProfileView, LogoutView, PasswordResetView, SendPasswordEmailView, VerifyOTPView, CreateDriverView, LoginDriverView, DriverProfileView
 
 app_name = 'users'
 
@@ -14,5 +14,6 @@ urlpatterns = [
     path('change-password/',ChnagePasswordView.as_view(), name='changepassengerpassword' ),
     path('send-reset-password/', SendPasswordEmailView.as_view(), name='send-reset-password'),
     path('reset-password/<uid>/<token>/',PasswordResetView.as_view(), name='changepassengerpassword' ),
+    path('driverprofile/', DriverProfileView.as_view(), name='driverprofile'),
     
 ]

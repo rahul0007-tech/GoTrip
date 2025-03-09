@@ -23,13 +23,13 @@ class DriverSignupPage extends StatelessWidget {
               children: [
                 Center(
                   child: Image.asset(
-                    'asset/images/trophy_icon.png',
+                    'asset/images/driver_signup.jpg',
                     height: 100,
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'CREATE YOUR ACCOUNT',
+                  'CREATE YOUR Driver ACCOUNT',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

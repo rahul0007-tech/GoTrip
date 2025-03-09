@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from .models import Driver, Passenger
-from .serializers import ChangePasswordSerilizer, CreatePassengerSerializer, DriverLoginSerializer, PassengerLoginSerializer, PassengerProfileSerializer, PasswordResetSerializer, SendPasswordResetEmailSerializer, VerifyOTPSerializer, CreateDriverSerializer
+from .serializers import ChangePasswordSerilizer, CreatePassengerSerializer, DriverLoginSerializer, DriverProfileSerializer, PassengerLoginSerializer, PassengerProfileSerializer, PasswordResetSerializer, SendPasswordResetEmailSerializer, VerifyOTPSerializer, CreateDriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -127,7 +127,14 @@ class LoginPassengerView(APIView):
 class PassengerProfileView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        serializer = PassengerProfileSerializer(request.user)
+        try:
+            passenger = Passenger.objects.get(pk=request.user.pk)
+        except Passenger.DoesNotExist:
+            return Response(
+                {"detail": "Passenger profile not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = PassengerProfileSerializer(passenger,context={'request':request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class ChnagePasswordView(APIView):
@@ -186,3 +193,15 @@ class PasswordResetView(APIView):
         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class DriverProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            driver = Driver.objects.get(pk=request.user.pk)
+        except Driver.DoesNotExist:
+            return Response(
+                {"detail": "Driver profile not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = DriverProfileSerializer(driver,context={'request':request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -50,7 +50,7 @@ class DriverLoginController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        Get.offNamed('/main');
+        Get.offNamed('/driver_main_page');
 
         // Optionally, store the token locally, then navigate to the home page.
         // For example: Get.toNamed('/home');

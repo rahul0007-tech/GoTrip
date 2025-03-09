@@ -20,7 +20,8 @@ class ProfilePage extends StatelessWidget {
         if (
             controller.username.value.isEmpty &&
             controller.email.value.isEmpty &&
-            controller.phone.value.isEmpty
+            controller.phone.value.isEmpty&&
+            controller.photo.value.isEmpty
             ) {
           return Center(child: CircularProgressIndicator());
         }
@@ -29,6 +30,16 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              controller.photo.value.isNotEmpty
+                  ? CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(controller.photo.value),
+                    )
+                  : CircleAvatar(
+                      radius: 50,
+                      child: Icon(Icons.person, size: 50),
+                    ),
+              SizedBox(height: 20),
               Text(
                 'Name: ${controller.username.value}',
                 style: TextStyle(fontSize: 16),
@@ -60,6 +71,10 @@ class ProfilePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
                 ),
+              ),
+              ElevatedButton(
+                onPressed: () => Get.toNamed('/change_password'),
+                child: Text("Change Password"),
               ),
             ],
           ),

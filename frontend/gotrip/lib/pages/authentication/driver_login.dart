@@ -23,7 +23,7 @@ class DriverLoginPage extends StatelessWidget {
               children: [
                 Center(
                   child: Image.asset(
-                    'asset/images/login_icon.png', // Add a login icon in assets
+                    'asset/images/driver_login.jpg', // Add a login icon in assets
                     height: 100,
                   ),
                 ),

@@ -43,8 +43,12 @@ class PassengerLoginSerializer(serializers.ModelSerializer):
 class PassengerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Passenger
-        fields = ['id', 'email', 'name', 'phone', 'Created_at', 'updated_at']
-
+        fields = ['id', 'email', 'name', 'phone','photo', 'Created_at', 'updated_at']
+    def get_photo(self, obj):
+        request = self.context.get('request')
+        if obj.photo:
+            return request.build_absolute_uri(obj.photo.url)
+        return None
 
 class CreateDriverSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,6 +69,21 @@ class DriverLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
         fields = ['email', 'password']
+
+class DriverProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = ['id', 'email', 'name', 'phone','photo','license','status', 'Created_at', 'updated_at']
+    def get_photo(self, obj):
+        request = self.context.get('request')
+        if obj.photo:
+            return request.build_absolute_uri(obj.photo.url)
+        return None
+    def get_license(self, obj):
+        request = self.context.get('request')
+        if obj.license:
+            return request.build_absolute_uri(obj.license.url)
+        return None
 
 class ChangePasswordSerilizer(serializers.Serializer):
     oldPassword = serializers.CharField(max_length = 255, style={'input_type':'password'}, write_only = True)

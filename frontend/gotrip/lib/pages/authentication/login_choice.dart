@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gotrip/utils/app_colors.dart';
 
 enum UserType { Passenger, Driver }
 
@@ -59,7 +60,20 @@ class _LoginChoicePageState extends State<LoginChoicePage> {
                   Get.toNamed('/driver_login');
                 }
               },
-            )
+            ),
+            SizedBox(height: 10),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigate to signup page
+                      Get.toNamed('/signup_choice');
+                    },
+                    child: Text(
+                      "Don't have an account? Signup here",
+                      style: TextStyle(color: AppColors.primary),
+                    ),
+                  ),
+                ),
           ],
         ),
       ),

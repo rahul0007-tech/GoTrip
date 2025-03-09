@@ -9,6 +9,7 @@ class ProfileController extends GetxController {
   var username = ''.obs;
   var email = ''.obs;
   var phone = ''.obs;
+  var photo = ''.obs;
   var created_at = ''.obs;
   var updated_at = ''.obs;
 
@@ -54,6 +55,7 @@ class ProfileController extends GetxController {
         username.value = response.data['name'] ?? '';
         email.value = response.data['email'] ?? '';
         phone.value = response.data['phone']?.toString() ?? '';
+        photo.value = response.data['photo'] ?? '';
         created_at.value = response.data['Created_at']?.toString()?? '';
         updated_at.value = response.data['updated_at']?.toString()?? '';
 
