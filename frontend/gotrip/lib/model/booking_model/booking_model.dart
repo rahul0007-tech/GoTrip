@@ -1,7 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'booking_model.g.dart';
-
-
 
 @JsonSerializable()
 class BookingModel {
@@ -15,6 +14,8 @@ class BookingModel {
     final String dropoffLocation;
     @JsonKey(name: "fare")
     final String fare;
+    @JsonKey(name: "booking_for")
+    final DateTime? bookingFor;
 
     BookingModel({
         required this.id,
@@ -22,6 +23,7 @@ class BookingModel {
         required this.pickupLocation,
         required this.dropoffLocation,
         required this.fare,
+        required this.bookingFor,
     });
 
     factory BookingModel.fromJson(Map<String, dynamic> json) => _$BookingModelFromJson(json);

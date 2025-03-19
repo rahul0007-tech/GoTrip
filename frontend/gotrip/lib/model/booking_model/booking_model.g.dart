@@ -12,6 +12,9 @@ BookingModel _$BookingModelFromJson(Map<String, dynamic> json) => BookingModel(
       pickupLocation: json['pickup_location'] as String,
       dropoffLocation: json['dropoff_location'] as String,
       fare: json['fare'] as String,
+      bookingFor: json['booking_for'] == null
+          ? null
+          : DateTime.parse(json['booking_for'] as String),
     );
 
 Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
@@ -21,4 +24,5 @@ Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
       'pickup_location': instance.pickupLocation,
       'dropoff_location': instance.dropoffLocation,
       'fare': instance.fare,
+      'booking_for': instance.bookingFor?.toIso8601String(),
     };

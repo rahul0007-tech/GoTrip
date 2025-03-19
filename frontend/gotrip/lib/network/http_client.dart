@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 
 
 
@@ -13,14 +14,15 @@ import 'package:dio/dio.dart';
 
 
 import 'package:gotrip/constants/constant.dart';
-import 'package:gotrip/network/storage_service.dart';
+// import 'package:gotrip/network/storage_service.dart';
 
 
 
 
-StorageService _storageService = SharedPrefsService();
+// StorageService _storageService = SharedPrefsService();
 
-var token = _storageService.getString('auth_token');
+// var token = _storageService.getString('auth_token');
+final box = GetStorage();
 
 
 final Dio httpClient = Dio(BaseOptions(
@@ -35,7 +37,8 @@ final Dio httpClient = Dio(BaseOptions(
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       // Get the token from SharedPreferences dynamically before each request
-      String? token = await _storageService.getString('auth_token');
+      // String? token = await _storageService.getString('auth_token');
+      String? token = box.read('access_token');
 
       if (token != null) {
         // Add the token to the Authorization header

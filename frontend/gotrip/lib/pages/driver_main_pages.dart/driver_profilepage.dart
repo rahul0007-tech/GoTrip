@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/controllers/driver_profile_controller.dart';
-import '../../controllers/passenger_profile_controller.dart';
 import '../../utils/app_colors.dart';
 
 class DriverProfilepage extends StatelessWidget {

@@ -169,6 +169,8 @@ class LoginDriverView(APIView):
             user = authenticate(email= email, password=password)
             if user is not None:
                 driver = get_object_or_404(Driver, id = user.id)
+                if driver.isVerified == False:
+                    return Response({'error':'Sorry you are still not verified please hold till admin verifies you'})
                 if not driver:
                     return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
                 token = get_tokens_for_user(user)

@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:gotrip/network/http_client.dart';
 
 class ProfileController extends GetxController {
-  // Observable fields for profile data
-  // var id = ''.obs;
+
   var username = ''.obs;
   var email = ''.obs;
   var phone = ''.obs;
@@ -13,14 +13,6 @@ class ProfileController extends GetxController {
   var created_at = ''.obs;
   var updated_at = ''.obs;
 
-  // Setup Dio with your base URL
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8000', // Change to your backend URL
-    connectTimeout: Duration(seconds: 20),
-    receiveTimeout: Duration(seconds: 20),
-  ));
-
-  final box = GetStorage();
 
   @override
   void onInit() {
@@ -29,29 +21,11 @@ class ProfileController extends GetxController {
   }
 
   void fetchUserProfile() async {
-    try {
-            // Retrieve the access token from storage
-      String? accessToken = box.read('access_token');
-      if (accessToken == null) {
-        Get.snackbar(
-          'Error',
-          'No access token found. Please login again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent,
-          colorText: Colors.white,
-        );
-        return;
-      }
+    try { 
 
-      // Set the token in the headers
-      _dio.options.headers["Authorization"] = "Bearer $accessToken";
-
-      final response = await _dio.get('/users/passengerprofile/');
-      print("Profile Response Data: ${response.data}");
+      final response = await httpClient.get('/users/passengerprofile/');
 
       if (response.statusCode == 200) {
-        // Adjust the keys below based on the JSON structure returned by your API
-        // id.value = response.data['id'] ?? '';
         username.value = response.data['name'] ?? '';
         email.value = response.data['email'] ?? '';
         phone.value = response.data['phone']?.toString() ?? '';
@@ -89,11 +63,8 @@ class ProfileController extends GetxController {
     }
   }
   void logout() {
-  // Remove tokens from storage
   box.remove('access_token');
-  // box.remove('refresh_token');
 
-  // Optionally, show a confirmation message
   Get.snackbar(
     'Logged Out',
     'You have been successfully logged out.',
@@ -102,7 +73,6 @@ class ProfileController extends GetxController {
     colorText: Colors.white,
   );
 
-  // Navigate to the login page (replace with your route name)
   Get.offAllNamed('/login');
   }
 }

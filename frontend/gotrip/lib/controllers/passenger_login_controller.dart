@@ -52,6 +52,7 @@ class LoginController extends GetxController {
         );
         Get.offNamed('/main');
 
+
         // Optionally, store the token locally, then navigate to the home page.
         // For example: Get.toNamed('/home');
       } else {

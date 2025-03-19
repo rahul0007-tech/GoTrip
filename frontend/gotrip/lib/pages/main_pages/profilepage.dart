@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gotrip/helper/date_format.dart';
 import '../../controllers/passenger_profile_controller.dart';
 import '../../utils/app_colors.dart';
 
 class ProfilePage extends StatelessWidget {
   final ProfileController controller = Get.find<ProfileController>();
 
-  ProfilePage({Key? key}) : super(key: key);
+  ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +57,15 @@ class ProfilePage extends StatelessWidget {
               ),
                             SizedBox(height: 10),
               Text(
-                'Created at: ${controller.created_at.value}',
+                'Created at: ${DateUtil.formatDate(controller.created_at.value)}',
                 style: TextStyle(fontSize: 16),
               ),
                             SizedBox(height: 10),
               Text(
-                'Updated at: ${controller.updated_at.value}',
-                style: TextStyle(fontSize: 16),
-              ),
+  'Updated at: ${DateUtil.formatDate(controller.updated_at.value)}',
+  style: TextStyle(fontSize: 16),
+),
+SizedBox(height: 20),
                             SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => controller.logout(),
