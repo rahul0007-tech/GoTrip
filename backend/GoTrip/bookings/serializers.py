@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
+
+from users.models import Driver
 from .models import Booking, Location
 
 
@@ -119,7 +121,22 @@ class CreateBookingSerializer(serializers.ModelSerializer):
 #         return value
 
 
+class ShowBookingLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ['name', 'fare']
+
 class AvailableBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id','passenger', 'pickup_location', 'dropoff_location', 'fare', 'booking_for']
+
+class DriverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = ['id', 'name', 'phone']
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'

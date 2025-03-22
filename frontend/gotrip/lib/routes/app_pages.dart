@@ -3,6 +3,7 @@
 import 'package:get/get.dart';
 import 'package:gotrip/bindings/accept_bboking_binding.dart';
 import 'package:gotrip/bindings/create_booking_binding.dart';
+import 'package:gotrip/bindings/get_accpeted_driver_binding.dart';
 import 'package:gotrip/bindings/get_booking_binding.dart';
 
 import 'package:gotrip/bindings/passenger_login_binding.dart';
@@ -19,6 +20,7 @@ import 'package:gotrip/pages/authentication/otp_verification.dart';
 import 'package:gotrip/pages/authentication/signup.dart';
 import 'package:gotrip/pages/authentication/driver_signup.dart';
 import 'package:gotrip/pages/bookings/accept_booking_page.dart';
+import 'package:gotrip/pages/bookings/driver_detial_page.dart';
 import 'package:gotrip/pages/bookings/get_bookingpage.dart';
 import 'package:gotrip/pages/driver_mainpage.dart';
 import 'package:gotrip/pages/main_pages/homepage.dart';
@@ -54,6 +56,8 @@ class AppPages {
     GetPage(name: '/create_booking_page', page: ()=> CreateBookingPage(),binding: CreateBookingBinding()),
     GetPage(name: '/accept_booking', page: () => AcceptBookingPage(), binding: AcceptBookingBinding(),),
     GetPage(name: '/get_booking', page: () => AvailableBookingPage(), binding: AvailableBookingBinding(),),
+    GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
+    GetPage(name: '/driver_details', page: () => DriverDetailsPage(),),
   ];
 }
 

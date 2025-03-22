@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
-from .models import Booking
+from .models import Booking, Location
 from users.models import Passenger, Driver
-from .serializers import AvailableBookingSerializer, CreateBookingSerializer
+from .serializers import AvailableBookingSerializer, CreateBookingSerializer, LocationSerializer, ShowBookingLocationSerializer, DriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -24,6 +24,30 @@ class CreateBookingView(APIView):
             return Response({"message": "Booking created successfully", "data": booking_data}, status=200)
 
         return Response(serializer.errors, status=400)
+    
+class ShowBookingLocationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get (self, request):
+        try:
+            location = Location.objects.filter(is_active=True)
+            if not location.exists():
+                return Response({"status":"failed", "message":"No such location found" })
+            serializer = ShowBookingLocationSerializer(location, many=True)
+            
+            # Return the serialized data
+            return Response(serializer.data, status=200)
+
+        
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error fetching locations: {str(e)}")
+            
+            # Return an error response
+            return Response(
+                {"message": f"An error occurred while fetching locations: {str(e)}"},
+                status=500
+            )
 
 
 # class CreateBookingView(APIView):
@@ -74,21 +98,96 @@ class AcceptBookingView(APIView):
         return Response({"message": "Booking accepted successfully", "booking_id": booking.id}, status=status.HTTP_200_OK)
 
 
+# class GetAcceptedDriversView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         user = request.user
+#         passenger = get_object_or_404(Passenger, id = user.id)
+#         if not passenger:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+#         booking_id = request.data.get('booking_id')
+#         if not booking_id:
+#             return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
+#         booking = get_object_or_404(Booking, id=booking_id)
+#         # drivers = booking.accepted_drivers.all()
+#         # driver_list = [{"id":driver.id, "name": driver.name, "phone": driver.phone} for driver in drivers]
+#         # return Response({"booking_id": booking.id, "accepted_drivers": driver_list}, status=status.HTTP_200_OK)
+#         drivers = booking.accepted_drivers.all()
+#         driver_serializer = DriverSerializer(drivers, many=True)
+#         return Response({
+#             "booking_id": booking.id,
+#             "accepted_drivers": driver_serializer.data
+#         }, status=status.HTTP_200_OK)
+
+
 class GetAcceptedDriversView(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self, request):
+    def get(self, request):
         user = request.user
         passenger = get_object_or_404(Passenger, id = user.id)
         if not passenger:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-        booking_id = request.data.get('booking_id')
-        if not booking_id:
-            return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        booking = get_object_or_404(Booking, id=booking_id)
-        drivers = booking.accepted_drivers.all()
-        driver_list = [{"id":driver.id, "name": driver.name, "phone": driver.phone} for driver in drivers]
-        return Response({"booking_id": booking.id, "accepted_drivers": driver_list}, status=status.HTTP_200_OK)
+        bookings = Booking.objects.filter(passenger=passenger, status= 'pending')
+        result = []
+        for booking in bookings:
+            drivers = booking.accepted_drivers.all()
+            if drivers.exists():  # Only include bookings that have accepted drivers
+                driver_serializer = DriverSerializer(drivers, many=True)
+                # pickup_location_serializer = LocationSerializer(booking.pickup_location)
+                dropoff_location_serializer = LocationSerializer(booking.dropoff_location)
+                result.append({
+                    "booking_id": booking.id,
+                    "pickup_location": booking.pickup_location,
+                    "dropoff_location": dropoff_location_serializer.data,
+                    "fare": booking.fare,
+                    "booking_for": booking.booking_for,
+                    "accepted_drivers": driver_serializer.data
+                    })
+        response_data = {
+                "status": "success",
+                "message": "Accepted drivers retrieved successfully",
+                "data": result
+            }
+            
+        return Response(response_data, status=status.HTTP_200_OK)
+        # booking_id = request.data.get('booking_id')
+        # if not booking_id:
+        #     return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        # booking = get_object_or_404(Booking, id=booking_id)
+        # # drivers = booking.accepted_drivers.all()
+        # # driver_list = [{"id":driver.id, "name": driver.name, "phone": driver.phone} for driver in drivers]
+        # # return Response({"booking_id": booking.id, "accepted_drivers": driver_list}, status=status.HTTP_200_OK)
+        # drivers = booking.accepted_drivers.all()
+        # driver_serializer = DriverSerializer(drivers, many=True)
+        # return Response({
+        #     "booking_id": booking.id,
+        #     "accepted_drivers": driver_serializer.data
+        # }, status=status.HTTP_200_OK)
 
+
+# class GetAcceptedDriversView(APIView):
+#     permission_classes = [IsAuthenticated]
+    
+#     def post(self, request):
+#         user = request.user
+#         passenger = get_object_or_404(Passenger, id=user.id)
+#         if not passenger:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+#         booking_id = request.data.get('booking_id')
+#         if not booking_id:
+#             return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+#         booking = get_object_or_404(Booking, id=booking_id)
+#         drivers = booking.accepted_drivers.all()
+        
+#         # Use the serializer to handle the conversion to JSON
+#         serializer = DriverSerializer(drivers, many=True)
+        
+#         return Response({
+#             "booking_id": booking.id,
+#             "accepted_drivers": serializer.data
+#         }, status=status.HTTP_200_OK)
 
 
 

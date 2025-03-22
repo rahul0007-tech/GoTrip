@@ -6,11 +6,25 @@ part of 'booking_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+LocationModel _$LocationModelFromJson(Map<String, dynamic> json) =>
+    LocationModel(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      fare: (json['fare'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$LocationModelToJson(LocationModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'fare': instance.fare,
+    };
+
 BookingModel _$BookingModelFromJson(Map<String, dynamic> json) => BookingModel(
       id: (json['id'] as num).toInt(),
       passenger: (json['passenger'] as num).toInt(),
       pickupLocation: json['pickup_location'] as String,
-      dropoffLocation: json['dropoff_location'] as String,
+      dropoffLocation: json['dropoff_location'],
       fare: json['fare'] as String,
       bookingFor: json['booking_for'] == null
           ? null
