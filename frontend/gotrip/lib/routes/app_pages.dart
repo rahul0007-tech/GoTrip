@@ -19,16 +19,18 @@ import 'package:gotrip/pages/authentication/driver_login.dart';
 import 'package:gotrip/pages/authentication/otp_verification.dart';
 import 'package:gotrip/pages/authentication/signup.dart';
 import 'package:gotrip/pages/authentication/driver_signup.dart';
-import 'package:gotrip/pages/bookings/accept_booking_page.dart';
-import 'package:gotrip/pages/bookings/driver_detial_page.dart';
+import 'package:gotrip/pages/bookings/create_bookingpage.dart';
+import 'package:gotrip/pages/bookings/get_accepted_driver_page.dart';
 import 'package:gotrip/pages/bookings/get_bookingpage.dart';
+import 'package:gotrip/pages/bookings/accept_booking_page.dart';
+// import 'package:gotrip/pages/bookings/driver_detial_page.dart';
 import 'package:gotrip/pages/driver_mainpage.dart';
 import 'package:gotrip/pages/main_pages/homepage.dart';
 import 'package:gotrip/pages/main_pages/profilepage.dart';
 import 'package:gotrip/pages/driver_main_pages.dart/driver_profilepage.dart';
 import 'package:gotrip/pages/main_pages/searchpage.dart';
 import 'package:gotrip/pages/authentication/change_password.dart';
-import 'package:gotrip/pages/bookings/create_bookingpage.dart';
+
 import 'package:gotrip/pages/mainpage.dart';
 import '../pages/main_pages/bookingpage.dart';
 import 'package:gotrip/bindings/passenger_profile_binding.dart';
@@ -56,8 +58,9 @@ class AppPages {
     GetPage(name: '/create_booking_page', page: ()=> CreateBookingPage(),binding: CreateBookingBinding()),
     GetPage(name: '/accept_booking', page: () => AcceptBookingPage(), binding: AcceptBookingBinding(),),
     GetPage(name: '/get_booking', page: () => AvailableBookingPage(), binding: AvailableBookingBinding(),),
+    // GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
+    // GetPage(name: '/driver_details', page: () => DriverDetailsPage(),),
     GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
-    GetPage(name: '/driver_details', page: () => DriverDetailsPage(),),
   ];
 }
 

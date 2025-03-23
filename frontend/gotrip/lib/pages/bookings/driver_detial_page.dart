@@ -3,13 +3,24 @@ import 'package:get/get.dart';
 import '../../model/user_model/driver_model.dart';
 import '../../utils/app_colors.dart';
 
+// Import the adapter
+import 'driver_details_adapter.dart';
+
 class DriverDetailsPage extends StatelessWidget {
-  final DriverModel driver = Get.arguments;
+  // Use the adapter to safely get the driver model from arguments
+  final DriverModel driver;
   
-  DriverDetailsPage({Key? key}) : super(key: key);
+  DriverDetailsPage({Key? key}) 
+      : driver = DriverDetailsAdapter.fromArguments(Get.arguments),
+        super(key: key);
   
   @override
   Widget build(BuildContext context) {
+    // Make sure to safely access fields that might be empty
+    String nameInitial = driver.name.isNotEmpty ? driver.name[0].toUpperCase() : '?';
+    String displayName = driver.name.isNotEmpty ? driver.name : 'Unknown Driver';
+    String displayPhone = driver.phone != 0 ? driver.phone.toString() : 'Not available';
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Driver Details'),
@@ -33,7 +44,7 @@ class DriverDetailsPage extends StatelessWidget {
                       radius: 60,
                       backgroundColor: AppColors.primary,
                       child: Text(
-                        driver.name.isNotEmpty ? driver.name[0].toUpperCase() : '?',
+                        nameInitial,
                         style: TextStyle(fontSize: 50, color: Colors.white),
                       ),
                     ),
@@ -51,22 +62,24 @@ class DriverDetailsPage extends StatelessWidget {
                         leading: Icon(Icons.person, color: AppColors.primary),
                         title: Text('Name'),
                         subtitle: Text(
-                          driver.name,
+                          displayName,
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                       Divider(),
                       
-                      // Driver phone
-                      ListTile(
-                        leading: Icon(Icons.phone, color: AppColors.primary),
-                        title: Text('Phone'),
-                        subtitle: Text(
-                          driver.phone.toString(),
-                          style: TextStyle(fontSize: 16),
+                      // Only show phone if it's available (not 0)
+                      if (driver.phone != 0) ...[
+                        ListTile(
+                          leading: Icon(Icons.phone, color: AppColors.primary),
+                          title: Text('Phone'),
+                          subtitle: Text(
+                            displayPhone,
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
-                      ),
-                      Divider(),
+                        Divider(),
+                      ],
                       
                       // Driver email (if available)
                       if (driver.email != null && driver.email!.isNotEmpty) ...[
@@ -110,30 +123,32 @@ class DriverDetailsPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Logic to call the driver
-                      Get.snackbar(
-                        'Call Driver',
-                        'Calling ${driver.name}',
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                      );
-                    },
-                    icon: Icon(Icons.call),
-                    label: Text('Call'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  // Only show the call button if phone is available
+                  if (driver.phone != 0)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Logic to call the driver
+                        Get.snackbar(
+                          'Call Driver',
+                          'Calling ${displayName}',
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      },
+                      icon: Icon(Icons.call),
+                      label: Text('Call'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      ),
                     ),
-                  ),
                   
                   ElevatedButton.icon(
                     onPressed: () {
                       // Logic to send message to the driver
                       Get.snackbar(
                         'Message Driver',
-                        'Opening chat with ${driver.name}',
+                        'Opening chat with ${displayName}',
                         backgroundColor: Colors.blue,
                         colorText: Colors.white,
                       );
@@ -160,7 +175,7 @@ class DriverDetailsPage extends StatelessWidget {
                     Get.back();
                     Get.snackbar(
                       'Driver Selected',
-                      'You have selected ${driver.name} for this booking',
+                      'You have selected ${displayName} for this booking',
                       backgroundColor: Colors.green,
                       colorText: Colors.white,
                     );

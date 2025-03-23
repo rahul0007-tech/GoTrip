@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from .models import Booking, Location
 from users.models import Passenger, Driver
-from .serializers import AvailableBookingSerializer, CreateBookingSerializer, LocationSerializer, ShowBookingLocationSerializer, DriverSerializer
+from .serializers import AvailableBookingSerializer, CreateBookingSerializer, ShowBookingLocationSerializer, DriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -134,7 +134,7 @@ class GetAcceptedDriversView(APIView):
             if drivers.exists():  # Only include bookings that have accepted drivers
                 driver_serializer = DriverSerializer(drivers, many=True)
                 # pickup_location_serializer = LocationSerializer(booking.pickup_location)
-                dropoff_location_serializer = LocationSerializer(booking.dropoff_location)
+                dropoff_location_serializer = ShowBookingLocationSerializer(booking.dropoff_location)
                 result.append({
                     "booking_id": booking.id,
                     "pickup_location": booking.pickup_location,
