@@ -50,19 +50,18 @@ class AcceptedDriversController extends GetxController {
             final fare = bookingData['fare'];
             final bookingFor = DateTime.parse(bookingData['booking_for']);
             
-            // Extract drivers - Check the structure of accepted_drivers
+            // Extract drivers with IDs - Update to include the ID
             final List<dynamic> driversData = bookingData['accepted_drivers'];
             final List<DriverModel> drivers = [];
             
             for (var driverData in driversData) {
-              // Create a driver model with available data
-              // Since the API only returns name, we'll create a minimal driver object
+              // Updated to include driver ID from the response
               drivers.add(
                 DriverModel(
-                  id: 0, // We don't have driver ID in the response, assign a default
+                  id: driverData['id'] ?? 0, // Get driver ID from response
                   name: driverData['name'],
-                  phone: 0, // We don't have phone in the response, assign a default
-                  email: null,
+                  phone: driverData['phone'] ?? 0, // Get phone if available
+                  email: driverData['email'], // Get email if available
                   status: null,
                   photo: null,
                 ),
@@ -103,23 +102,23 @@ class AcceptedDriversController extends GetxController {
     }
   }
   
-  // Method to select a driver for a booking
-  Future<void> selectDriver(int bookingId, String driverName) async {
+  // Method to select a driver for a booking - Updated to send driver_id
+  Future<void> selectDriver(int bookingId, int driverId) async {
     try {
       isLoading(true);
       
-      // Since we don't have the driver ID, we'll send the driver name
+      // Updated to send driver_id matching the API requirements
       final response = await httpClient.post(
-        '/api/passengers/bookings/select-driver/',
+        '/bookings/select-driver/',
         data: {
           'booking_id': bookingId,
-          'driver_name': driverName,
+          'driver_id': driverId,
         },
       );
       
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['status'] == 'success') {
+        if (data['status'] == 'success' || data['message'] == 'Driver selected successfully') {
           Get.snackbar(
             'Success',
             'Driver selected successfully',
@@ -131,7 +130,7 @@ class AcceptedDriversController extends GetxController {
         } else {
           Get.snackbar(
             'Error',
-            data['message'] ?? 'Failed to select driver',
+            data['message'] ?? data['error'] ?? 'Failed to select driver',
             snackPosition: SnackPosition.BOTTOM,
           );
         }
@@ -143,6 +142,7 @@ class AcceptedDriversController extends GetxController {
         );
       }
     } catch (e) {
+      print(e);
       Get.snackbar(
         'Error',
         'An error occurred: ${e.toString()}',

@@ -237,4 +237,24 @@ class GetAvailableBookingView(APIView):
             'message': 'Available bookings retrieved successfully',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+    
+class CancelBookingView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self, request):
+        user = request.user
+
+        passenger = get_object_or_404(Passenger, id=user.id)
+
+        if not passenger:
+            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        booking_id = request.data.get('booking_id')
+        if not booking_id:
+            return Response({'error': 'Booking ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        booking = get_object_or_404(Booking, id=booking_id)
+        # booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
+        # booking = Booking.objects.all()
+        if not booking:
+            return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_400_BAD_REQUEST)
 

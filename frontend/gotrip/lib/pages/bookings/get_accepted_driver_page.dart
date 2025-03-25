@@ -184,12 +184,14 @@ class AcceptedDriversPage extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
-                    // Don't show phone if we don't have it
-                    // SizedBox(height: 4),
-                    // Text(
-                    //   'Phone: ${driver.phone}',
-                    //   style: TextStyle(color: Colors.grey[600]),
-                    // ),
+                    // Show phone if available
+                    if (driver.phone != 0 && driver.phone != null) ...[
+                      SizedBox(height: 4),
+                      Text(
+                        'Phone: ${driver.phone}',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -223,7 +225,8 @@ class AcceptedDriversPage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Get.back();
-              controller.selectDriver(bookingId, driver.name);
+              // Pass driver ID instead of driver name
+              controller.selectDriver(bookingId, driver.id);
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text('Confirm'),

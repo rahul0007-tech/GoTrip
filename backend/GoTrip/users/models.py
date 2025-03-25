@@ -73,28 +73,28 @@ class Driver(User):
         verbose_name = 'driver'
         verbose_name_plural = 'drivers'
 
-class Vehicle(models.Model):
-    VEHICLE_TYPES = [
-        ('Suv', 'SUV'),
-        ('Sedan', 'Sedan'),
-        ('Hatchback', 'Hatchback'),
-        ('4X4', '4X4'),
-        ('PickUp', 'Pickup')
-    ]
+# class Vehicle(models.Model):
+#     VEHICLE_TYPES = [
+#         ('Suv', 'SUV'),
+#         ('Sedan', 'Sedan'),
+#         ('Hatchback', 'Hatchback'),
+#         ('4X4', '4X4'),
+#         ('PickUp', 'Pickup')
+#     ]
     
-    FUEL_TYPES = [
-        ('Diesel', 'Diesel'),
-        ('Petrol', 'Petrol'),
-        ('Electric', 'Electric')
-    ]
+#     FUEL_TYPES = [
+#         ('Diesel', 'Diesel'),
+#         ('Petrol', 'Petrol'),
+#         ('Electric', 'Electric')
+#     ]
     
-    driver = models.OneToOneField(Driver, on_delete=models.CASCADE, related_name='vehicle')
-    vehicle_color = models.CharField(max_length=30)
-    vehicle_company = models.CharField(max_length=50)
-    vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES)
-    vehicle_fuel_type = models.CharField(max_length=20, choices=FUEL_TYPES)
-    vehicle_number = models.CharField(max_length=20)
-    sitting_capacity = models.IntegerField()
+#     driver = models.OneToOneField(Driver, on_delete=models.CASCADE, related_name='vehicle')
+#     vehicle_color = models.CharField(max_length=30)
+#     vehicle_company = models.CharField(max_length=50)
+#     vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES)
+#     vehicle_fuel_type = models.CharField(max_length=20, choices=FUEL_TYPES)
+#     vehicle_number = models.CharField(max_length=20)
+#     sitting_capacity = models.IntegerField()
 
-    def __str__(self):
-        return f"{self.vehicle_company} - {self.vehicle_number}"
+#     def __str__(self):
+#         return f"{self.vehicle_company} - {self.vehicle_number}"
