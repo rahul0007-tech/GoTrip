@@ -1,0 +1,296 @@
+import 'dart:io';
+import 'package:dio/dio.dart' as dio;  // Using 'as dio' to namespace
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import '../model/vehicle_model.dart';
+import '../network/http_client.dart';
+
+class AddVehicleController extends GetxController {
+  // Form key and controllers
+  final formKey = GlobalKey<FormState>();
+  final vehicleColorController = TextEditingController();
+  final vehicleCompanyController = TextEditingController();
+  final vehicleNumberController = TextEditingController();
+  final sittingCapacityController = TextEditingController();
+  
+  // Observables for UI state
+  var isLoading = false.obs;
+  var errorMessage = ''.obs;
+  
+  // Dropdown data
+  var vehicleTypes = <VehicleTypeModel>[].obs;
+  var fuelTypes = <FuelTypeModel>[].obs;
+  
+  // Selected values
+  var selectedVehicleTypeId = RxnInt();
+  var selectedFuelTypeId = RxnInt();
+  
+  // Vehicle images
+  var vehicleImages = <File>[].obs;
+  
+  // Storage for auth token
+  final box = GetStorage();
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchVehicleTypes();
+    fetchFuelTypes();
+  }
+  
+  @override
+  void onClose() {
+    vehicleColorController.dispose();
+    vehicleCompanyController.dispose();
+    vehicleNumberController.dispose();
+    sittingCapacityController.dispose();
+    super.onClose();
+  }
+  
+  // Fetch vehicle types from API
+  Future<void> fetchVehicleTypes() async {
+    isLoading.value = true;
+    errorMessage.value = '';
+    
+    try {
+      final response = await httpClient.get('/vehicle-types/');
+      
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        vehicleTypes.value = data
+            .map((type) => VehicleTypeModel.fromJson(type))
+            .toList();
+        
+        if (vehicleTypes.isNotEmpty) {
+          selectedVehicleTypeId.value = vehicleTypes[0].id;
+        }
+      } else {
+        errorMessage.value = 'Failed to load vehicle types';
+        Get.snackbar(
+          'Error',
+          errorMessage.value,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
+    } on dio.DioException catch (e) {  // Using namespaced DioException
+      print("DioError: ${e.message}");
+      errorMessage.value = 'An error occurred while fetching vehicle types.';
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("Unexpected Error: $e");
+      errorMessage.value = 'An unexpected error occurred.';
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  // Fetch fuel types from API
+  Future<void> fetchFuelTypes() async {
+    isLoading.value = true;
+    errorMessage.value = '';
+    
+    try {
+      final response = await httpClient.get('/fuel-types/');
+      
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        fuelTypes.value = data
+            .map((type) => FuelTypeModel.fromJson(type))
+            .toList();
+        
+        if (fuelTypes.isNotEmpty) {
+          selectedFuelTypeId.value = fuelTypes[0].id;
+        }
+      } else {
+        errorMessage.value = 'Failed to load fuel types';
+        Get.snackbar(
+          'Error',
+          errorMessage.value,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
+    } on dio.DioException catch (e) {  // Using namespaced DioException
+      print("DioError: ${e.message}");
+      errorMessage.value = 'An error occurred while fetching fuel types.';
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("Unexpected Error: $e");
+      errorMessage.value = 'An unexpected error occurred.';
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  // Pick images from gallery or camera
+  Future<void> pickImages() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage();
+      
+      if (images.isNotEmpty) {
+        // Convert XFile to File and add to list
+        final files = images.map((xfile) => File(xfile.path)).toList();
+        vehicleImages.addAll(files);
+      }
+    } catch (e) {
+      print("Error picking images: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to pick images',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    }
+  }
+  
+  // Remove an image
+  void removeImage(int index) {
+    if (index >= 0 && index < vehicleImages.length) {
+      vehicleImages.removeAt(index);
+    }
+  }
+  
+  // Submit vehicle
+  Future<void> submitVehicle() async {
+    if (!formKey.currentState!.validate()) return;
+    
+    isLoading.value = true;
+    errorMessage.value = '';
+    
+    try {
+      // Create a map of fields first
+      Map<String, dynamic> fields = {
+        'vehicle_color': vehicleColorController.text,
+        'vehicle_company': vehicleCompanyController.text,
+        'vehicle_type': selectedVehicleTypeId.value.toString(),
+        'vehicle_fuel_type': selectedFuelTypeId.value.toString(),
+        'vehicle_number': vehicleNumberController.text,
+        'sitting_capacity': sittingCapacityController.text,
+      };
+      
+      // Create FormData with the fields using the dio namespace
+      var formData = dio.FormData.fromMap(fields);
+      
+      // Add images if any
+      for (var i = 0; i < vehicleImages.length; i++) {
+        formData.files.add(
+          MapEntry(
+            'uploaded_images', 
+            await dio.MultipartFile.fromFile(
+              vehicleImages[i].path,
+              filename: 'image_$i.jpg',
+            ),
+          ),
+        );
+      }
+      
+      // Send request
+      final response = await httpClient.post(
+        '/add-vehicle/',
+        data: formData,
+        options: dio.Options(  // Using namespaced Options
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+      
+      if (response.statusCode == 201) {
+        if (response.data['status'] == 'success') {
+          // Clear form and return to previous screen
+          clearForm();
+          Get.back(result: true);
+          Get.snackbar(
+            'Success',
+            response.data['message'] ?? 'Vehicle added successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        } else {
+          throw response.data['message'] ?? 'Unknown error occurred';
+        }
+      } else {
+        throw 'Failed to add vehicle: ${response.statusCode}';
+      }
+    } on dio.DioException catch (e) {  // Using namespaced DioException
+      print("DioError: ${e.message}");
+      String errorMsg = 'An error occurred while adding the vehicle.';
+      
+      if (e.response?.data is Map) {
+        final data = e.response!.data as Map;
+        if (data.containsKey('message')) {
+          errorMsg = data['message'].toString();
+        } else if (data.containsKey('error')) {
+          errorMsg = data['error'].toString();
+        } else if (data.containsKey('errors')) {
+          errorMsg = data['errors'].toString();
+        }
+      }
+      
+      errorMessage.value = errorMsg;
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("Unexpected Error: $e");
+      errorMessage.value = 'An unexpected error occurred.';
+      Get.snackbar(
+        'Error',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  // Clear form
+  void clearForm() {
+    vehicleColorController.clear();
+    vehicleCompanyController.clear();
+    vehicleNumberController.clear();
+    sittingCapacityController.clear();
+    vehicleImages.clear();
+    formKey.currentState?.reset();
+  }
+}

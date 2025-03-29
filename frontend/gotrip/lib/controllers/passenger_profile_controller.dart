@@ -6,6 +6,8 @@ import 'package:gotrip/network/http_client.dart';
 
 class ProfileController extends GetxController {
 
+  final box = GetStorage();
+
   var username = ''.obs;
   var email = ''.obs;
   var phone = ''.obs;

@@ -1,144 +1,57 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.permissions import IsAuthenticated
+
+from goTrip.users.models import Driver
+from .serializers import AddVehicleSerializer
 from django.shortcuts import get_object_or_404
-from .models import Vehicle, VehicleImage, VehicleType, FuelType
-from .serializers import VehicleSerializer, VehicleImageSerializer, VehicleTypeSerializer, FuelTypeSerializer
-
-class VehicleTypeListCreateAPIView(APIView):
-    def get(self, request):
-        vehicle_types = VehicleType.objects.all()
-        serializer = VehicleTypeSerializer(vehicle_types, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = VehicleTypeSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class VehicleTypeDetailAPIView(APIView):
-    def get_object(self, pk):
-        return get_object_or_404(VehicleType, pk=pk)
+# class AddVehicleView(APIView):
+#     permission_classes = [IsAuthenticated]
     
-    def get(self, request, pk):
-        vehicle_type = self.get_object(pk)
-        serializer = VehicleTypeSerializer(vehicle_type)
-        return Response(serializer.data)
-    
-    def put(self, request, pk):
-        vehicle_type = self.get_object(pk)
-        serializer = VehicleTypeSerializer(vehicle_type, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk):
-        vehicle_type = self.get_object(pk)
-        vehicle_type.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     def post(self, request):
+#         serializer = AddVehicleSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # Auto-assign driver if user is a driver
+#             if hasattr(request.user, 'driver'):
+#                 vehicle = serializer.save(driver=request.user.driver)
+#             else:
+#                 return Response(
+#                     {"error": "Only drivers can add vehicles"}, 
+#                     status=status.HTTP_403_FORBIDDEN
+#                 )
+                
+#             return Response(
+#                 {"id": vehicle.id, "message": "Vehicle added successfully"}, 
+#                 status=status.HTTP_201_CREATED
+#             )
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FuelTypeListCreateAPIView(APIView):
-    def get(self, request):
-        fuel_types = FuelType.objects.all()
-        serializer = FuelTypeSerializer(fuel_types, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = FuelTypeSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class FuelTypeDetailAPIView(APIView):
-    def get_object(self, pk):
-        return get_object_or_404(FuelType, pk=pk)
-    
-    def get(self, request, pk):
-        fuel_type = self.get_object(pk)
-        serializer = FuelTypeSerializer(fuel_type)
-        return Response(serializer.data)
-    
-    def put(self, request, pk):
-        fuel_type = self.get_object(pk)
-        serializer = FuelTypeSerializer(fuel_type, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk):
-        fuel_type = self.get_object(pk)
-        fuel_type.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class VehicleListCreateAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser, JSONParser)
-    
-    def get(self, request):
-        vehicles = Vehicle.objects.all()
-        serializer = VehicleSerializer(vehicles, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = VehicleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class VehicleDetailAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser, JSONParser)
-    
-    def get_object(self, pk):
-        return get_object_or_404(Vehicle, pk=pk)
-    
-    def get(self, request, pk):
-        vehicle = self.get_object(pk)
-        serializer = VehicleSerializer(vehicle)
-        return Response(serializer.data)
-    
-    def put(self, request, pk):
-        vehicle = self.get_object(pk)
-        serializer = VehicleSerializer(vehicle, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk):
-        vehicle = self.get_object(pk)
-        vehicle.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class VehicleImageUploadAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    
-    def post(self, request, pk):
-        vehicle = get_object_or_404(Vehicle, pk=pk)
-        files = request.FILES.getlist('images')
+    # def post(self, request):
+    #     user = request.user
         
-        if not files:
-            return Response({'error': 'No images provided'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        images = []
-        for file in files:
-            image = VehicleImage.objects.create(vehicle=vehicle, image=file)
-            images.append(image)
-        
-        serializer = VehicleImageSerializer(images, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     passenger = get_object_or_404(Passenger, id=user.id)  
+
+    #     serializer = CreateBookingSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         booking = serializer.save(passenger=passenger)
+    #         booking_data = CreateBookingSerializer(booking).data
+    #         return Response({"message": "Booking created successfully", "data": booking_data}, status=200)
+
+    #     return Response(serializer.errors, status=400)
+
+
+class AddVehicle(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        driver = get_object_or_404(Driver, id= user.id)
+        serializer = AddVehicleSerializer(data = request.data)
+        if serializer.is_valid():
+            vehicle = serializer.save(driver=driver)
+            vehicle_data = AddVehicleSerializer(vehicle).data
+            return Response({"status":"success", "message":"Vahicle Added Successfully", "data":vehicle_data})
