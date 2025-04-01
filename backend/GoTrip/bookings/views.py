@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.utils import timezone
 
 
 
@@ -207,6 +208,11 @@ class SelectDriverView(APIView):
 
         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
         selected_driver = get_object_or_404(Driver, id=driver_id)
+
+        
+        if booking.booking_for < timezone.now().date():
+            return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
 
         if selected_driver not in booking.accepted_drivers.all():
             return Response({'error': 'This driver has not accepted the booking'}, status=status.HTTP_400_BAD_REQUEST)

@@ -33,9 +33,9 @@ class AddVehicleSerializer(serializers.ModelSerializer):
 class ShowFuelTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FuelType
-        fields = ['name']
+        fields = ['id', 'name', 'display_name']
 
 class ShowVehicleTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleType
-        fields = ['name']
+        fields = ['id', 'name', 'display_name']
