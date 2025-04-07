@@ -164,6 +164,11 @@ class PasswordResetSerializer(serializers.Serializer):
         except DjangoUnicodeDecodeError as identifier:
             PasswordResetTokenGenerator().check_token(user,token)
             raise ValidationError('Token is not Valid or Expired')
+        
+class DriverDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = ['id', 'email', 'name', 'phone','status']
 
 
  

@@ -41,6 +41,15 @@ class Booking(models.Model):
         ],
         default='pending'
     )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('confirmed', 'Confirmed'),
+            ('canceled', 'Canceled')
+        ],
+        default='pending'
+    )
     accepted_drivers = models.ManyToManyField('users.Driver', related_name='accepted_bookings', blank=True)
     fare = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Actual fare for this booking
     booking_for = models.DateField()

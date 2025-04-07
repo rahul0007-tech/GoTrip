@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.utils import timezone
+from payments.models import Payment, OrderStatus
 
 
 
@@ -193,11 +194,81 @@ class GetAcceptedDriversView(APIView):
 
 
 
+# class SelectDriverView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         user = request.user
+#         passenger = get_object_or_404(Passenger, id = user.id)
+#         if not passenger:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+#         booking_id = request.data.get('booking_id')
+#         driver_id = request.data.get('driver_id')
+
+#         if not booking_id or not driver_id:
+#             return Response({'error': 'Booking ID and Driver ID are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
+#         selected_driver = get_object_or_404(Driver, id=driver_id)
+
+        
+#         if booking.booking_for < timezone.now().date():
+#             return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
+#                           status=status.HTTP_400_BAD_REQUEST)
+
+#         if selected_driver not in booking.accepted_drivers.all():
+#             return Response({'error': 'This driver has not accepted the booking'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         booking.driver = selected_driver
+#         booking.status = 'confirmed'
+#         booking.save()
+
+#         return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)        
+
+
+# class SelectDriverView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         user = request.user
+#         passenger = get_object_or_404(Passenger, id=user.id)
+#         if not passenger:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+#         booking_id = request.data.get('booking_id')
+#         driver_id = request.data.get('driver_id')
+
+#         if not booking_id or not driver_id:
+#             return Response({'error': 'Booking ID and Driver ID are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
+        
+
+#         payment = Payment.objects.filter(booking=booking, status=OrderStatus.COMPLETED).first()
+        
+#         if not payment:
+#             return Response({'error': 'Payment is required before selecting a driver', 'payment_required': True}, 
+#                           status=status.HTTP_400_BAD_REQUEST)
+        
+#         selected_driver = get_object_or_404(Driver, id=driver_id)
+        
+#         if booking.booking_for < timezone.now().date():
+#             return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
+#                           status=status.HTTP_400_BAD_REQUEST)
+
+#         if selected_driver not in booking.accepted_drivers.all():
+#             return Response({'error': 'This driver has not accepted the booking'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         booking.driver = selected_driver
+#         booking.status = 'confirmed'
+#         booking.save()
+
+#         return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)
+
+
+
 class SelectDriverView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         user = request.user
-        passenger = get_object_or_404(Passenger, id = user.id)
+        passenger = get_object_or_404(Passenger, id=user.id)
         if not passenger:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
         booking_id = request.data.get('booking_id')
@@ -207,8 +278,20 @@ class SelectDriverView(APIView):
             return Response({'error': 'Booking ID and Driver ID are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
+        
+        # Check if payment is completed for this booking
+        from payments.models import Payment, OrderStatus
+        payment = Payment.objects.filter(
+            user=user, 
+            status=OrderStatus.COMPLETED,
+            response_data__booking_id=booking_id
+        ).first()
+        
+        if not payment:
+            return Response({'error': 'Payment is required before selecting a driver', 'payment_required': True}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+        
         selected_driver = get_object_or_404(Driver, id=driver_id)
-
         
         if booking.booking_for < timezone.now().date():
             return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
@@ -221,8 +304,7 @@ class SelectDriverView(APIView):
         booking.status = 'confirmed'
         booking.save()
 
-        return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)        
-
+        return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)
 
 class GetAvailableBookingView(APIView):
     permission_classes = [IsAuthenticated]
@@ -262,5 +344,11 @@ class CancelBookingView(APIView):
         # booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
         # booking = Booking.objects.all()
         if not booking:
-            return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_40ehi0_BAD_REQUEST)
+        
+
+
+        
+                
+
 

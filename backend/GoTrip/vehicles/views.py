@@ -2,10 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from users.models import Driver
-from .serializers import AddVehicleSerializer, ShowVehicleTypeSerializer, ShowFuelTypeSerializer
+from users.models import Driver, Passenger
+from .serializers import AddVehicleSerializer, ShowVehicleTypeSerializer, ShowFuelTypeSerializer, DriverWithVehicleSerializer
 from django.shortcuts import get_object_or_404
-from .models import FuelType, VehicleType
+from .models import FuelType, VehicleType, Vehicle
 
 
 class AddVehicleView(APIView):
@@ -67,40 +67,60 @@ class ShowVehicleTypeView(APIView):
             return Response({"error":"failed", "message":"No such vehicle found"})
         serializer = ShowVehicleTypeSerializer(vehicle_type, many=True)
         return Response({"status":"success", "message":"Vehicle Type Fetched Successfully", "data":serializer.data})
-    # def get(self, request):
-    #     user = request.user
-    #     try:
-    #         driver = Driver.objects.get(user=user)  # Change this line
-    #         # Instead of get_object_or_404(Driver, id=user.id)
-            
-    #         vehicle_type = VehicleType.objects.all()
-    #         serializer = ShowVehicleTypeSerializer(vehicle_type, many=True)
-    #         return Response({"status":"success", "message":"Vehicle Type Fetched Successfully", "data":serializer.data})
-    #     except Driver.DoesNotExist:
-    #         return Response({'error':'Driver not found for this user'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class GetVehiclesCategoryView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        user = request.user
+        passenger = get_object_or_404(Passenger, id=user.id)
+        vehicle_type = VehicleType.objects
+        if not passenger:
+            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        if not vehicle_type.exists():
+            return Response({"message":"Sorry No vehicles found"})
+        serializer = ShowVehicleTypeSerializer(vehicle_type, many=True)
+        return Response({"status":"success", "data":{"vehicle_type":serializer.data}, "message":"vehicle Fetched Successfully"})
+    
+
+class GetDriversByVehicleTypeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):  # Use POST instead of GET
+        # Retrieve vehicle_type_id from the body
+        vehicle_type_id = request.data.get('vehicle_type_id')
+
+        if not vehicle_type_id:
+            return Response({"error": "Vehicle type ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the authenticated user
+        user = request.user
+
+        # Fetch the passenger object associated with the user
+        passenger = get_object_or_404(Passenger, id=user.id)
+
+        if not passenger:
+            return Response({'error': 'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the vehicle type exists
+        vehicle_type = get_object_or_404(VehicleType, id=vehicle_type_id)
+
+        # Retrieve all vehicles that match the vehicle type
+        vehicles = Vehicle.objects.filter(vehicle_type=vehicle_type)
+
+        if not vehicles.exists():
+            return Response({"message": "No drivers found for this vehicle type."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the drivers associated with these vehicles
+        drivers = [vehicle.driver for vehicle in vehicles]  # Retrieve the driver for each vehicle
+
+        # Serialize the driver details
+        serializer = DriverWithVehicleSerializer(drivers, many=True)
+
+        return Response({
+            "status": "success",
+            "data": serializer.data,
+            "message": "Drivers fetched successfully"
+        })
         
-
-
-# class ShowBookingLocationView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get (self, request):
-#         try:
-#             location = Location.objects.filter(is_active=True)
-#             if not location.exists():
-#                 return Response({"status":"failed", "message":"No such location found" })
-#             serializer = ShowBookingLocationSerializer(location, many=True)
-            
-#             # Return the serialized data
-#             return Response(serializer.data, status=200)
-
         
-#         except Exception as e:
-#             # Log the error for debugging
-#             print(f"Error fetching locations: {str(e)}")
-            
-#             # Return an error response
-#             return Response(
-#                 {"message": f"An error occurred while fetching locations: {str(e)}"},
-#                 status=500
-#             )

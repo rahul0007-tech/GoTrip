@@ -29,8 +29,8 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('id','passenger', 'dropoff_location', 'booking_for', 'pickup_location', 'fare', 'status', 'created_at')
-    list_filter = ('status', 'dropoff_location', 'booking_for')
+    list_display = ('id','passenger', 'dropoff_location', 'booking_for', 'pickup_location', 'fare', 'status', 'created_at', 'payment_status')
+    list_filter = ('status', 'dropoff_location', 'booking_for', 'payment_status')
     search_fields = ('passenger__user__username', 'driver__user__username', 'pickup_location')
     readonly_fields = ('created_at', 'updated_at')
     raw_id_fields = ('passenger', 'driver', 'accepted_drivers')

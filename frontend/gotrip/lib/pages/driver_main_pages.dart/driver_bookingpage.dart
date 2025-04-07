@@ -22,14 +22,6 @@ class DriverBookingsPage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Redirect to the Accept Booking page
-                Get.toNamed('/accept_booking_page');
-              },
-              child: Text('Accept Booking'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
                 // Redirect to the Available Booking page
                 Get.toNamed('/get_booking'); // Navigate to the AvailableBookingPage
               },

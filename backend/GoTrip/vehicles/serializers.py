@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Vehicle, VehicleImage, FuelType, VehicleType
+from users.models import Driver
 
 class AddVehicleSerializer(serializers.ModelSerializer):
     uploaded_images = serializers.ListField(
@@ -39,3 +40,15 @@ class ShowVehicleTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleType
         fields = ['id', 'name', 'display_name']
+
+
+class VehicleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vehicle
+        fields = ['vehicle_color', 'vehicle_company', 'vehicle_number', 'sitting_capacity', 'vehicle_type', 'vehicle_fuel_type']
+
+class DriverWithVehicleSerializer(serializers.ModelSerializer):
+    vehicle=VehicleSerializer()
+    class Meta:
+        model = Driver
+        fields = ['id','name','vehicle']

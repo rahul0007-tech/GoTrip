@@ -6,6 +6,7 @@ import 'package:gotrip/bindings/add_vehicle_binding.dart';
 import 'package:gotrip/bindings/create_booking_binding.dart';
 import 'package:gotrip/bindings/get_accpeted_driver_binding.dart';
 import 'package:gotrip/bindings/get_booking_binding.dart';
+import 'package:gotrip/bindings/khalti_payment_binding.dart';
 
 import 'package:gotrip/bindings/passenger_login_binding.dart';
 import 'package:gotrip/bindings/driver_login_binding.dart';
@@ -58,12 +59,16 @@ class AppPages {
     GetPage(name: '/driver_profile', page: () => DriverProfilepage(), binding: DriverProfileBinding(),),
     GetPage(name: '/change_password', page: () => ChangePasswordPage(), binding: ChangePasswordBinding(),),
     GetPage(name: '/create_booking_page', page: ()=> CreateBookingPage(),binding: CreateBookingBinding()),
-    GetPage(name: '/accept_booking', page: () => AcceptBookingPage(), binding: AcceptBookingBinding(),),
+    GetPage(name: '/accept_booking', page: () => AcceptBookingPage(
+
+    ), binding: AcceptBookingBinding(),),
     GetPage(name: '/get_booking', page: () => AvailableBookingPage(), binding: AvailableBookingBinding(),),
     // GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
     // GetPage(name: '/driver_details', page: () => DriverDetailsPage(),),
     GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
     GetPage(name: '/add_vehicle', page: () => const AddVehiclePage(), binding: AddVehicleBinding()),
+    
+
   ];
 }
 
