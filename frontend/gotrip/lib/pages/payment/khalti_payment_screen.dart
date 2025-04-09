@@ -1,170 +1,10 @@
-// import 'package:flutter/material.dart';
-// import 'package:gotrip/controllers/khalti_payment_controller.dart';
-// import 'package:khalti_checkout_flutter/khalti_checkout_flutter.dart';
-// import 'dart:developer';
-
-
-// class KhaltiSDKDemo extends StatefulWidget {
-
-  
-
-  
-//  KhaltiSDKDemo({super.key});
-
-//   @override
-//   State<KhaltiSDKDemo> createState() => _KhaltiSDKDemoState();
-// }
-
-// class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
-
-  
-  
-//   PaymentResult? paymentResult;
-//   late Future<Khalti?>
-//       khaltiFuture; // Future to initialize Khalti SDK asynchronously
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Access pidx from the MembershipProvider state and initialize Khalti SDK
-   
-//   }
-
-//   void initializeKhalti(){}
-
-
-//   // Initialize Khalti SDK
-//   Future<Khalti?> _initializeKhalti() async {
-//     // if (pidx.isEmpty) {
-//     //   return null;
-//     // }
-
-//     // final payConfig = KhaltiPayConfig(
-//     //   publicKey:
-//     //       '7c631d753a7a499f954a1498abfd0b86', // Replace with your actual live public key
-//     //   pidx: pidx,
-//     //   environment: Environment.test, // Can be Environment.prod for live
-//     // );
-
-//     // final khalti = Khalti.init(
-//     //   enableDebugging: true,
-//     //   payConfig: payConfig,
-//     //   onPaymentResult: (paymentResult, khalti) {
-//     //     log(paymentResult.toString());
-//     //     setState(() {
-//     //       this.paymentResult = paymentResult;
-//     //     });
-//     //     print(paymentResult);
-//     //     if (paymentResult.payload?.status == 'Completed') {
-//     //       final provider =
-//     //           Provider.of<MembershipProvider>(context, listen: false);
-//     //       provider.verifyPayment(context, transactionId, "Completed");
-//     //       showCoolSnackBar(context, "Payment Successful", true);
-//     //     } else {
-//     //       showCoolSnackBar(context, "Payment Failed", false);
-//     //     }
-
-//     //     khalti.close(context);
-//     //   },
-//     //   onMessage: (
-//     //     khalti, {
-//     //     description,
-//     //     statusCode,
-//     //     event,
-//     //     needsPaymentConfirmation,
-//     //   }) async {
-//     //     log(
-//     //       'Description: $description, Status Code: $statusCode, Event: $event, NeedsPaymentConfirmation: $needsPaymentConfirmation',
-//     //     );
-//     //     khalti.close(context);
-//     //   },
-//     //   onReturn: () => log('Successfully redirected to return_url.'),
-//     // );
-
-//     // return khalti; // Return the khalti instance to be used in the FutureBuilder
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: FutureBuilder<Khalti?>(
-//           future: khaltiFuture, // The FutureBuilder now uses khaltiFuture
-//           initialData: null,
-//           builder: (context, snapshot) {
-//             if (snapshot.connectionState == ConnectionState.waiting) {
-//               return const CircularProgressIndicator.adaptive();
-//             } else if (snapshot.hasError) {
-//               return Text('Error: ${snapshot.error}');
-//             } else if (snapshot.hasData) {
-//               final khaltiInstance = snapshot.data;
-
-//               return Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Image.asset(
-//                     'assets/images/profile/default_avatar.jpg', // Your image asset
-
-//                     height: 200,
-//                     width: 200,
-//                   ),
-//                   const SizedBox(height: 120),
-//                   Text(
-//                     // replace with actual price
-//                     'payable amount',
-//                     style: const TextStyle(fontSize: 25),
-//                   ),
-//                   const Text('1 day fee'),
-//                   OutlinedButton(
-//                     onPressed: () {
-//                       // Open Khalti payment page
-//                       khaltiInstance?.open(context);
-//                     },
-//                     child: const Text('Pay with Khalti'),
-//                   ),
-//                   const SizedBox(height: 120),
-//                   paymentResult == null
-//                       ? Text(
-//                           'pidx: pidx',
-//                           style: const TextStyle(fontSize: 15),
-//                         )
-//                       : Column(
-//                           children: [
-//                             Text('pidx: ${paymentResult!.payload?.pidx}'),
-//                             Text('Status: ${paymentResult!.payload?.status}'),
-//                             Text(
-//                                 'Amount Paid: ${paymentResult!.payload?.totalAmount}'),
-//                             Text(
-//                                 'Transaction ID: ${paymentResult!.payload?.transactionId}'),
-//                           ],
-//                         ),
-//                   const SizedBox(height: 120),
-//                   OutlinedButton(
-//                       onPressed: () {
-//                         // context.pushNamed('membershipPlans');
-//                       },
-//                       child: const Text('Go to Membership Sceen')),
-//                   const Text(
-//                     'Demo Payment Using Khalti.',
-//                     style: TextStyle(fontSize: 12),
-//                   ),
-//                 ],
-//               );
-//             } else {
-//               return const Text('No Khalti SDK data available.');
-//             }
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/controllers/khalti_payment_controller.dart';
+import 'package:gotrip/pages/driver_main_pages.dart/driver_homepage.dart';
 import 'package:khalti_checkout_flutter/khalti_checkout_flutter.dart';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 class KhaltiSDKDemo extends StatefulWidget {
   const KhaltiSDKDemo({super.key});
@@ -175,163 +15,320 @@ class KhaltiSDKDemo extends StatefulWidget {
 
 class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
   final KhaltiPaymentController controller = Get.find<KhaltiPaymentController>();
-  PaymentResult? paymentResult;
-  Future<Khalti?>? khaltiFuture; // Make nullable instead of late
   String? pidx;
   String? paymentId;
   double? amount;
+  PaymentResult? paymentResult;
+  Future<Khalti?>? khaltiFuture;
+  String debugInfo = ""; // Add a debug info string to track state
 
   @override
   void initState() {
     super.initState();
-    // Initialize data and Khalti in initState
-    _setupPaymentData();
+    _addDebug("initState called");
+    
+    // Access data from the controller and initialize Khalti SDK with a delay
+    // to ensure controller has time to load data
+    Future.delayed(Duration(milliseconds: 500), () {
+      _addDebug("Delayed initialization triggered");
+      _initializePaymentData();
+    });
   }
 
-  void _setupPaymentData() {
-    // Check if payment data is available
-    if (controller.payment.isNotEmpty) {
-      final paymentData = controller.payment.first;
+  // Add debug information
+  void _addDebug(String info) {
+    dev.log("KHALTI DEBUG: $info");
+    setState(() {
+      debugInfo += "• $info\n";
+    });
+    print("KHALTI DEBUG: $info"); // Also print to console for terminal debugging
+  }
+
+  void _initializePaymentData() {
+    try {
+      _addDebug("_initializePaymentData called");
+      _addDebug("Controller payment list length: ${controller.payment.length}");
       
-      setState(() {
-        // Get values from payment data
-        pidx = paymentData.pidx;
-        paymentId = paymentData.paymentId.toString();
-        amount = paymentData.amount.toDouble();
+      // Check if payment data is available in the controller
+      if (controller.payment.isNotEmpty) {
+        final paymentData = controller.payment.first;
+        _addDebug("Payment data found: PIDX=${paymentData.pidx}, ID=${paymentData.paymentId}, Amount=${paymentData.amount}");
         
-        // Now initialize khaltiFuture
-        khaltiFuture = _initializeKhalti();
-      });
-    } else {
-      // Show error if no payment data
+        setState(() {
+          // Get values from payment data
+          pidx = paymentData.pidx;
+          paymentId = paymentData.paymentId.toString();
+          amount = paymentData.amount.toDouble();
+          
+          // Initialize Khalti SDK
+          _addDebug("Initializing Khalti SDK with PIDX: $pidx");
+          khaltiFuture = _initializeKhalti();
+        });
+      } else {
+        _addDebug("No payment data found in controller");
+        
+        // Show error snackbar if no payment data is available
+        Get.snackbar(
+          'Error',
+          'Payment information not available. Please try again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        
+        // Navigate back after a short delay
+        Future.delayed(Duration(seconds: 2), () {
+          _addDebug("Navigating back due to missing payment data");
+          Get.close(1); // Close the current screen
+        });
+      }
+    } catch (e, stackTrace) {
+      _addDebug("ERROR in _initializePaymentData: $e");
+      _addDebug("Stack trace: $stackTrace");
+      
+      // Show error snackbar
       Get.snackbar(
         'Error',
-        'Payment information not available. Please try again.',
+        'Failed to initialize payment: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );
-      
-      // Navigate back after a short delay
-      Future.delayed(Duration(seconds: 2), () {
-        if (Get.isDialogOpen ?? false) {
-          Get.back();
-        }
-        Get.back();
-      });
     }
   }
 
   // Initialize Khalti SDK
   Future<Khalti?> _initializeKhalti() async {
-    if (pidx == null || pidx!.isEmpty) {
+    try {
+      _addDebug("_initializeKhalti called");
+      
+      if (pidx == null || pidx!.isEmpty) {
+        _addDebug("Invalid PIDX: ${pidx ?? 'null'}");
+        Get.snackbar(
+          'Error',
+          'Invalid payment token.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        return null;
+      }
+
+      _addDebug("Configuring Khalti with PIDX: $pidx");
+
+      // Use a try-catch inside the Future to catch any errors during initialization
+      try {
+        final payConfig = KhaltiPayConfig(
+          publicKey: '11d8ca6a221240deb98b99ee2b4ea4ac', // Replace with your actual public key
+          pidx: pidx!,
+          environment: Environment.test, // Can be Environment.prod for live
+        );
+
+        _addDebug("KhaltiPayConfig created successfully");
+
+        final khalti = Khalti.init(
+          enableDebugging: true,
+          payConfig: payConfig,
+          onPaymentResult: (paymentResult, khalti) {
+            _addDebug("onPaymentResult called with status: ${paymentResult.payload?.status}");
+            _addDebug("Full payment result: ${paymentResult.toString()}");
+            
+            setState(() {
+              this.paymentResult = paymentResult;
+            });
+            
+            if (paymentResult.payload?.status == 'Completed') {
+              _addDebug("Payment completed, verifying with backend");
+              // Verify payment with backend
+              if (pidx != null && paymentId != null) {
+                try {
+                  controller.verifyPayment(pidx!, paymentId!).then((_) {
+                    _addDebug("Payment verification completed");
+                  }).catchError((e) {
+                    _addDebug("Payment verification error: $e");
+                  });
+                } catch (e) {
+                  _addDebug("Error during payment verification: $e");
+                }
+              }
+              
+              // Show success snackbar
+              Get.snackbar(
+                'Success',
+                'Payment completed successfully!',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+              );
+            } else {
+              _addDebug("Payment not completed, status: ${paymentResult.payload?.status}");
+              // Show failure snackbar
+              Get.snackbar(
+                'Failed',
+                'Payment was not completed',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+              );
+            }
+
+            try {
+              _addDebug("Closing Khalti payment window");
+              khalti.close(context);
+            } catch (e) {
+              _addDebug("Error closing Khalti: $e");
+            }
+          },
+          onMessage: (
+            khalti, {
+            description,
+            statusCode,
+            event,
+            needsPaymentConfirmation,
+          }) async {
+            _addDebug("onMessage: Description=$description, StatusCode=$statusCode, Event=$event, NeedsConfirmation=$needsPaymentConfirmation");
+            
+            try {
+              khalti.close(context);
+            } catch (e) {
+              _addDebug("Error closing Khalti from onMessage: $e");
+            }
+          },
+          onReturn: () {
+            _addDebug("onReturn: Successfully redirected to return_url");
+          },
+        );
+
+        _addDebug("Khalti initialization successful");
+        return khalti;
+      } catch (e, stackTrace) {
+        _addDebug("ERROR during Khalti.init: $e");
+        _addDebug("Stack trace: $stackTrace");
+        return null;
+      }
+    } catch (e, stackTrace) {
+      _addDebug("OUTER ERROR in _initializeKhalti: $e");
+      _addDebug("Stack trace: $stackTrace");
       return null;
     }
-
-    print("Initializing Khalti with pidx: $pidx");
-
-    final payConfig = KhaltiPayConfig(
-      publicKey: '7c631d753a7a499f954a1498abfd0b86', // Replace with your actual public key
-      pidx: pidx!,
-      environment: Environment.test, // Change to Environment.prod for production
-    );
-
-    final khalti = Khalti.init(
-      enableDebugging: true,
-      payConfig: payConfig,
-      onPaymentResult: (paymentResult, khalti) {
-        log("Payment result: ${paymentResult.toString()}");
-        setState(() {
-          this.paymentResult = paymentResult;
-        });
-        
-        if (paymentResult.payload?.status == 'Completed') {
-          // Verify payment with backend
-          if (pidx != null && paymentId != null) {
-            controller.verifyPayment(pidx!, paymentId!);
-          }
-          _showSuccessSnackbar();
-        } else {
-          _showFailureSnackbar();
-        }
-
-        khalti.close(context);
-      },
-      onMessage: (
-        khalti, {
-        description,
-        statusCode,
-        event,
-        needsPaymentConfirmation,
-      }) async {
-        log(
-          'Description: $description, Status Code: $statusCode, Event: $event, NeedsPaymentConfirmation: $needsPaymentConfirmation',
-        );
-        khalti.close(context);
-      },
-      onReturn: () => log('Successfully redirected to return_url.'),
-    );
-
-    return khalti;
-  }
-
-  void _showSuccessSnackbar() {
-    Get.snackbar(
-      'Success', 
-      'Payment completed successfully!',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  void _showFailureSnackbar() {
-    Get.snackbar(
-      'Failed', 
-      'Payment was not completed',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Khalti Payment'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        return Center(
-          child: khaltiFuture == null
+Widget build(BuildContext context) {
+  // Log outside of the build method instead of inside Obx
+  print("KHALTI DEBUG: Building widget, khaltiFuture: ${khaltiFuture == null ? 'null' : 'initialized'}");
+  
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Khalti Payment'),
+      backgroundColor: Colors.deepPurple,
+      actions: [
+        // Add debug button to show debug info
+        IconButton(
+          icon: Icon(Icons.bug_report),
+          onPressed: () => _showDebugInfo(),
+        )
+      ],
+    ),
+    body: Obx(() {
+      // Don't call setState() inside build - use print instead of _addDebug
+      if (controller.isLoading.value) {
+        print("KHALTI DEBUG: UI in loading state");
+        return Center(child: CircularProgressIndicator());
+      }
+      
+      print("KHALTI DEBUG: UI building main content, khaltiFuture: ${khaltiFuture == null ? 'null' : 'initialized'}");
+      
+      return Center(
+        child: khaltiFuture == null
             ? _buildNoDataView()
             : FutureBuilder<Khalti?>(
                 future: khaltiFuture,
-                initialData: null,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
+                    print("KHALTI DEBUG: FutureBuilder waiting");
                     return const CircularProgressIndicator.adaptive();
                   } else if (snapshot.hasError) {
+                    print("KHALTI DEBUG: FutureBuilder error: ${snapshot.error}");
                     return _buildErrorView(snapshot.error.toString());
                   } else if (snapshot.hasData) {
+                    print("KHALTI DEBUG: FutureBuilder has data");
                     final khaltiInstance = snapshot.data;
                     return _buildPaymentView(khaltiInstance);
                   } else {
+                    print("KHALTI DEBUG: FutureBuilder no data");
                     return _buildNoDataView();
                   }
                 },
               ),
-        );
-      }),
+      );
+    }),
+  );
+}
+
+  void _showDebugInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Debug Information"),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Debug Log:", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  debugInfo,
+                  style: TextStyle(color: Colors.green, fontFamily: 'monospace'),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text("Payment Data:", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text("PIDX: ${pidx ?? 'null'}"),
+              Text("Payment ID: ${paymentId ?? 'null'}"),
+              Text("Amount: ${amount ?? 'null'}"),
+              SizedBox(height: 16),
+              Text("Controller State:", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text("Payment List Length: ${controller.payment.length}"),
+              Text("Error Message: ${controller.errorMessage.value.isEmpty ? 'none' : controller.errorMessage.value}"),
+              Text("Is Loading: ${controller.isLoading.value}"),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("Close"),
+          ),
+          TextButton(
+            onPressed: () {
+              // Copy debug info to clipboard
+              // (You would need to implement this)
+              Navigator.of(context).pop();
+              Get.snackbar(
+                'Debug',
+                'Debug info copied to clipboard',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            child: Text("Copy"),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildNoDataView() {
+    _addDebug("Building no data view");
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -349,14 +346,29 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
             'Please try again or contact support if the issue persists.',
             textAlign: TextAlign.center,
           ),
+          SizedBox(height: 10),
+          Text(
+            'Debug: ${controller.payment.length} payment(s), PIDX: ${pidx ?? "null"}',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
           SizedBox(height: 30),
           ElevatedButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.close(1),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
             ),
             child: Text('Go Back'),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () => _initializePaymentData(), // Retry button
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+            ),
+            child: Text('Retry'),
           ),
         ],
       ),
@@ -364,6 +376,7 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
   }
 
   Widget _buildErrorView(String error) {
+    _addDebug("Building error view: $error");
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -381,14 +394,32 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.red),
           ),
+          SizedBox(height: 10),
+          Text(
+            'Debug: PIDX=$pidx, PaymentID=$paymentId',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
           SizedBox(height: 30),
           ElevatedButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.close(1),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
             ),
             child: Text('Go Back'),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () => setState(() {
+              _addDebug("Retrying Khalti initialization");
+              khaltiFuture = _initializeKhalti();
+            }),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+            ),
+            child: Text('Retry'),
           ),
         ],
       ),
@@ -396,6 +427,7 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
   }
 
   Widget _buildPaymentView(Khalti? khaltiInstance) {
+    _addDebug("Building payment view, khaltiInstance is ${khaltiInstance == null ? 'null' : 'initialized'}");
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -458,14 +490,39 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('PIDX:'),
+                      Text(
+                        pidx ?? 'N/A',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: khaltiInstance != null 
-                ? () => khaltiInstance.open(context)
-                : null,
+              onPressed: khaltiInstance != null
+                  ? () {
+                      _addDebug("Opening Khalti payment window");
+                      try {
+                        khaltiInstance.open(context);
+                      } catch (e) {
+                        _addDebug("ERROR opening Khalti: $e");
+                        Get.snackbar(
+                          'Error',
+                          'Failed to open payment: $e',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.redAccent,
+                          colorText: Colors.white,
+                        );
+                      }
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: const Color(0xFF5C2D91), // Khalti purple color
@@ -485,6 +542,17 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
                 ],
               ),
             ),
+            const SizedBox(height: 20),
+            // Debug retry button
+            OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  _addDebug("Manual retry of Khalti initialization");
+                  khaltiFuture = _initializeKhalti();
+                });
+              },
+              child: Text('Reinitialize Khalti'),
+            ),
             const SizedBox(height: 30),
             if (paymentResult != null)
               Card(
@@ -498,9 +566,9 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
                         'Payment Status: ${paymentResult!.payload?.status ?? "N/A"}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: paymentResult!.payload?.status == 'Completed' 
-                            ? Colors.green 
-                            : Colors.red,
+                          color: paymentResult!.payload?.status == 'Completed'
+                              ? Colors.green
+                              : Colors.red,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -513,11 +581,11 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
               ),
             const SizedBox(height: 20),
             TextButton(
-              onPressed: () => Get.back(),
+              onPressed: () => Get.to(HomePage()),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.deepPurple,
               ),
-              child: Text('Back to Booking'),
+              child: Text('Go to Home Page'),
             ),
             const SizedBox(height: 20),
             const Text(

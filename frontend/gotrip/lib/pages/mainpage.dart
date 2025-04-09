@@ -60,6 +60,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gotrip/controllers/display_vehicle_type_controller.dart';
 import 'package:gotrip/pages/main_pages/bookingpage.dart';
 import 'package:gotrip/pages/main_pages/homepage.dart';
 import 'package:gotrip/pages/main_pages/profilepage.dart';
@@ -72,6 +73,13 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+
+    @override
+  void initState() {
+    super.initState();
+    // Initialize the VehicleController when MainPage loads
+    Get.put(VehicleController());
+  }
 
   final List<Widget> _pages = [
     HomePage(),

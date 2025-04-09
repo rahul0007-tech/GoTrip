@@ -4,9 +4,10 @@ import 'package:get/get.dart';
 import 'package:gotrip/bindings/accept_bboking_binding.dart';
 import 'package:gotrip/bindings/add_vehicle_binding.dart';
 import 'package:gotrip/bindings/create_booking_binding.dart';
+import 'package:gotrip/bindings/display_driver_by_vehicle_type.dart';
+import 'package:gotrip/bindings/display_vehicle_type_binding.dart';
 import 'package:gotrip/bindings/get_accpeted_driver_binding.dart';
 import 'package:gotrip/bindings/get_booking_binding.dart';
-import 'package:gotrip/bindings/khalti_payment_binding.dart';
 
 import 'package:gotrip/bindings/passenger_login_binding.dart';
 import 'package:gotrip/bindings/driver_login_binding.dart';
@@ -25,6 +26,7 @@ import 'package:gotrip/pages/bookings/create_bookingpage.dart';
 import 'package:gotrip/pages/bookings/get_accepted_driver_page.dart';
 import 'package:gotrip/pages/bookings/get_bookingpage.dart';
 import 'package:gotrip/pages/bookings/accept_booking_page.dart';
+import 'package:gotrip/pages/display_driver_by_vehicle_page.dart';
 // import 'package:gotrip/pages/bookings/driver_detial_page.dart';
 import 'package:gotrip/pages/driver_mainpage.dart';
 import 'package:gotrip/pages/main_pages/homepage.dart';
@@ -53,7 +55,7 @@ class AppPages {
     GetPage(name: '/main', page: () => MainPage(), binding: MainBinding(),),
     GetPage(name: '/driver_main_page', page: () => DriverMainPage(), binding: DriverProfileBinding(),),
     GetPage(name: '/home', page: () => HomePage()),
-    GetPage(name: '/search', page: () => SearchPage()),
+    // GetPage(name: '/search', page: () => SearchPage()),
     GetPage(name: '/bookings', page: () => BookingsPage()),
     GetPage(name: '/profile', page: () => ProfilePage(), binding: ProfileBinding()),
     GetPage(name: '/driver_profile', page: () => DriverProfilepage(), binding: DriverProfileBinding(),),
@@ -67,6 +69,16 @@ class AppPages {
     // GetPage(name: '/driver_details', page: () => DriverDetailsPage(),),
     GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
     GetPage(name: '/add_vehicle', page: () => const AddVehiclePage(), binding: AddVehicleBinding()),
+    GetPage(
+      name: '/search',
+      page: () =>const SearchPage(),
+      binding: VehicleBinding(),
+    ),
+    GetPage(
+      name: '/drivers',
+      page: () => const DriversPage(),
+      binding: DriverBinding(),
+    ),
     
 
   ];
