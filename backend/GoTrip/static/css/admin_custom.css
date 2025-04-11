@@ -1,0 +1,11 @@
+#header {
+    background: #1c4e64;  /* Change to match your brand color */
+    color: #fff;
+}
+
+#site-name a {
+    color: #fff !important;
+    font-weight: bold;
+}
+
+/* You can add more custom styles here */

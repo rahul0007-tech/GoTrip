@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:gotrip/controllers/auth_controller.dart';
 import 'package:gotrip/utils/app_colors.dart';
 
 class HomePage extends StatelessWidget {
@@ -6,6 +8,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.put(AuthController());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -31,7 +34,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Greeting Section
+              // Greeting Section   ` ` 
               Text(
                 'Welcome, User!',
                 style: TextStyle(
@@ -107,6 +110,14 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
+
+              IconButton(
+                icon: Icon(Icons.logout),
+                onPressed: () {
+                  authController.logout(); // Call the logout method from AuthController
+                  Get.offAllNamed('/login'); // Navigate to the login page
+                },
+              ),
 
               // Vehicle Categories Section
               Text(

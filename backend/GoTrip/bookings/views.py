@@ -347,6 +347,132 @@ class CancelBookingView(APIView):
             return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_40ehi0_BAD_REQUEST)
         
 
+# class GetVehiclesCategoryView(APIView):
+#     permission_classes=[IsAuthenticated]
+#     def get(self,request):
+#         user = request.user
+#         passenger = get_object_or_404(Passenger, id=user.id)
+#         vehicle_type = VehicleType.objects
+#         if not passenger:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+#         if not vehicle_type.exists():
+#             return Response({"message":"Sorry No vehicles found"})
+#         serializer = ShowVehicleTypeSerializer(vehicle_type, many=True)
+#         return Response({"status":"success", "data":{"vehicle_type":serializer.data}, "message":"vehicle Fetched Successfully"})
+
+
+class GetLocation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        driver = get_object_or_404(Driver, id=user.id)
+        if not driver:
+            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        location = Location.objects.filter(is_active=True)
+        if not location.exists():
+            return Response({"status":"failed", "message":"No such location found" })
+        serializer = ShowBookingLocationSerializer(location, many=True)
+        
+        # Return the serialized data
+        return Response(serializer.data, status=200)
+
+# class GetDriversByVehicleTypeView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):  # Use POST instead of GET
+#         # Retrieve vehicle_type_id from the body
+#         vehicle_type_id = request.data.get('vehicle_type_id')
+
+#         if not vehicle_type_id:
+#             return Response({"error": "Vehicle type ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Get the authenticated user
+#         user = request.user
+
+#         # Fetch the passenger object associated with the user
+#         passenger = get_object_or_404(Passenger, id=user.id)
+
+#         if not passenger:
+#             return Response({'error': 'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Check if the vehicle type exists
+#         vehicle_type = get_object_or_404(VehicleType, id=vehicle_type_id)
+
+#         # Retrieve all vehicles that match the vehicle type
+#         vehicles = Vehicle.objects.filter(vehicle_type=vehicle_type)
+
+#         if not vehicles.exists():
+#             return Response({"message": "No drivers found for this vehicle type."}, status=status.HTTP_404_NOT_FOUND)
+
+#         # Get the drivers associated with these vehicles
+#         # drivers = [vehicle.driver for vehicle in vehicles]  # Retrieve the driver for each vehicle
+
+#         drivers = []
+
+#         for vehicle in vehicles:
+#             if vehicle.driver.status =='free':
+#                 drivers.append(vehicle.driver)
+
+#         if not drivers:
+#             return Response({"message":"Sorry No matching Drivers Found"}, status=status.HTTP_404_NOT_FOUND)
+
+#         # Serialize the driver details
+#         serializer = DriverWithVehicleSerializer(drivers, many=True)
+
+#         return Response({
+#             "status": "success",
+#             "data": serializer.data,
+#             "message": "Drivers fetched successfully"
+#         })
+
+# class GetBookingByLoacation(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request):
+#         user = request.user
+#         driver = get_object_or_404(Driver, id=user.id)
+#         if not driver:
+#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+#         location_id = request.data.get('location_id')
+#         if not location_id:
+#             return Response({'error': 'Location ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+#         bookings = Booking.objects.filter(dropoff_location=location_id, status='pending', booking_for>=timezone.now().date())
+#         if not bookings.exists():
+#             return Response({'error': 'No available bookings found'}, status=status.HTTP_404_NOT_FOUND)
+        
+#         return Response({   
+#             'status': 'success',
+#             'message': 'Available bookings retrieved successfully',
+#             'data': bookings.values('id', 'pickup_location', 'dropoff_location', 'fare', 'booking_for')
+#         }, status=status.HTTP_200_OK)
+
+
+class GetBookingByLoacation(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        driver = get_object_or_404(Driver, id=user.id)
+        if not driver:
+            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        location_id = request.data.get('location_id')
+        if not location_id:
+            return Response({'error': 'Location ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Fix the space between booking_for and >=
+        bookings = Booking.objects.filter(dropoff_location=location_id, status='pending', booking_for__gte=timezone.now().date())
+        if not bookings.exists():
+            return Response({'error': 'No available bookings found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response({   
+            'status': 'success',
+            'message': 'Available bookings retrieved successfully',
+            'data': bookings.values('id', 'pickup_location', 'dropoff_location', 'fare', 'booking_for')
+        }, status=status.HTTP_200_OK)
+
 
         
                 

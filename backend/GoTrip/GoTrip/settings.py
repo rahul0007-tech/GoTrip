@@ -18,6 +18,7 @@ ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,7 +33,70 @@ INSTALLED_APPS = [
     'vehicles',
     'khalti',
     'payments',
+    'import_export',
 ]
+
+
+JET_DEFAULT_THEME = 'light-blue'
+JET_THEMES = [
+    {
+        'theme': 'default',
+        'color': '#47bac1',
+        'title': 'Default'
+    },
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    },
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    },
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    },
+]
+
+JET_SIDE_MENU_ITEMS = [
+    {
+        'label': 'Users & Accounts',
+        'items': [
+            {'name': 'users.passenger'},
+            {'name': 'users.driver'},
+            {'name': 'auth.group'},
+        ]
+    },
+    {
+        'label': 'Vehicles',
+        'items': [
+            {'name': 'vehicles.vehicle'},
+            {'name': 'vehicles.vehicletype'},
+            {'name': 'vehicles.fueltype'},
+            {'name': 'vehicles.vehicleimage'},
+        ]
+    },
+    {
+        'label': 'Bookings & Locations',
+        'items': [
+            {'name': 'bookings.booking'},
+            {'name': 'bookings.location'},
+        ]
+    },
+    {
+        'label': 'Payments',
+        'items': [
+            {'name': 'payments.payment'},
+        ]
+    },
+]
+
+# Optional dashboard configuration
+JET_INDEX_DASHBOARD = 'goTrip.dashboard.CustomDashboard'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,7 +114,7 @@ ROOT_URLCONF = 'goTrip.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

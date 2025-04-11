@@ -85,16 +85,16 @@ import '../../controllers/driver_login_controller.dart';
 
 class DriverLoginPage extends StatelessWidget {
   final controller = Get.find<DriverLoginController>();
-  
+
   DriverLoginPage({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     // Define consistent colors
     final Color primaryColor = AppColors.primary;
     final Color secondaryColor = Colors.teal.shade50;
     final Color accentColor = Colors.amber.shade600;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -124,7 +124,7 @@ class DriverLoginPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Main content
           SafeArea(
             child: SingleChildScrollView(
@@ -145,9 +145,9 @@ class DriverLoginPage extends StatelessWidget {
                         padding: EdgeInsets.zero,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Driver icon
                     Stack(
                       alignment: Alignment.center,
@@ -175,9 +175,9 @@ class DriverLoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // App name and driver tag
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -192,7 +192,8 @@ class DriverLoginPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.green.shade100,
                             borderRadius: BorderRadius.circular(20),
@@ -208,9 +209,9 @@ class DriverLoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Welcome text
                     Column(
                       children: [
@@ -234,9 +235,9 @@ class DriverLoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Login form
                     Container(
                       padding: const EdgeInsets.all(24),
@@ -260,22 +261,24 @@ class DriverLoginPage extends StatelessWidget {
                             hint: 'Enter your email address',
                             icon: LineAwesomeIcons.envelope,
                             keyboardType: TextInputType.emailAddress,
-                            onChanged: (value) => controller.email.value = value,
+                            onChanged: (value) =>
+                                controller.email.value = value,
                           ),
-                          
+
                           const SizedBox(height: 20),
-                          
+
                           // Password field
                           _buildInputField(
                             label: 'Password',
                             hint: 'Enter your password',
                             icon: LineAwesomeIcons.lock_solid,
                             isPassword: true,
-                            onChanged: (value) => controller.password.value = value,
+                            onChanged: (value) =>
+                                controller.password.value = value,
                           ),
-                          
+
                           const SizedBox(height: 16),
-                          
+
                           // Forgot password link
                           Align(
                             alignment: Alignment.centerRight,
@@ -297,9 +300,28 @@ class DriverLoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          
+
+                          Obx(() => Row(
+                                children: [
+                                  Checkbox(
+                                    value: controller.rememberMe.value,
+                                    onChanged: (value) {
+                                      controller.rememberMe.value =
+                                          value ?? false;
+                                    },
+                                    activeColor: AppColors.primary,
+                                  ),
+                                  Text(
+                                    'Remember me',
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ],
+                              )),
+
                           const SizedBox(height: 30),
-                          
+
                           // Login button
                           SizedBox(
                             width: double.infinity,
@@ -326,9 +348,9 @@ class DriverLoginPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Signup link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -355,7 +377,7 @@ class DriverLoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -366,7 +388,7 @@ class DriverLoginPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildInputField({
     required String label,
     required String hint,

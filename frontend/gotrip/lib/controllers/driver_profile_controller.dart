@@ -79,16 +79,14 @@
 //   }
 // }
 
-// import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gotrip/network/http_client.dart';
 
 class DriverProfileController extends GetxController {
-  // Add this line to initialize the box
   final box = GetStorage();
-  
+
   var username = ''.obs;
   var email = ''.obs;
   var phone = ''.obs;
@@ -96,29 +94,29 @@ class DriverProfileController extends GetxController {
   var license = ''.obs;
   var created_at = ''.obs;
   var updated_at = ''.obs;
-  
-  // Add loading state variable
+
   var isLoading = true.obs;
   var hasError = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+    print("DriverProfileController initialized");
     fetchUserProfile();
   }
 
   void fetchUserProfile() async {
+    print("Fetching user profile...");
     isLoading.value = true;
     hasError.value = false;
-    
+
     try {
-      // Add timeout to prevent hanging
-      final response = await httpClient.get(
-        '/users/driverprofile/',
-        // options: Options(sendTimeout: 10000, receiveTimeout: 10000),
-      );
+      final response = await httpClient.get('/users/driverprofile/');
+      print("HTTP GET /users/driverprofile/ response: ${response.statusCode}");
 
       if (response.statusCode == 200) {
+        print("Profile data received: ${response.data}");
+
         username.value = response.data['name'] ?? '';
         email.value = response.data['email'] ?? '';
         phone.value = response.data['phone']?.toString() ?? '';
@@ -126,8 +124,18 @@ class DriverProfileController extends GetxController {
         license.value = response.data['license'] ?? '';
         created_at.value = response.data['Created_at']?.toString() ?? '';
         updated_at.value = response.data['updated_at']?.toString() ?? '';
+
+        print("Parsed profile data: "
+            "username=$username, "
+            "email=$email, "
+            "phone=$phone, "
+            "photo=$photo, "
+            "license=$license, "
+            "created_at=$created_at, "
+            "updated_at=$updated_at");
       } else {
         hasError.value = true;
+        print("Non-200 response received: ${response.statusCode}");
         Get.snackbar(
           'Error',
           'Failed to load profile data',
@@ -138,7 +146,7 @@ class DriverProfileController extends GetxController {
       }
     } catch (e) {
       hasError.value = true;
-      print("Error: $e");
+      print("Exception during profile fetch: $e");
       Get.snackbar(
         'Error',
         'Failed to load profile data',
@@ -147,12 +155,16 @@ class DriverProfileController extends GetxController {
         colorText: Colors.white,
       );
     } finally {
-      isLoading.value = false; // Always set loading to false when done
+      isLoading.value = false;
+      print("Finished fetching profile. isLoading set to false.");
     }
   }
 
   void logout() {
+    print("Logging out...");
     box.remove('access_token');
+    print("Access token removed from storage.");
+
     Get.snackbar(
       'Logged Out',
       'You have been successfully logged out.',
@@ -160,8 +172,8 @@ class DriverProfileController extends GetxController {
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
+
     Get.offAllNamed('/login');
+    print("Navigated to login screen.");
   }
 }
-
-

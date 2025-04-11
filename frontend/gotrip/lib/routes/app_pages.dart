@@ -36,6 +36,7 @@ import 'package:gotrip/pages/main_pages/searchpage.dart';
 import 'package:gotrip/pages/authentication/change_password.dart';
 
 import 'package:gotrip/pages/mainpage.dart';
+import 'package:gotrip/pages/splash_screen/splash_screen.dart';
 import 'package:gotrip/pages/vehicles/add_vehicle_page.dart';
 import '../pages/main_pages/bookingpage.dart';
 import 'package:gotrip/bindings/passenger_profile_binding.dart';
@@ -43,10 +44,12 @@ import 'package:gotrip/bindings/driver_profile_binding.dart';
 import 'package:gotrip/bindings/main_bindings.dart';
 
 class AppPages {
-  static const initial = '/signup_choice'; // Start from signup page
+  // static const initial = '/signup_choice'; // Start from signup page
+  static const initial = '/splash';
 
   static final routes = [GetPage(name: '/signup_choice', page: () => const SignupChoicePage(),),
     GetPage(name: '/signup', page: () => SignupPage(), binding: SignupBinding(),),
+    GetPage(name: '/splash', page: () => const SplashScreen()),
     GetPage(name: '/driver_signup', page: () => DriverSignupPage(), binding: DriverSignupBinding(),),
     GetPage(name: '/login_choice', page: () => LoginChoicePage(),),
     GetPage(name: '/login', page: () => LoginPage(), binding: LoginBinding()),

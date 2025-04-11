@@ -525,6 +525,103 @@ class AcceptedDriversPage extends StatelessWidget {
     );
   }
 
+  // Updated _initiatePayment method for the AcceptedDriversPage class
+
+// void _initiatePayment(int bookingId, String fare) {
+//   // Get phone number
+//   final phoneNumber = profileController.phone.value;
+
+//   if (phoneNumber.isEmpty) {
+//     Get.snackbar(
+//       'Missing Information',
+//       'Your phone number is not available. Please update your profile.',
+//       snackPosition: SnackPosition.TOP,
+//       backgroundColor: Colors.red[700],
+//       colorText: Colors.white,
+//       duration: Duration(seconds: 5),
+//       margin: EdgeInsets.all(10),
+//       borderRadius: 10,
+//     );
+//     return;
+//   }
+
+//   // Show loading indicator
+//   Get.dialog(
+//     Dialog(
+//       backgroundColor: Colors.transparent,
+//       elevation: 0,
+//       child: Container(
+//         padding: EdgeInsets.all(16),
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(16),
+//         ),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             CircularProgressIndicator(
+//               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+//             ),
+//             SizedBox(height: 16),
+//             Text(
+//               'Initializing payment...',
+//               style: TextStyle(fontSize: 16),
+//             ),
+//           ],
+//         ),
+//       ),
+//     ),
+//     barrierDismissible: false,
+//   );
+  
+//   // Clear any existing payment data first
+//   khaltiPaymentController.clearPaymentData();
+  
+//   // Initiate payment and handle the result
+//   khaltiPaymentController.initiatePayment(bookingId, phoneNumber).then((success) {
+//     // Close loading dialog
+//     Get.back();
+    
+//     if (success && khaltiPaymentController.isPaymentReady()) {
+//       // Navigate to payment screen with animation
+//       Get.to(
+//         () => KhaltiSDKDemo(),
+//         transition: Transition.rightToLeft,
+//         duration: Duration(milliseconds: 300),
+//       );
+//     } else {
+//       // Show error if payment initialization failed
+//       Get.snackbar(
+//         'Error',
+//         khaltiPaymentController.errorMessage.value.isEmpty
+//           ? 'Failed to initialize payment. Please try again.'
+//           : khaltiPaymentController.errorMessage.value,
+//         snackPosition: SnackPosition.BOTTOM,
+//         backgroundColor: Colors.redAccent,
+//         colorText: Colors.white,
+//         duration: Duration(seconds: 5),
+//         margin: EdgeInsets.all(10),
+//         borderRadius: 10,
+//       );
+//     }
+//   }).catchError((error) {
+//     // Close loading dialog
+//     Get.back();
+    
+//     // Show error message with details
+//     Get.snackbar(
+//       'Error',
+//       'Payment initialization failed: ${error.toString()}',
+//       snackPosition: SnackPosition.BOTTOM,
+//       backgroundColor: Colors.redAccent,
+//       colorText: Colors.white,
+//       duration: Duration(seconds: 5),
+//       margin: EdgeInsets.all(10),
+//       borderRadius: 10,
+//     );
+//   });
+// }
+
   void _initiatePayment(int bookingId, String fare) {
     // Get phone number
     final phoneNumber = profileController.phone.value;

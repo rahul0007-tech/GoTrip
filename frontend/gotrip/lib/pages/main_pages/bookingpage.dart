@@ -71,19 +71,19 @@ class BookingsPage extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'My Bookings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   title: const Text(
+      //     'My Bookings',
+      //     style: TextStyle(
+      //       fontWeight: FontWeight.bold,
+      //       fontSize: 22,
+      //     ),
+      //   ),
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   foregroundColor: Colors.black87,
+      // ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

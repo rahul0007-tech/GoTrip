@@ -112,7 +112,16 @@ class GetDriversByVehicleTypeView(APIView):
             return Response({"message": "No drivers found for this vehicle type."}, status=status.HTTP_404_NOT_FOUND)
 
         # Get the drivers associated with these vehicles
-        drivers = [vehicle.driver for vehicle in vehicles]  # Retrieve the driver for each vehicle
+        # drivers = [vehicle.driver for vehicle in vehicles]  # Retrieve the driver for each vehicle
+
+        drivers = []
+
+        for vehicle in vehicles:
+            if vehicle.driver.status =='free':
+                drivers.append(vehicle.driver)
+
+        if not drivers:
+            return Response({"message":"Sorry No matching Drivers Found"}, status=status.HTTP_404_NOT_FOUND)
 
         # Serialize the driver details
         serializer = DriverWithVehicleSerializer(drivers, many=True)

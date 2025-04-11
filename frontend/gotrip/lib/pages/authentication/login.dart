@@ -265,6 +265,23 @@ class LoginPage extends StatelessWidget {
                           ),
                           
                           const SizedBox(height: 30),
+                          Obx(() => Row(
+  children: [
+    Checkbox(
+      value: controller.rememberMe.value,
+      onChanged: (value) {
+        controller.rememberMe.value = value ?? false;
+      },
+      activeColor: AppColors.primary,
+    ),
+    Text(
+      'Remember me',
+      style: TextStyle(
+        color: Colors.grey[700],
+      ),
+    ),
+  ],
+)),
                           
                           // Login button
                           SizedBox(

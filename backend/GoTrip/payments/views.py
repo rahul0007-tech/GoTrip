@@ -439,7 +439,7 @@ class PaymentViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Payment.objects.filter(user=user)
-
+    
 class InitiateKhaltiPayment(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -458,25 +458,32 @@ class InitiateKhaltiPayment(APIView):
                     passenger = get_object_or_404(Passenger, id=user.id)
                     booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
                     
-                    # Check if booking is already paid
-                    existing_payment = Payment.objects.filter(
+                    # Check if booking is already paid (COMPLETED status)
+                    completed_payment = Payment.objects.filter(
                         user=user, 
-                        status__in=[OrderStatus.COMPLETED, OrderStatus.INITIATED],
+                        status=OrderStatus.COMPLETED,
                         response_data__booking_id=booking_id
                     ).first()
                     
-                    if existing_payment:
-                        if existing_payment.status == OrderStatus.COMPLETED:
-                            return Response({'error': 'This booking is already paid for'}, status=status.HTTP_400_BAD_REQUEST)
-                        else:
-                            # Return the existing payment URL if payment is already initiated
-                            return Response({'redirect_url': f"https://a.khalti.com/api/v2/epayment/complete/{existing_payment.transaction_id}/"}, 
-                                          status=status.HTTP_200_OK)
+                    if completed_payment:
+                        return Response({'error': 'This booking is already paid for'}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    # Find any existing INITIATED payments for this booking and cancel them
+                    existing_initiated_payments = Payment.objects.filter(
+                        user=user, 
+                        status=OrderStatus.INITIATED,
+                        response_data__booking_id=booking_id
+                    )
+                    
+                    # Update all existing initiated payments to CANCELED
+                    for payment in existing_initiated_payments:
+                        payment.status = OrderStatus.CANCELED
+                        payment.save()
                     
                     # Generate a unique token
                     token = str(uuid.uuid4())
                     
-                    # Create payment record
+                    # Create new payment record
                     payment = Payment.objects.create(
                         token=token,
                         user=user,
@@ -507,25 +514,118 @@ class InitiateKhaltiPayment(APIView):
                     response = requests.post("https://a.khalti.com/api/v2/epayment/initiate/", headers=headers, data=payload)
                     
                     if response.status_code != 200:
-                        print(response.data.pidx)
                         payment.status = OrderStatus.CANCELED
                         payment.save()
                         return Response({'error': 'Failed to initiate payment with Khalti'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
                     new_res = response.json()
                     
-                    
                     # Save the transaction ID
                     payment.transaction_id = new_res.get('pidx')
                     payment.save()
                     
                     # Return redirect URL
-                    return Response({"status": "success","message":"payment successful" ,"data": {'payment_id': payment.id, 'pidx':payment.transaction_id, 'amount':booking.fare} })
+                    return Response({
+                        "status": "success",
+                        "message": "payment initiated successfully",
+                        "data": {
+                            'payment_id': payment.id, 
+                            'pidx': payment.transaction_id, 
+                            'amount': booking.fare
+                        }
+                    })
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class InitiateKhaltiPayment(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         try:
+#             with transaction.atomic():
+#                 serializer = KhaltiPaymentSerializer(data=request.data)
+#                 if serializer.is_valid():
+#                     return_url = serializer.validated_data["return_url"]
+#                     website_url = serializer.validated_data["website_url"]
+#                     booking_id = serializer.validated_data["booking_id"]
+#                     phone_number = serializer.validated_data["phone_number"]
+                    
+#                     # Get the user and booking
+#                     user = request.user
+#                     passenger = get_object_or_404(Passenger, id=user.id)
+#                     booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
+                    
+#                     # Check if booking is already paid
+#                     existing_payment = Payment.objects.filter(
+#                         user=user, 
+#                         status__in=[OrderStatus.COMPLETED, OrderStatus.INITIATED],
+#                         response_data__booking_id=booking_id
+#                     ).first()
+                    
+#                     if existing_payment:
+#                         if existing_payment.status == OrderStatus.COMPLETED:
+#                             return Response({'error': 'This booking is already paid for'}, status=status.HTTP_400_BAD_REQUEST)
+#                         else:
+#                             # Return the existing payment URL if payment is already initiated
+#                             return Response({'redirect_url': f"https://a.khalti.com/api/v2/epayment/complete/{existing_payment.transaction_id}/"}, 
+#                                           status=status.HTTP_200_OK)
+                    
+#                     # Generate a unique token
+#                     token = str(uuid.uuid4())
+                    
+#                     # Create payment record
+#                     payment = Payment.objects.create(
+#                         token=token,
+#                         user=user,
+#                         amount=booking.fare,
+#                         status=OrderStatus.INITIATED,
+#                         response_data={'booking_id': booking_id}  # Store booking ID in response_data
+#                     )
+
+#                     payload = json.dumps({
+#                         "return_url": f"{return_url}?payment_id={payment.id}",
+#                         "website_url": website_url,
+#                         "amount": float(booking.fare) * 100,  # Khalti expects amount in paisa
+#                         "purchase_order_id": str(payment.id),
+#                         "purchase_order_name": f"Booking to {booking.dropoff_location.name}",
+#                         "customer_info": {
+#                             "name": passenger.name,
+#                             "email": passenger.email,
+#                             "phone": phone_number
+#                         }
+#                     })
+
+#                     # Request to Khalti API
+#                     headers = {
+#                         'Authorization': f"key {config('KHALTI_SECRET_KEY')}",
+#                         'Content-Type': 'application/json',
+#                     }
+
+#                     response = requests.post("https://a.khalti.com/api/v2/epayment/initiate/", headers=headers, data=payload)
+                    
+#                     if response.status_code != 200:
+#                         print(response.data.pidx)
+#                         payment.status = OrderStatus.CANCELED
+#                         payment.save()
+#                         return Response({'error': 'Failed to initiate payment with Khalti'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    
+#                     new_res = response.json()
+                    
+                    
+#                     # Save the transaction ID
+#                     payment.transaction_id = new_res.get('pidx')
+#                     payment.save()
+                    
+#                     # Return redirect URL
+#                     return Response({"status": "success","message":"payment successful" ,"data": {'payment_id': payment.id, 'pidx':payment.transaction_id, 'amount':booking.fare} })
+#                 else:
+#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class VerifyKhaltiPayment(APIView):
     permission_classes = [IsAuthenticated]

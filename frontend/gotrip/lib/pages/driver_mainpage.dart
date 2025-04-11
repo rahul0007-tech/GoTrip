@@ -74,7 +74,7 @@ class _DriverMainPageState extends State<DriverMainPage> {
   int _currentIndex = 2; // Start with the search tab selected
 
   final List<Widget> _pages = [
-    HomePage(),
+    DriverHomePage(),
     DriverBookingsPage(), // Document/list page
     SearchPage(),         // Search/discovery page (now in middle)
     DriverProfilepage(),  // Profile page
