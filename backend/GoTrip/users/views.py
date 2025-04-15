@@ -11,6 +11,8 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from bookings.models import Booking
+
 # Create your views here.
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -207,3 +209,19 @@ class DriverProfileView(APIView):
             )
         serializer = DriverProfileSerializer(driver,context={'request':request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangeDriverStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        driver = get_object_or_404(Driver, id=request.user.id)
+        if driver.status == 'busy':
+            driver.status = 'free'
+        else:
+            driver.status = 'busy'
+        driver.save()
+        return Response({'status':'success','message': 'Driver status updated successfully','data': driver.status}, status=status.HTTP_200_OK)
+
+
+

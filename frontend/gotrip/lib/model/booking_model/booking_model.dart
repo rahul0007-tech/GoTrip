@@ -15,8 +15,15 @@ class LocationModel {
     required this.fare,
   });
 
-  factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
-  Map<String, dynamic> toJson() => _$LocationModelToJson(this);
+  // factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
+  // Map<String, dynamic> toJson() => _$LocationModelToJson(this);
+  factory LocationModel.fromJson(Map<String, dynamic> json) {
+  return LocationModel(
+    id: int.parse(json['id'].toString()),  // Convert string to int
+    name: json['name'],
+    fare: double.parse(json['fare'].toString()),  // Convert to double if needed
+  );
+}
 }
 
 @JsonSerializable(explicitToJson: true)

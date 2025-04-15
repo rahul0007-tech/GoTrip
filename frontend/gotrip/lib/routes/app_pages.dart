@@ -26,6 +26,7 @@ import 'package:gotrip/pages/bookings/create_bookingpage.dart';
 import 'package:gotrip/pages/bookings/get_accepted_driver_page.dart';
 import 'package:gotrip/pages/bookings/get_bookingpage.dart';
 import 'package:gotrip/pages/bookings/accept_booking_page.dart';
+import 'package:gotrip/pages/bookings_by_location_page.dart';
 import 'package:gotrip/pages/display_driver_by_vehicle_page.dart';
 // import 'package:gotrip/pages/bookings/driver_detial_page.dart';
 import 'package:gotrip/pages/driver_mainpage.dart';
@@ -82,8 +83,6 @@ class AppPages {
       page: () => const DriversPage(),
       binding: DriverBinding(),
     ),
-    
-
   ];
 }
 

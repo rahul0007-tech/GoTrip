@@ -45,6 +45,7 @@ class Booking(models.Model):
         max_length=20,
         choices=[
             ('pending', 'Pending'),
+            ('partial', 'Partially Paid'),
             ('confirmed', 'Confirmed'),
             ('canceled', 'Canceled')
         ],
@@ -53,6 +54,7 @@ class Booking(models.Model):
     accepted_drivers = models.ManyToManyField('users.Driver', related_name='accepted_bookings', blank=True)
     fare = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Actual fare for this booking
     booking_for = models.DateField()
+    booking_time = models.TimeField(null=True, blank=True)  # Time for the booking
 
     class Meta:
         verbose_name = "Booking"

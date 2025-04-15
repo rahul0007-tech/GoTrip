@@ -189,30 +189,30 @@ class KhaltiPaymentController extends GetxController {
       print("Payment initiation response: ${response.data}");
 
       if (response.data['status'] == "success") {
-        // Extract the 'data' field and map it to the list of PaymentModel objects
-        List<dynamic> responseData = response.data['data'];
-        
-        if (responseData.isEmpty) {
-          errorMessage.value = "No payment data received from server";
-          Get.snackbar(
-            'Error',
-            errorMessage.value,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent,
-            colorText: Colors.white,
-          );
-          return false;
-        }
+      // Extract the 'data' field which is a Map (not a List)
+      var responseData = response.data['data'];
+      
+      if (responseData == null) {
+        errorMessage.value = "No payment data received from server";
+        Get.snackbar(
+          'Error',
+          errorMessage.value,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        return false;
+      }
+
         
         // Convert response to PaymentModel objects
-        List<PaymentModel> paymentInformation = responseData
-            .map((item) => PaymentModel.fromJson(item))
-            .toList();
+        PaymentModel paymentInformation = PaymentModel.fromJson(responseData);
+
 
         // Update the payment list
-        payment.value = paymentInformation;
+        payment.value = [paymentInformation];
         isPaymentInitialized.value = true;
-        
+      
         print("Payment initialized successfully. PIDX: ${payment.first.pidx}");
         return true;
       } else {
@@ -337,6 +337,7 @@ class KhaltiPaymentController extends GetxController {
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );
+      print("Error message: ${errorMessage.value}");
       return false;
     } finally {
       isLoading.value = false;
