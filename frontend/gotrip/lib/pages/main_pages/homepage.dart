@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/controllers/auth_controller.dart';
+import 'package:gotrip/controllers/location_controller.dart';
 import 'package:gotrip/utils/app_colors.dart';
+import 'package:gotrip/network/http_client.dart';  // Added for baseUrl
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,6 +11,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.put(AuthController());
+    final LocationController locationController = Get.put(LocationController());
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -74,42 +78,76 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5, // Number of destinations
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 120,
-                      margin: EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: AssetImage(
-                              'asset/images/destination${index + 1}.jpg'), // Add dummy images
-                          fit: BoxFit.cover,
+              Obx(() {
+                if (locationController.isLoading.value) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (locationController.error.value.isNotEmpty) {
+                  return Text(locationController.error.value);
+                }
+                return SizedBox(
+                  height: 150,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: locationController.locations.length,
+                    itemBuilder: (context, index) {
+                      final location = locationController.locations[index];
+                      return Container(
+                        width: 120,
+                        margin: EdgeInsets.only(right: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: location.locationImage != null
+                                ? NetworkImage(baseUrl + location.locationImage!)
+                                : AssetImage('asset/images/destination1.jpg') as ImageProvider,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Destination ${index + 1}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              backgroundColor: Colors.black45,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.7),
+                              ],
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    location.name,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${location.fare}',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 20),
+                      );
+                    },
+                  ),
+                );
+              }),
 
               IconButton(
                 icon: Icon(Icons.logout),

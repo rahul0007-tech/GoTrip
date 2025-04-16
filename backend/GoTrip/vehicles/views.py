@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from users.models import Driver, Passenger
 from .serializers import AddVehicleSerializer, ShowVehicleTypeSerializer, ShowFuelTypeSerializer, DriverWithVehicleSerializer
 from django.shortcuts import get_object_or_404
-from .models import FuelType, VehicleType, Vehicle
+from .models import FuelType, VehicleImage, VehicleType, Vehicle
 
 
 class AddVehicleView(APIView):
@@ -14,11 +14,74 @@ class AddVehicleView(APIView):
         user = request.user
         driver = get_object_or_404(Driver, id= user.id)
         serializer = AddVehicleSerializer(data = request.data)
+        existing_vehicle = Vehicle.objects.filter(driver=driver).first()
+        if existing_vehicle:
+            return Response({"status":"failed", "message":"You already have a vehicle"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             vehicle = serializer.save(driver=driver)
             vehicle_data = AddVehicleSerializer(vehicle).data
             return Response({"status":"success", "message":"Vahicle Added Successfully", "data":vehicle_data})
         
+class AddVehicleImageView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        driver = get_object_or_404(Driver, id=user.id)
+        
+        # Check if driver has a vehicle
+        try:
+            vehicle = Vehicle.objects.get(driver=driver)
+        except Vehicle.DoesNotExist:
+            return Response({
+                "status": "failed",
+                "message": "You do not have a vehicle. Please add a vehicle first."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Handle image upload
+        uploaded_images = request.FILES.getlist('uploaded_images')
+        for image in uploaded_images:
+            VehicleImage.objects.create(vehicle=vehicle, image=image)
+        
+        return Response({
+            "status": "success", 
+            "message": "Vehicle Images Added Successfully"
+        })
+    
+class GetVehiclesImageView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        driver = get_object_or_404(Driver, id=user.id)
+
+        if not driver:  
+            return Response({'error': 'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if driver has a vehicle
+        try:
+            vehicle = Vehicle.objects.get(driver=driver)
+        except Vehicle.DoesNotExist:
+            return Response({
+                "status": "failed",
+                "message": "You do not have a vehicle. Please add a vehicle first."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Retrieve images associated with the vehicle
+        images = VehicleImage.objects.filter(vehicle=vehicle)
+        
+        if not images.exists():
+            return Response({
+                "status": "failed",
+                "message": "No images found for this vehicle."
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        image_data = [{"id": image.id, "image_url": image.image.url} for image in images]
+        
+        return Response({
+            "status": "success", 
+            "message": "Vehicle Images Fetched Successfully",
+            "data": image_data
+        })
+
 
 # class ShowFuelTypeView(APIView):
 #     permission_classes = [IsAuthenticated]

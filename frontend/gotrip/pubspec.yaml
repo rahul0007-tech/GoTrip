@@ -36,14 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.6.6
   line_awesome_flutter: ^3.0.1
-  dio: ^5.7.0
+  dio: ^5.3.2  # for handling multipart form data
   shared_preferences: ^2.5.2
   json_annotation: ^4.9.0
   json_serializable: ^6.9.4
   build_runner: ^2.4.14
   get_storage: ^2.1.1
   intl: ^0.20.2
-  image_picker: ^1.1.2
+  image_picker: ^1.0.4
   khalti_checkout_flutter: ^1.0.0-dev.8
   lottie: ^3.3.1
   url_launcher: ^6.3.1

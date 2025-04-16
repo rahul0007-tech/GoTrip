@@ -152,7 +152,7 @@ class GetAcceptedDriversView(APIView):
         passenger = get_object_or_404(Passenger, id = user.id)
         if not passenger:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-        bookings = Booking.objects.filter(passenger=passenger, status= 'pending', booking_for__gte=timezone.now().date())
+        bookings = Booking.objects.filter(passenger=passenger, status= 'pending', booking_for__gte=timezone.now().date()).order_by('booking_for')
         result = []
         for booking in bookings:
             drivers = booking.accepted_drivers.all()
@@ -176,116 +176,6 @@ class GetAcceptedDriversView(APIView):
             }
             
         return Response(response_data, status=status.HTTP_200_OK)
-        # booking_id = request.data.get('booking_id')
-        # if not booking_id:
-        #     return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        # booking = get_object_or_404(Booking, id=booking_id)
-        # # drivers = booking.accepted_drivers.all()
-        # # driver_list = [{"id":driver.id, "name": driver.name, "phone": driver.phone} for driver in drivers]
-        # # return Response({"booking_id": booking.id, "accepted_drivers": driver_list}, status=status.HTTP_200_OK)
-        # drivers = booking.accepted_drivers.all()
-        # driver_serializer = DriverSerializer(drivers, many=True)
-        # return Response({
-        #     "booking_id": booking.id,
-        #     "accepted_drivers": driver_serializer.data
-        # }, status=status.HTTP_200_OK)
-
-
-# class GetAcceptedDriversView(APIView):
-#     permission_classes = [IsAuthenticated]
-    
-#     def post(self, request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id=user.id)
-#         if not passenger:
-#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-            
-#         booking_id = request.data.get('booking_id')
-#         if not booking_id:
-#             return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
-            
-#         booking = get_object_or_404(Booking, id=booking_id)
-#         drivers = booking.accepted_drivers.all()
-        
-#         # Use the serializer to handle the conversion to JSON
-#         serializer = DriverSerializer(drivers, many=True)
-        
-#         return Response({
-#             "booking_id": booking.id,
-#             "accepted_drivers": serializer.data
-#         }, status=status.HTTP_200_OK)
-
-
-
-
-# class SelectDriverView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id = user.id)
-#         if not passenger:
-#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-#         booking_id = request.data.get('booking_id')
-#         driver_id = request.data.get('driver_id')
-
-#         if not booking_id or not driver_id:
-#             return Response({'error': 'Booking ID and Driver ID are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
-#         selected_driver = get_object_or_404(Driver, id=driver_id)
-
-        
-#         if booking.booking_for < timezone.now().date():
-#             return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
-#                           status=status.HTTP_400_BAD_REQUEST)
-
-#         if selected_driver not in booking.accepted_drivers.all():
-#             return Response({'error': 'This driver has not accepted the booking'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         booking.driver = selected_driver
-#         booking.status = 'confirmed'
-#         booking.save()
-
-#         return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)        
-
-
-# class SelectDriverView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id=user.id)
-#         if not passenger:
-#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-#         booking_id = request.data.get('booking_id')
-#         driver_id = request.data.get('driver_id')
-
-#         if not booking_id or not driver_id:
-#             return Response({'error': 'Booking ID and Driver ID are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
-        
-
-#         payment = Payment.objects.filter(booking=booking, status=OrderStatus.COMPLETED).first()
-        
-#         if not payment:
-#             return Response({'error': 'Payment is required before selecting a driver', 'payment_required': True}, 
-#                           status=status.HTTP_400_BAD_REQUEST)
-        
-#         selected_driver = get_object_or_404(Driver, id=driver_id)
-        
-#         if booking.booking_for < timezone.now().date():
-#             return Response({'error': 'Cannot select a driver for a booking with a past date'}, 
-#                           status=status.HTTP_400_BAD_REQUEST)
-
-#         if selected_driver not in booking.accepted_drivers.all():
-#             return Response({'error': 'This driver has not accepted the booking'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         booking.driver = selected_driver
-#         booking.status = 'confirmed'
-#         booking.save()
-
-#         return Response({"message": "Driver selected successfully", "selected_driver": {"id": selected_driver.id, "name": selected_driver.name, "phone": selected_driver.phone}}, status=status.HTTP_200_OK)
-
 
 
 class SelectDriverView(APIView):
@@ -339,7 +229,7 @@ class GetAvailableBookingView(APIView):
         driver = get_object_or_404(Driver, id=user.id)
         if not driver:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-        bookings = Booking.objects.filter(status='pending')
+        bookings = Booking.objects.filter(status='pending', booking_for__gte=timezone.now().date()).order_by('booking_for')
         if not bookings.exists():
             return Response({'error': 'No available bookings found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -417,7 +307,7 @@ class GetBookingByLoacation(APIView):
             return Response({'error': 'Location ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Fix the space between booking_for and >=
-        bookings = Booking.objects.filter(dropoff_location=location_id, status='pending', booking_for__gte=timezone.now().date())
+        bookings = Booking.objects.filter(dropoff_location=location_id, status='pending', booking_for__gte=timezone.now().date()).order_by('booking_for')
         if not bookings.exists():
             return Response({'error': 'No available bookings found'}, status=status.HTTP_404_NOT_FOUND)
         
@@ -498,6 +388,23 @@ class ChangeBookingPaymentStatus(APIView):
         booking.save()
 
         return Response({"message": "Booking status updated successfully"}, status=status.HTTP_200_OK)
+    
+
+class DriverBookingHistory(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        driver = get_object_or_404(Driver, id=request.user.id)
+
+        if not driver:
+            return Response({'error': 'Invalid Token or Token has expired'}, status=status.HTTP_404_NOT_FOUND)
+
+        driver_Bookings = Booking.objects.filter(driver=driver).order_by('booking_for')
+
+        serializer = DriverHistorySerializer(driver_Bookings, many=True)
+        if not driver_Bookings.exists():
+            return Response({'status':'failed','message': 'No trip history found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status':'success','message': 'Driver trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)
     
         
         

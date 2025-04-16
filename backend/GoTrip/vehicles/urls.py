@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AddVehicleView, GetDriversByVehicleTypeView, ShowFuelTypeView, ShowVehicleTypeView,GetVehiclesCategoryView
+from .views import AddVehicleImageView, AddVehicleView, GetDriversByVehicleTypeView, GetVehiclesImageView, ShowFuelTypeView, ShowVehicleTypeView,GetVehiclesCategoryView
 
 app_name='vehicles'
 
@@ -9,5 +9,7 @@ urlpatterns = [
     path('vehicle-types/', ShowVehicleTypeView.as_view(), name='vehicleType'),
     path('vehicle-types-for-passenger/', GetVehiclesCategoryView.as_view(), name='vehicleTypePassenger'),
     path('drivers-by-vehicle-type/', GetDriversByVehicleTypeView.as_view(), name='DriverDetail'),
+    path('vehicle-image/', AddVehicleImageView.as_view(), name = 'addVehicleImage'),
+    path('get-vehicle-image/', GetVehiclesImageView.as_view(), name = 'getVehicleImage')
 
 ]

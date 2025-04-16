@@ -74,7 +74,7 @@ class CreateBookingSerializer(serializers.ModelSerializer):
 class ShowBookingLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ['id','name', 'fare']
+        fields = ['id','name', 'fare','location_image']
 
 class AvailableBookingSerializer(serializers.ModelSerializer):
     class Meta:

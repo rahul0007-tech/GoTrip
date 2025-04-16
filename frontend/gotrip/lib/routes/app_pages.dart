@@ -1,5 +1,3 @@
-
-
 import 'package:get/get.dart';
 import 'package:gotrip/bindings/accept_bboking_binding.dart';
 import 'package:gotrip/bindings/add_vehicle_binding.dart';
@@ -8,7 +6,6 @@ import 'package:gotrip/bindings/display_driver_by_vehicle_type.dart';
 import 'package:gotrip/bindings/display_vehicle_type_binding.dart';
 import 'package:gotrip/bindings/get_accpeted_driver_binding.dart';
 import 'package:gotrip/bindings/get_booking_binding.dart';
-
 import 'package:gotrip/bindings/passenger_login_binding.dart';
 import 'package:gotrip/bindings/driver_login_binding.dart';
 import 'package:gotrip/bindings/passenger_signup_binding.dart';
@@ -35,7 +32,6 @@ import 'package:gotrip/pages/main_pages/profilepage.dart';
 import 'package:gotrip/pages/driver_main_pages.dart/driver_profilepage.dart';
 import 'package:gotrip/pages/main_pages/searchpage.dart';
 import 'package:gotrip/pages/authentication/change_password.dart';
-
 import 'package:gotrip/pages/mainpage.dart';
 import 'package:gotrip/pages/splash_screen/splash_screen.dart';
 import 'package:gotrip/pages/vehicles/add_vehicle_page.dart';
@@ -43,6 +39,7 @@ import '../pages/main_pages/bookingpage.dart';
 import 'package:gotrip/bindings/passenger_profile_binding.dart';
 import 'package:gotrip/bindings/driver_profile_binding.dart';
 import 'package:gotrip/bindings/main_bindings.dart';
+import 'package:gotrip/pages/driver_main_pages.dart/driver_history_page.dart';
 
 class AppPages {
   // static const initial = '/signup_choice'; // Start from signup page
@@ -74,8 +71,12 @@ class AppPages {
     GetPage(name: '/accepted_drivers', page: () => AcceptedDriversPage(), binding: AcceptedDriversBinding(),),
     GetPage(name: '/add_vehicle', page: () => const AddVehiclePage(), binding: AddVehicleBinding()),
     GetPage(
+      name: '/driver-history',
+      page: () => DriverHistoryPage(),
+    ),
+    GetPage(
       name: '/search',
-      page: () =>const SearchPage(),
+      page: () => const SearchPage(),
       binding: VehicleBinding(),
     ),
     GetPage(

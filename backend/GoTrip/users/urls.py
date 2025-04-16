@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import ChangeDriverStatusView, ChnagePasswordView, CreatePassengerView, LoginPassengerView, PassengerProfileView, LogoutView, PasswordResetView, SendPasswordEmailView, VerifyOTPView, CreateDriverView, LoginDriverView, DriverProfileView
+from .views import (
+    ChangeDriverStatusView, ChnagePasswordView, CreatePassengerView, 
+     LoginPassengerView, 
+    PassengerProfileView, ResendOTPView, SendPasswordEmailView, 
+    VerifyOTPView, CreateDriverView, LoginDriverView, DriverProfileView
+)
 
 app_name = 'users'
 
@@ -9,13 +14,10 @@ urlpatterns = [
     path('passengerLogin/', LoginPassengerView.as_view(), name='passengerLogin'),
     path('passengerprofile/', PassengerProfileView.as_view(), name='passengerprofile'),
     path('driver/', CreateDriverView.as_view(), name='CreateDriver'),
-    path('logout/', LogoutView.as_view(), name='logout'),
     path('driverlogin/',LoginDriverView.as_view(), name='driverLogin'),
-    path('change-password/',ChnagePasswordView.as_view(), name='changepassengerpassword' ),
-    path('send-reset-password/', SendPasswordEmailView.as_view(), name='send-reset-password'),
-    path('reset-password/<uid>/<token>/',PasswordResetView.as_view(), name='changepassengerpassword' ),
+    path('change-password/',ChnagePasswordView.as_view(), name='changepassengerpassword'),
+    # path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    # path('reset-password/', PasswordResetView.as_view(), name='reset-password'),
     path('driverprofile/', DriverProfileView.as_view(), name='driverprofile'),
     path('driverstatus/', ChangeDriverStatusView.as_view(), name='driverstatus'),
-    
-    
 ]
