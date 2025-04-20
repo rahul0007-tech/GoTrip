@@ -1,53 +1,62 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:intl/intl.dart';
 
-part 'upcomming_booking.g.dart';
+part 'passenger_upcoming_booking.g.dart';
 
 @JsonSerializable()
-class DriverUpcomingBookingsResponse {
+class PassengerUpcomingBookingsResponse {
   final String status;
   final String message;
-  final List<UpcomingBooking> data;
+  final List<PassengerUpcomingBooking> data;
 
-  DriverUpcomingBookingsResponse({
+  PassengerUpcomingBookingsResponse({
     required this.status,
     required this.message,
     required this.data,
   });
 
-  factory DriverUpcomingBookingsResponse.fromJson(Map<String, dynamic> json) => _$DriverUpcomingBookingsResponseFromJson(json);
-  Map<String, dynamic> toJson() => _$DriverUpcomingBookingsResponseToJson(this);
+  factory PassengerUpcomingBookingsResponse.fromJson(Map<String, dynamic> json) => _$PassengerUpcomingBookingsResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$PassengerUpcomingBookingsResponseToJson(this);
 }
 
 @JsonSerializable()
-class UpcomingBooking {
+class PassengerUpcomingBooking {
   final int id;
-  final Passenger passenger;
-  @JsonKey(name: "pickup_location")
+  final Driver? driver;
   final String pickupLocation;
-  @JsonKey(name: "dropoff_location")
   final DropoffLocation dropoffLocation;
   final String fare;
-  @JsonKey(name: "booking_for")
   final String bookingFor;
-  @JsonKey(name: "booking_time")
   final String? bookingTime;
-  final Driver? driver;
+  final String status;
+  final String paymentStatus;
 
-  UpcomingBooking({
+  PassengerUpcomingBooking({
     required this.id,
-    required this.passenger,
+    this.driver,
     required this.pickupLocation,
     required this.dropoffLocation,
     required this.fare,
     required this.bookingFor,
     this.bookingTime,
-    this.driver,
+    required this.status,
+    required this.paymentStatus,
   });
 
-  factory UpcomingBooking.fromJson(Map<String, dynamic> json) => _$UpcomingBookingFromJson(json);
-  Map<String, dynamic> toJson() => _$UpcomingBookingToJson(this);
-  
+  factory PassengerUpcomingBooking.fromJson(Map<String, dynamic> json) {
+    return PassengerUpcomingBooking(
+      id: (json['id'] as num).toInt(),
+      driver: json['driver'] == null ? null : Driver.fromJson(json['driver'] as Map<String, dynamic>),
+      pickupLocation: json['pickup_location'] as String,
+      dropoffLocation: DropoffLocation.fromJson(json['dropoff_location'] as Map<String, dynamic>),
+      fare: json['fare'].toString(),
+      bookingFor: json['booking_for'] as String,
+      bookingTime: json['booking_time'] as String?,
+      status: json['status'] as String,
+      paymentStatus: json['payment_status'] as String,
+    );
+  }
+
   String getFormattedDate() {
     try {
       final parts = bookingFor.split('-');
@@ -80,27 +89,15 @@ class UpcomingBooking {
 }
 
 @JsonSerializable()
-class Passenger {
-  final String name;
-
-  Passenger({
-    required this.name,
-  });
-
-  factory Passenger.fromJson(Map<String, dynamic> json) => _$PassengerFromJson(json);
-  Map<String, dynamic> toJson() => _$PassengerToJson(this);
-}
-
-@JsonSerializable()
 class Driver {
   final int id;
   final String name;
-  final Vehicle? vehicle;
+  final Vehicle vehicle;
 
   Driver({
     required this.id,
     required this.name,
-    this.vehicle,
+    required this.vehicle,
   });
 
   factory Driver.fromJson(Map<String, dynamic> json) => _$DriverFromJson(json);
@@ -110,34 +107,34 @@ class Driver {
 @JsonSerializable()
 class Vehicle {
   @JsonKey(name: "vehicle_color")
-  final String? vehicleColor;
+  final String vehicleColor;
   
   @JsonKey(name: "vehicle_company")
-  final String? vehicleCompany;
+  final String vehicleCompany;
   
   @JsonKey(name: "vehicle_number")
-  final String? vehicleNumber;
+  final String vehicleNumber;
   
   @JsonKey(name: "sitting_capacity")
-  final int? sittingCapacity;
+  final int sittingCapacity;
   
   @JsonKey(name: "vehicle_type")
-  final VehicleType? vehicleType;
+  final VehicleType vehicleType;
   
   @JsonKey(name: "vehicle_fuel_type")
-  final VehicleFuelType? vehicleFuelType;
+  final VehicleFuelType vehicleFuelType;
   
   @JsonKey(name: "images")
-  final List<VehicleImage>? images;
+  final List<VehicleImage> images;
 
   Vehicle({
-    this.vehicleColor,
-    this.vehicleCompany,
-    this.vehicleNumber,
-    this.sittingCapacity,
-    this.vehicleType,
-    this.vehicleFuelType,
-    this.images,
+    required this.vehicleColor,
+    required this.vehicleCompany,
+    required this.vehicleNumber,
+    required this.sittingCapacity,
+    required this.vehicleType,
+    required this.vehicleFuelType,
+    required this.images,
   });
 
   factory Vehicle.fromJson(Map<String, dynamic> json) => _$VehicleFromJson(json);

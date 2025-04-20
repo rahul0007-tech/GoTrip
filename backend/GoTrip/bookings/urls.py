@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ChangeBookingStatus, CreateBookingView,AcceptBookingView, DriverUpcommingBookingsView,GetAcceptedDriversView, GetBookingByLoacation, GetLocation,SelectDriverView,GetAvailableBookingView, ShowBookingLocationView, DriverBookingHistory
+from .views import ChangeBookingStatus, CreateBookingView,AcceptBookingView, DriverUpcommingBookingsView,GetAcceptedDriversView, GetBookingByLoacation, GetLocation, PassengerUpcommingBookingsView,SelectDriverView,GetAvailableBookingView, ShowBookingLocationView, DriverBookingHistory
 
 app_name = 'bookings'
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('driverupcommingbooking/', DriverUpcommingBookingsView.as_view(), name='driverupcommingbooking'),
     path('changebookingstatus/', ChangeBookingStatus.as_view(), name='changebookingtatus' ),
     path('driverbookinghistory/', DriverBookingHistory.as_view(), name='driverbookinghistory'),
+    path('passengerupcomingbookings/', PassengerUpcommingBookingsView.as_view(), name='passengerupcomingbookings' ),
 
 
 ]

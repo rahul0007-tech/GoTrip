@@ -42,10 +42,21 @@ class ShowVehicleTypeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'display_name']
 
 
+
+
+class VehicleImageSerializer(serializers.ModelSerializer):
+    # vehicle = VehicleSerializer()
+    class Meta:
+        model = VehicleImage
+        fields = ['id', 'image']
+
 class VehicleSerializer(serializers.ModelSerializer):
+    vehicle_type = ShowVehicleTypeSerializer()
+    vehicle_fuel_type = ShowFuelTypeSerializer()
+    images=VehicleImageSerializer(many=True, read_only=True)
     class Meta:
         model = Vehicle
-        fields = ['vehicle_color', 'vehicle_company', 'vehicle_number', 'sitting_capacity', 'vehicle_type', 'vehicle_fuel_type']
+        fields = ['vehicle_color', 'vehicle_company', 'vehicle_number', 'sitting_capacity', 'vehicle_type', 'vehicle_fuel_type', 'images']
 
 class DriverWithVehicleSerializer(serializers.ModelSerializer):
     vehicle=VehicleSerializer()

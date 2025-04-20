@@ -1,360 +1,385 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gotrip/utils/app_colors.dart';
-import 'package:intl/intl.dart';
-import '../../controllers/driver_home_page_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
+// import '../model/user_model/driver_model.dart';
+// import '../model/booking_model/upcomming_booking.dart';
+// import '../model/booking_model/trip_history.dart';
+import '../../model/booking_model/trip_history.dart';
+import '../../model/booking_model/upcomming_booking.dart';
+import '../../model/user_model/driver_model.dart';
 
-Widget buildUpcomingRides(DriverHomePageController controller) {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Your Upcoming Rides',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'View All',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Obx(() {
-          // Show loading indicator while fetching bookings
-          if (controller.isBookingsLoading.value) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(),
-              ),
-            );
+class DriverHomePageController extends GetxController {
+  final totalEarnings = '₹24,580'.obs;
+  final todayEarnings = '₹1,250'.obs;
+  final rideCompleted = 18.obs;
+  final rating = 4.8.obs;
+  final isOnline = true.obs;
+  final isLoading = false.obs;
+  
+  // Add driver profile using your existing model
+  final Rx<DriverModel?> driverProfile = Rx<DriverModel?>(null);
+  final isProfileLoading = true.obs;
+  
+  // Add upcoming bookings using the specialized adapter model
+  final RxList<UpcomingBooking> upcomingBookings = <UpcomingBooking>[].obs;
+  final isBookingsLoading = true.obs;
+  final hasBookingsError = false.obs;
+  final bookingsErrorMessage = ''.obs;
+  
+  // Update trip history list to use proper model
+  final RxList<TripHistory> tripHistory = <TripHistory>[].obs;
+  final isTripHistoryLoading = true.obs;
+  final hasTripHistoryError = false.obs;
+  final tripHistoryErrorMessage = ''.obs;
+  
+  // Add vehicle images state
+  final RxList<Map<String, dynamic>> vehicleImages = <Map<String, dynamic>>[].obs;
+  final isVehicleImagesLoading = true.obs;
+  final hasVehicleImagesError = false.obs;
+  final vehicleImagesErrorMessage = ''.obs;
+  
+  // Computed property for upcoming rides count
+  int get upcomingRidesCount => upcomingBookings.length;
+  
+  // Storage for token
+  final _storage = GetStorage();
+  
+  // API endpoints
+  final String statusEndpoint = '/users/driverstatus/';
+  final String profileEndpoint = '/users/driverprofile/';
+  final String upcomingBookingsEndpoint = '/bookings/driverupcommingbooking/';
+  final String driverBookingHistoryEndpoint = '/bookings/driverbookinghistory/';
+  
+  // Create a Dio instance directly in the controller
+  late final Dio _dio;
+  
+  @override
+  void onInit() {
+    super.onInit();
+    
+    // Initialize Dio with correct configuration
+    _dio = Dio(BaseOptions(
+      baseUrl: 'http://10.0.2.2:8000', // For Android emulator
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    ));
+    
+    // Add token interceptor
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          // Get token from storage
+          final String? token = _getToken();
+          
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+            print('Adding auth token: Bearer $token');
+          } else {
+            print('No token available');
           }
           
-          // Show error message if API call failed (not including 404)
-          if (controller.hasBookingsError.value && controller.upcomingBookings.isEmpty) {
-            return Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  Icon(
-                    Icons.error_outline,
-                    size: 60,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    controller.bookingsErrorMessage.value,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => controller.fetchUpcomingBookings(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
+          return handler.next(options);
+        },
+        onError: (e, handler) {
+          print('Request error: ${e.message}');
+          
+          // Handle 401 Unauthorized errors
+          if (e.response?.statusCode == 401) {
+            print('401 Unauthorized: User needs to log in again');
+            
+            // Show login required message
+            Get.snackbar(
+              'Session Expired',
+              'Please log in again to continue',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 3),
             );
+            
+            // Optional: Navigate to login screen
+            // Get.offAllNamed('/login');
           }
           
-          // Show empty state when no bookings
-          if (controller.upcomingBookings.isEmpty) {
-            return Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  Icon(
-                    Icons.directions_car_outlined,
-                    size: 80,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No upcoming rides',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'New ride requests will appear here',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          // Show list of upcoming bookings
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.upcomingBookings.length,
-            itemBuilder: (context, index) {
-              final booking = controller.upcomingBookings[index];
-              
-              // Format currency
-              final currencyFormatter = NumberFormat.currency(
-                symbol: '₹',
-                decimalDigits: 2,
-              );
-              final formattedFare = currencyFormatter.format(double.tryParse(booking.fare) ?? 0);
-              
-              return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            // Use a default avatar for passenger
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              color: Colors.grey[200],
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.grey[400],
-                                size: 40,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      booking.passengerName,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        'B-${booking.id}',
-                                        style: TextStyle(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today,
-                                      size: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      booking.getFormattedDate(),
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      booking.bookingTime != null ? booking.getFormattedTime() : 'Time not specified',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                buildLocationInfo(
-                                  icon: Icons.circle,
-                                  color: Colors.green,
-                                  label: booking.pickupLocation,
-                                ),
-                                buildLocationDivider(),
-                                buildLocationInfo(
-                                  icon: Icons.location_on,
-                                  color: Colors.red,
-                                  label: booking.dropoffLocationName,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Distance is not available in the API response
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.route,
-                                size: 16,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Trip distance',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.attach_money,
-                                size: 16,
-                                color: Colors.green[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                formattedFare,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.green[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        // Navigate to ride details
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(16),
-                            bottomRight: Radius.circular(16),
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Change Payment Status',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }),
-      ],
-    ),
-  );
-}
-
-Widget buildLocationInfo({required IconData icon, required Color color, required String label}) {
-  return Row(
-    children: [
-      Icon(
-        icon,
-        size: 16,
-        color: color,
+          return handler.next(e);
+        },
       ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ],
-  );
-}
+    );
+    
+    // Initialize data
+    initData();
+  }
+  
+  // Initialize all data
+  Future<void> initData() async {
+    await fetchDriverProfile();
+    await fetchUpcomingBookings();
+    await fetchVehicleImages(); // Add this line
+  }
+  
+  // Get token from storage
+  String? _getToken() {
+    return _storage.read('access_token');
+  }
+  
+  // Fetch driver profile from API
+  Future<void> fetchDriverProfile() async {
+    try {
+      isProfileLoading.value = true;
+      
+      // Check if token exists
+      if (_getToken() == null) {
+        print('No token available, cannot fetch profile');
+        return;
+      }
+      
+      print('Fetching driver profile from: $profileEndpoint');
+      final response = await _dio.get(profileEndpoint);
+      
+      print('Profile response received');
+      
+      if (response.statusCode == 200) {
+        // Parse profile data using your existing model
+        final profileData = DriverModel.fromJson(response.data);
+        driverProfile.value = profileData;
+        
+        // Update online status based on profile data
+        isOnline.value = profileData.status == 'free';
+        
+        print('Driver profile loaded: ${profileData.name}');
+      }
+    } catch (e) {
+      print('Error fetching driver profile: $e');
+      // No need to show a snackbar here as it might be annoying during initial load
+    } finally {
+      isProfileLoading.value = false;
+    }
+  }
 
-Widget buildLocationDivider() {
-  return Container(
-    margin: const EdgeInsets.only(left: 8),
-    height: 20,
-    width: 1,
-    color: Colors.grey[300],
-  );
+  Future<void> fetchDriverHistory() async {
+    try {
+      isTripHistoryLoading.value = true;
+      hasTripHistoryError.value = false;
+      
+      if (_getToken() == null) {
+        print('No token available, cannot fetch history');
+        hasTripHistoryError.value = true;
+        tripHistoryErrorMessage.value = 'Authentication required';
+        return;
+      }
+      
+      print('Fetching driver history from: $driverBookingHistoryEndpoint');
+      final response = await _dio.get(driverBookingHistoryEndpoint);
+      
+      print('Driver history response received: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        final historyResponse = DriverTripHistoryResponse.fromJson(response.data);
+        tripHistory.assignAll(historyResponse.data);
+        print('Loaded ${tripHistory.length} trips');
+      } else {
+        hasTripHistoryError.value = true;
+        tripHistoryErrorMessage.value = 'Failed to load trip history';
+      }
+    } catch (e) {
+      print('Error fetching driver history: $e');
+      hasTripHistoryError.value = true;
+      tripHistoryErrorMessage.value = 'Failed to load trip history';
+    } finally {
+      isTripHistoryLoading.value = false;
+    }
+  }
+  
+  // Fetch upcoming bookings from API
+  Future<void> fetchUpcomingBookings() async {
+    try {
+      isBookingsLoading.value = true;
+      hasBookingsError.value = false;
+      
+      // Check if token exists
+      if (_getToken() == null) {
+        print('No token available, cannot fetch bookings');
+        hasBookingsError.value = true;
+        bookingsErrorMessage.value = 'Authentication required';
+        return;
+      }
+      
+      print('Fetching upcoming bookings from: $upcomingBookingsEndpoint');
+      final response = await _dio.get(upcomingBookingsEndpoint);
+      
+      print('Bookings response received: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        // Debugging - print the type of response data
+        print('Response data type: ${response.data.runtimeType}');
+        
+        // Check if the response contains the expected structure
+        if (response.data is Map<String, dynamic> && 
+            response.data.containsKey('status') && 
+            response.data.containsKey('data')) {
+          
+          // First clear the existing list to avoid conflicts
+          upcomingBookings.clear();
+          
+          final responseStatus = response.data['status'] as String;
+          final responseMessage = response.data['message'] as String;
+          
+          if (responseStatus == 'success') {
+            // Get the raw data list
+            final List<dynamic> rawBookings = response.data['data'];
+            
+            // Manually convert each item in the list to an UpcomingBooking
+            List<UpcomingBooking> parsedBookings = [];
+            for (var booking in rawBookings) {
+              try {
+                parsedBookings.add(UpcomingBooking.fromJson(booking));
+              } catch (e) {
+                print('Error parsing booking: $e');
+                print('Problematic booking data: $booking');
+              }
+            }
+            
+            // Now safely assign the parsed bookings to our observable list
+            upcomingBookings.assignAll(parsedBookings);
+            print('Loaded ${upcomingBookings.length} upcoming bookings');
+          } else {
+            // Handle API error response
+            hasBookingsError.value = true;
+            bookingsErrorMessage.value = responseMessage;
+            print('API error: $responseMessage');
+          }
+        } else {
+          // Invalid response format
+          hasBookingsError.value = true;
+          bookingsErrorMessage.value = 'Invalid response format';
+          print('Invalid response format: ${response.data}');
+        }
+      }
+    } catch (e) {
+      print('Error fetching upcoming bookings: $e');
+      hasBookingsError.value = true;
+      
+      // Check if it's a 404 Not Found (no bookings)
+      if (e is DioException && e.response?.statusCode == 404) {
+        // This is an expected response when no bookings are found
+        bookingsErrorMessage.value = 'No upcoming bookings found';
+        // Clear the list just in case
+        upcomingBookings.clear();
+      } else {
+        // Some other error occurred
+        bookingsErrorMessage.value = 'Failed to load upcoming bookings';
+      }
+    } finally {
+      isBookingsLoading.value = false;
+    }
+  }
+  
+  // Add vehicle images fetch method
+  Future<void> fetchVehicleImages() async {
+    try {
+      isVehicleImagesLoading.value = true;
+      hasVehicleImagesError.value = false;
+      
+      if (_getToken() == null) {
+        print('No token available, cannot fetch vehicle images');
+        hasVehicleImagesError.value = true;
+        vehicleImagesErrorMessage.value = 'Authentication required';
+        return;
+      }
+      
+      final response = await _dio.get('/vehicles/get-vehicle-image/');
+      
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['status'] == 'success') {
+          vehicleImages.assignAll(List<Map<String, dynamic>>.from(data['data']));
+          print('Loaded ${vehicleImages.length} vehicle images');
+        } else {
+          hasVehicleImagesError.value = true;
+          vehicleImagesErrorMessage.value = data['message'] ?? 'Failed to load vehicle images';
+        }
+      }
+    } catch (e) {
+      print('Error fetching vehicle images: $e');
+      hasVehicleImagesError.value = true;
+      if (e is DioException && e.response?.statusCode == 404) {
+        vehicleImagesErrorMessage.value = 'No images found for this vehicle.';
+        vehicleImages.clear();
+      } else {
+        vehicleImagesErrorMessage.value = 'Failed to load vehicle images';
+      }
+    } finally {
+      isVehicleImagesLoading.value = false;
+    }
+  }
+  
+  // Toggle online status with API integration
+  Future<void> toggleOnlineStatus() async {
+    try {
+      isLoading.value = true;
+      
+      // Check if token exists
+      if (_getToken() == null) {
+        print('No token available, prompting login');
+        Get.snackbar(
+          'Login Required',
+          'Please log in to change your status',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+      
+      print('Calling API: $statusEndpoint');
+      final response = await _dio.post(statusEndpoint);
+      
+      print('Response received: ${response.data}');
+      
+      // Update local state based on API response
+      final String newStatus = response.data['data'].toString();
+      isOnline.value = newStatus == 'free'; // 'free' = online, 'busy' = offline
+      
+      // Refresh the profile to get updated data
+      fetchDriverProfile();
+      
+      // Show success message
+      Get.snackbar(
+        'Status Updated',
+        response.data['message'] ?? 'Status updated successfully',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isOnline.value ? Colors.green : Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      print('Error toggling status: $e');
+      
+      // Only show error if it's not a 401 (that's handled in the interceptor)
+      if (e is DioException && e.response?.statusCode != 401) {
+        Get.snackbar(
+          'Error',
+          'Failed to update status. Please try again.',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  // Pull to refresh functionality
+  Future<void> refreshData() async {
+    await fetchDriverProfile();
+    await fetchUpcomingBookings();
+    await fetchVehicleImages(); // Add this line
+    // You can add more refresh logic here if needed
+  }
 }

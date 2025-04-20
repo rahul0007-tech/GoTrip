@@ -379,4 +379,59 @@ class DriverHomePageController extends GetxController {
     await fetchVehicleImages(); // Add this line
     // You can add more refresh logic here if needed
   }
+
+  Future<void> updatePaymentStatus(int bookingId) async {
+    try {
+      isLoading.value = true;
+      
+      // Check if token exists
+      if (_getToken() == null) {
+        Get.snackbar(
+          'Login Required',
+          'Please log in to update payment status',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      final response = await _dio.post(
+        '/bookings/update-payment-status/',
+        data: {'booking_id': bookingId},
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar(
+          'Success',
+          response.data['message'] ?? 'Payment status updated successfully',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        
+        // Refresh the bookings list to show updated status
+        await fetchUpcomingBookings();
+      } else {
+        Get.snackbar(
+          'Error',
+          response.data['message'] ?? 'Failed to update payment status',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error updating payment status: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to update payment status. Please try again.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

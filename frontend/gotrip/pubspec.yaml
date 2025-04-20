@@ -77,6 +77,8 @@ flutter:
   assets:
     - asset/images/trophy_icon.png
     - asset/images/
+    - asset/svg/
+    - asset/images/profile_placeholder.png
 
   #   - images/a_dot_ham.jpeg
 

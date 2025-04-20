@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from .models import Booking, Location
 from users.models import Passenger, Driver
-from .serializers import AvailableBookingSerializer, CreateBookingSerializer, DriverHistorySerializer, ShowBookingLocationSerializer, DriverSerializer
+from .serializers import AvailableBookingSerializer, CreateBookingSerializer, DriverHistorySerializer, PassengerHistorySerializer, ShowBookingLocationSerializer, DriverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -54,11 +54,14 @@ class ShowBookingLocationView(APIView):
             )
 
 
-class CreateInstantBooking(APIView):
+class BookingWithDriver(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         user = request.user
-        passenger = get_object_or_404(Passenger, id=user.id)  
+        passenger = get_object_or_404(Passenger, id=user.id) 
+
+        if not passenger:   
+            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST) 
 
         driver = request.data.get('driver_id')
         if not driver:
@@ -122,27 +125,6 @@ class AcceptBookingView(APIView):
 
         return Response({"message": "Booking accepted successfully", "booking_id": booking.id}, status=status.HTTP_200_OK)
 
-
-# class GetAcceptedDriversView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id = user.id)
-#         if not passenger:
-#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-#         booking_id = request.data.get('booking_id')
-#         if not booking_id:
-#             return Response({'error':'Booking id is required'}, status=status.HTTP_400_BAD_REQUEST)
-#         booking = get_object_or_404(Booking, id=booking_id)
-#         # drivers = booking.accepted_drivers.all()
-#         # driver_list = [{"id":driver.id, "name": driver.name, "phone": driver.phone} for driver in drivers]
-#         # return Response({"booking_id": booking.id, "accepted_drivers": driver_list}, status=status.HTTP_200_OK)
-#         drivers = booking.accepted_drivers.all()
-#         driver_serializer = DriverSerializer(drivers, many=True)
-#         return Response({
-#             "booking_id": booking.id,
-#             "accepted_drivers": driver_serializer.data
-#         }, status=status.HTTP_200_OK)
 
 
 class GetAcceptedDriversView(APIView):
@@ -258,7 +240,7 @@ class CancelBookingView(APIView):
         # booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
         # booking = Booking.objects.all()
         if not booking:
-            return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_40ehi0_BAD_REQUEST)
+            return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_400_BAD_REQUEST)
         
 
 # class GetVehiclesCategoryView(APIView):
@@ -329,13 +311,34 @@ class DriverUpcommingBookingsView(APIView):
         
         
 
-        driver_Bookings = Booking.objects.filter(driver=driver,booking_for__gte=timezone.now().date()).order_by('booking_for')
+        driver_Bookings = Booking.objects.filter(status='confirmed',driver=driver,booking_for__gte=timezone.now().date()).order_by('booking_for')
 
         serializer = DriverHistorySerializer(driver_Bookings, many=True)
         if not driver_Bookings.exists():
             return Response({'status':'failed','message': 'No trip history found'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'status':'success','message': 'Driver trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)
+
+
+class PassengerUpcommingBookingsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        passenger = get_object_or_404(Passenger, id=request.user.id)
+
+        if not passenger:
+            return Response({'error': 'Invalid Token or Token has expired'}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+
+        passenger_Bookings = Booking.objects.filter(status='confirmed',passenger=passenger,booking_for__gte=timezone.now().date()).order_by('booking_for')
+
+        serializer = PassengerHistorySerializer(passenger_Bookings, many=True)
+        if not passenger_Bookings.exists():
+            return Response({'status':'failed','message': 'No trip history found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status':'success','message': 'Passenger trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)
+    
 
 class ChangeBookingStatus(APIView):
     permission_classes = [IsAuthenticated]

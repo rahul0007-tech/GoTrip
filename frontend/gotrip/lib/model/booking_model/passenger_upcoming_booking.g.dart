@@ -1,62 +1,59 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'upcomming_booking.dart';
+part of 'passenger_upcoming_booking.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-DriverUpcomingBookingsResponse _$DriverUpcomingBookingsResponseFromJson(
+PassengerUpcomingBookingsResponse _$PassengerUpcomingBookingsResponseFromJson(
         Map<String, dynamic> json) =>
-    DriverUpcomingBookingsResponse(
+    PassengerUpcomingBookingsResponse(
       status: json['status'] as String,
       message: json['message'] as String,
       data: (json['data'] as List<dynamic>)
-          .map((e) => UpcomingBooking.fromJson(e as Map<String, dynamic>))
+          .map((e) =>
+              PassengerUpcomingBooking.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$DriverUpcomingBookingsResponseToJson(
-        DriverUpcomingBookingsResponse instance) =>
+Map<String, dynamic> _$PassengerUpcomingBookingsResponseToJson(
+        PassengerUpcomingBookingsResponse instance) =>
     <String, dynamic>{
       'status': instance.status,
       'message': instance.message,
       'data': instance.data,
     };
 
-UpcomingBooking _$UpcomingBookingFromJson(Map<String, dynamic> json) =>
-    UpcomingBooking(
+PassengerUpcomingBooking _$PassengerUpcomingBookingFromJson(
+        Map<String, dynamic> json) =>
+    PassengerUpcomingBooking(
       id: (json['id'] as num).toInt(),
-      passenger: Passenger.fromJson(json['passenger'] as Map<String, dynamic>),
-      pickupLocation: json['pickup_location'] as String,
-      dropoffLocation: DropoffLocation.fromJson(
-          json['dropoff_location'] as Map<String, dynamic>),
-      fare: json['fare'] as String,
-      bookingFor: json['booking_for'] as String,
-      bookingTime: json['booking_time'] as String?,
       driver: json['driver'] == null
           ? null
           : Driver.fromJson(json['driver'] as Map<String, dynamic>),
+      pickupLocation: json['pickupLocation'] as String,
+      dropoffLocation: DropoffLocation.fromJson(
+          json['dropoffLocation'] as Map<String, dynamic>),
+      fare: json['fare'] as String,
+      bookingFor: json['bookingFor'] as String,
+      bookingTime: json['bookingTime'] as String?,
+      status: json['status'] as String,
+      paymentStatus: json['paymentStatus'] as String,
     );
 
-Map<String, dynamic> _$UpcomingBookingToJson(UpcomingBooking instance) =>
+Map<String, dynamic> _$PassengerUpcomingBookingToJson(
+        PassengerUpcomingBooking instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'passenger': instance.passenger,
-      'pickup_location': instance.pickupLocation,
-      'dropoff_location': instance.dropoffLocation,
-      'fare': instance.fare,
-      'booking_for': instance.bookingFor,
-      'booking_time': instance.bookingTime,
       'driver': instance.driver,
-    };
-
-Passenger _$PassengerFromJson(Map<String, dynamic> json) => Passenger(
-      name: json['name'] as String,
-    );
-
-Map<String, dynamic> _$PassengerToJson(Passenger instance) => <String, dynamic>{
-      'name': instance.name,
+      'pickupLocation': instance.pickupLocation,
+      'dropoffLocation': instance.dropoffLocation,
+      'fare': instance.fare,
+      'bookingFor': instance.bookingFor,
+      'bookingTime': instance.bookingTime,
+      'status': instance.status,
+      'paymentStatus': instance.paymentStatus,
     };
 
 Driver _$DriverFromJson(Map<String, dynamic> json) => Driver(

@@ -9,7 +9,9 @@
 from datetime import datetime
 from django.utils.timezone import now, make_aware
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError  # Use this instead of Django's
+from rest_framework.exceptions import ValidationError
+
+from vehicles.serializers import DriverWithVehicleSerializer, VehicleSerializer  # Use this instead of Django's
 from .models import Booking, Location
 from users.models import Driver, Passenger
 
@@ -104,6 +106,14 @@ class DriverHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id','passenger', 'pickup_location', 'dropoff_location', 'fare', 'booking_for', 'booking_time']
+
+class PassengerHistorySerializer(serializers.ModelSerializer):
+    dropoff_location = LocationNameSerializer()
+    driver = DriverWithVehicleSerializer()
+    
+    class Meta:
+        model = Booking
+        fields = ['id','driver', 'pickup_location', 'dropoff_location', 'fare', 'booking_for', 'booking_time']
 
 
 

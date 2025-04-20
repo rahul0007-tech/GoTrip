@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gotrip/network/http_client.dart';
+import 'package:gotrip/model/passenger.dart';
 
 class ProfileController extends GetxController {
 
@@ -76,6 +77,36 @@ class ProfileController extends GetxController {
   );
 
   Get.offAllNamed('/login');
+  }
+}
+
+class PassengerProfileController extends GetxController {
+  final Rxn<Passenger> passenger = Rxn<Passenger>();
+  final RxBool isLoading = false.obs;
+  final RxString error = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfile();
+  }
+
+  Future<void> fetchProfile() async {
+    try {
+      isLoading(true);
+      final response = await httpClient.get('/users/passengerprofile/');
+      
+      if (response.statusCode == 200) {
+        // The API returns the full URL, so we can use it directly
+        passenger.value = Passenger.fromJson(response.data);
+      } else {
+        error.value = 'Failed to load profile';
+      }
+    } catch (e) {
+      error.value = 'Error: $e';
+    } finally {
+      isLoading(false);
+    }
   }
 }
 
