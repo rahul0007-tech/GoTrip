@@ -43,4 +43,3 @@ class KhaltiPaymentSerializer(serializers.Serializer):
     return_url = serializers.URLField(required=True)
     website_url = serializers.URLField(required=True)
     booking_id = serializers.IntegerField(required=True)
-    phone_number = serializers.CharField(required=True)

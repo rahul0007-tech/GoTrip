@@ -360,6 +360,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
   void initState() {
     super.initState();
     _fetchBookings();
+    
   }
 
   Future<void> _fetchBookings() async {

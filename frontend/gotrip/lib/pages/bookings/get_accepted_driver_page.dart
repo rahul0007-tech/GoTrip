@@ -526,24 +526,6 @@ class AcceptedDriversPage extends StatelessWidget {
   }
 
   void _initiatePayment(int bookingId, String fare) {
-    // Get phone number
-    final phoneNumber = profileController.phone.value;
-
-    if (phoneNumber.isEmpty) {
-      Get.snackbar(
-        'Missing Information',
-        'Your phone number is not available. Please update your profile.',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red[700],
-        colorText: Colors.white,
-        duration: Duration(seconds: 5),
-        margin: EdgeInsets.all(10),
-        borderRadius: 10,
-      );
-      return;
-    }
-
-    // Show payment confirmation dialog with enhanced UI
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -582,7 +564,7 @@ class AcceptedDriversPage extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                '₹$fare',
+                'Rs. $fare',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -623,8 +605,8 @@ class AcceptedDriversPage extends StatelessWidget {
                       Get.back(); // Close dialog
                       khaltiPaymentController.clearPaymentData();
                       
-                      // Prepare payment data
-                      khaltiPaymentController.initiatePayment(bookingId, phoneNumber);
+                      // Initialize payment with just bookingId
+                      khaltiPaymentController.initiatePayment(bookingId);
                       
                       // Navigate to payment screen
                       Get.to(
@@ -635,13 +617,13 @@ class AcceptedDriversPage extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
-                      'Pay Now',
+                      'Confirm Payment',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,

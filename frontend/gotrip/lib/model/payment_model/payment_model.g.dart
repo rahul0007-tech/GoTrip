@@ -8,8 +8,9 @@ part of 'payment_model.dart';
 
 PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) => PaymentModel(
       paymentId: (json['payment_id'] as num).toInt(),
-      pidx: json['pidx'] as String,
+      pidx: json['pidx'] as String? ?? '',
       amount: (json['amount'] as num).toInt(),
+      status: json['status'] as String? ?? 'initiated',
     );
 
 Map<String, dynamic> _$PaymentModelToJson(PaymentModel instance) =>
@@ -17,4 +18,5 @@ Map<String, dynamic> _$PaymentModelToJson(PaymentModel instance) =>
       'payment_id': instance.paymentId,
       'pidx': instance.pidx,
       'amount': instance.amount,
+      'status': instance.status,
     };

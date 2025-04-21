@@ -21,7 +21,7 @@ class PassengerUpcomingBookingsController extends GetxController {
       hasError(false);
       errorMessage('');
       
-      final response = await httpClient.get('/bookings/accepted-drivers/');
+      final response = await httpClient.get('/bookings/passengerupcomingbookings/');
       
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> responseData = response.data;

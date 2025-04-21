@@ -62,7 +62,9 @@ Map<String, dynamic> _$PassengerToJson(Passenger instance) => <String, dynamic>{
 Driver _$DriverFromJson(Map<String, dynamic> json) => Driver(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
-      vehicle: Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
+      vehicle: json['vehicle'] == null
+          ? null
+          : Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DriverToJson(Driver instance) => <String, dynamic>{
@@ -72,16 +74,19 @@ Map<String, dynamic> _$DriverToJson(Driver instance) => <String, dynamic>{
     };
 
 Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
-      vehicleColor: json['vehicle_color'] as String,
-      vehicleCompany: json['vehicle_company'] as String,
-      vehicleNumber: json['vehicle_number'] as String,
-      sittingCapacity: (json['sitting_capacity'] as num).toInt(),
-      vehicleType:
-          VehicleType.fromJson(json['vehicle_type'] as Map<String, dynamic>),
-      vehicleFuelType: VehicleFuelType.fromJson(
-          json['vehicle_fuel_type'] as Map<String, dynamic>),
-      images: (json['images'] as List<dynamic>)
-          .map((e) => VehicleImage.fromJson(e as Map<String, dynamic>))
+      vehicleColor: json['vehicle_color'] as String?,
+      vehicleCompany: json['vehicle_company'] as String?,
+      vehicleNumber: json['vehicle_number'] as String?,
+      sittingCapacity: (json['sitting_capacity'] as num?)?.toInt(),
+      vehicleType: json['vehicle_type'] == null
+          ? null
+          : VehicleType.fromJson(json['vehicle_type'] as Map<String, dynamic>),
+      vehicleFuelType: json['vehicle_fuel_type'] == null
+          ? null
+          : VehicleFuelType.fromJson(
+              json['vehicle_fuel_type'] as Map<String, dynamic>),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => VehicleImage.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
