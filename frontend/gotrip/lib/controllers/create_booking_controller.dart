@@ -3,40 +3,155 @@
 // import 'package:get/get.dart';
 // import 'package:get_storage/get_storage.dart';
 // import 'package:gotrip/model/booking_model/booking_model.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:geocoding/geocoding.dart';
 
 // class CreateBookingController extends GetxController {
 //   // Observable fields for booking data
 //   var pickupLocation = ''.obs;
 //   var isLoading = false.obs;
 //   var isLoadingLocations = false.obs;
-
-//   // Store the date as a string
 //   var bookingDate = ''.obs;
-
+//   var bookingTime = ''.obs;
+  
+//   // Map related observables
+//   var currentLocation = const LatLng(0, 0).obs;
+//   var selectedLocation = const LatLng(0, 0).obs;
+//   var isLoadingCurrentLocation = false.obs;
+//   var markers = <Marker>{}.obs;
+//   GoogleMapController? mapController;
+  
 //   // Store locations from the API
 //   var locations = <LocationModel>[].obs;
-
-//   // Store selected location
-//   Rx<LocationModel?> selectedLocation = Rx<LocationModel?>(null);
-
+  
+//   // Store selected destination
+//   Rx<LocationModel?> selectedDestination = Rx<LocationModel?>(null);
+  
 //   // Controller for the date text field
 //   final TextEditingController dateController = TextEditingController();
-
+  
 //   // Setup Dio with your backend URL
 //   final Dio _dio = Dio(
 //     BaseOptions(
-//       baseUrl: 'http://10.0.2.2:8000', // Update with your backend URL
+//       baseUrl: 'http://10.0.2.2:8000',
 //       connectTimeout: Duration(seconds: 20),
 //       receiveTimeout: Duration(seconds: 20),
 //     ),
 //   );
-
+  
 //   final box = GetStorage();
 
 //   @override
 //   void onInit() {
 //     super.onInit();
-//     fetchLocations(); // Fetch locations when controller initializes
+//     fetchLocations();
+//     getCurrentLocation();
+//   }
+  
+//   // Get current location
+//   Future<void> getCurrentLocation() async {
+//     isLoadingCurrentLocation.value = true;
+//     try {
+//       // Check location permissions
+//       LocationPermission permission = await Geolocator.checkPermission();
+//       if (permission == LocationPermission.denied) {
+//         permission = await Geolocator.requestPermission();
+//         if (permission == LocationPermission.denied) {
+//           Get.snackbar(
+//             'Error',
+//             'Location permission denied',
+//             snackPosition: SnackPosition.BOTTOM,
+//             backgroundColor: Colors.redAccent,
+//             colorText: Colors.white,
+//           );
+//           return;
+//         }
+//       }
+
+//       // Get current position
+//       Position position = await Geolocator.getCurrentPosition();
+//       currentLocation.value = LatLng(position.latitude, position.longitude);
+//       selectedLocation.value = currentLocation.value;
+      
+//       // Update marker
+//       updateMarker(currentLocation.value);
+      
+//       // Get address from coordinates
+//       List<Placemark> placemarks = await placemarkFromCoordinates(
+//         position.latitude,
+//         position.longitude,
+//       );
+      
+//       if (placemarks.isNotEmpty) {
+//         Placemark place = placemarks[0];
+//         pickupLocation.value = "${place.street}, ${place.subLocality}, ${place.locality}";
+//       }
+      
+//       // Move camera to current location
+//       if (mapController != null) {
+//         mapController!.animateCamera(
+//           CameraUpdate.newCameraPosition(
+//             CameraPosition(
+//               target: currentLocation.value,
+//               zoom: 15,
+//             ),
+//           ),
+//         );
+//       }
+//     } catch (e) {
+//       print('Error getting location: $e');
+//       Get.snackbar(
+//         'Error',
+//         'Failed to get current location',
+//         snackPosition: SnackPosition.BOTTOM,
+//         backgroundColor: Colors.redAccent,
+//         colorText: Colors.white,
+//       );
+//     } finally {
+//       isLoadingCurrentLocation.value = false;
+//     }
+//   }
+  
+//   // Update marker on map
+//   void updateMarker(LatLng position) {
+//     markers.clear();
+//     markers.add(
+//       Marker(
+//         markerId: const MarkerId('selected_location'),
+//         position: position,
+//         draggable: true,
+//         onDragEnd: (newPosition) async {
+//           selectedLocation.value = newPosition;
+//           // Update address when marker is dragged
+//           List<Placemark> placemarks = await placemarkFromCoordinates(
+//             newPosition.latitude,
+//             newPosition.longitude,
+//           );
+//           if (placemarks.isNotEmpty) {
+//             Placemark place = placemarks[0];
+//             pickupLocation.value = "${place.street}, ${place.subLocality}, ${place.locality}";
+//           }
+//         },
+//       ),
+//     );
+//   }
+  
+//   // Handle map tap to update location
+//   void onMapTap(LatLng position) async {
+//     selectedLocation.value = position;
+//     updateMarker(position);
+    
+//     // Get address from tapped location
+//     List<Placemark> placemarks = await placemarkFromCoordinates(
+//       position.latitude,
+//       position.longitude,
+//     );
+    
+//     if (placemarks.isNotEmpty) {
+//       Placemark place = placemarks[0];
+//       pickupLocation.value = "${place.street}, ${place.subLocality}, ${place.locality}";
+//     }
 //   }
 
 //   // Fetch locations from the backend
@@ -139,11 +254,40 @@
 
 //   // Set the selected location
 //   void setSelectedLocation(LocationModel? location) {
-//     selectedLocation.value = location;
+//     selectedDestination.value = location;
+//   }
+
+//   // Check if selected date is in the past
+//   bool isDateInPast(String date) {
+//     try {
+//       // Get current date (without time)
+//       final now = DateTime.now();
+//       final today = DateTime(now.year, now.month, now.day);
+      
+//       // Parse the date string
+//       final dateParts = date.split('-');
+      
+//       if (dateParts.length != 3) {
+//         return false; // Invalid format, treat as not in past
+//       }
+      
+//       final year = int.parse(dateParts[0]);
+//       final month = int.parse(dateParts[1]);
+//       final day = int.parse(dateParts[2]);
+      
+//       // Create date object (without time)
+//       final selectedDate = DateTime(year, month, day);
+      
+//       // Compare with today's date (ignoring time)
+//       return selectedDate.isBefore(today);
+//     } catch (e) {
+//       print('Error parsing date: $e');
+//       return false; // On error, assume it's not in the past
+//     }
 //   }
 
 //   Future<void> createBooking() async {
-//     if (selectedLocation.value == null) {
+//     if (selectedDestination.value == null) {
 //       Get.snackbar(
 //         'Error',
 //         'Please select a destination',
@@ -175,6 +319,29 @@
 //       );
 //       return;
 //     }
+    
+//     if (bookingTime.value.isEmpty) {
+//       Get.snackbar(
+//         'Error',
+//         'Please select booking time',
+//         snackPosition: SnackPosition.BOTTOM,
+//         backgroundColor: Colors.redAccent,
+//         colorText: Colors.white,
+//       );
+//       return;
+//     }
+    
+//     // Validate that the date is not in the past
+//     if (isDateInPast(bookingDate.value)) {
+//       Get.snackbar(
+//         'Error',
+//         'Cannot book a ride for a past date. Please select today or a future date.',
+//         snackPosition: SnackPosition.BOTTOM,
+//         backgroundColor: Colors.redAccent,
+//         colorText: Colors.white,
+//       );
+//       return;
+//     }
 
 //     isLoading.value = true;
 //     try {
@@ -194,12 +361,12 @@
 //       // Set the token in the headers
 //       _dio.options.headers["Authorization"] = "Bearer $accessToken";
 
-//       // According to your API, dropoff_location should be a string
-//       // The API expects the actual location string, not the ID
+//       // Send separate date and time fields to match Django API expectations
 //       final response = await _dio.post('/bookings/createbooking/', data: {
 //         'pickup_location': pickupLocation.value,
-//         'dropoff_location': selectedLocation.value!.name, // Send the name as a string
-//         'booking_for': bookingDate.value,
+//         'dropoff_location': selectedDestination.value!.name, // Send the name as a string
+//         'booking_for': bookingDate.value,     // Send date as separate field
+//         'booking_time': bookingTime.value,    // Send time as separate field
 //       });
 
 //       if (response.statusCode == 200) { // Your API returns 200 on success, not 201
@@ -212,8 +379,9 @@
 //         );
 //         // Clear fields after success
 //         pickupLocation.value = '';
-//         selectedLocation.value = null;
+//         selectedDestination.value = null;
 //         bookingDate.value = '';
+//         bookingTime.value = '';
 //         dateController.clear();
 //       } else {
 //         Get.snackbar(
@@ -229,7 +397,22 @@
 //       // Try to extract error message from response if possible
 //       String errorMsg = 'An error occurred while creating the booking';
 //       if (e is DioError && e.response != null) {
-//         errorMsg = e.response?.data?.toString() ?? errorMsg;
+//         final responseData = e.response?.data;
+        
+//         // Try to extract validation errors from response
+//         if (responseData is Map<String, dynamic>) {
+//           if (responseData.containsKey('booking_time')) {
+//             errorMsg = responseData['booking_time'].toString();
+//           } else if (responseData.containsKey('booking_for')) {
+//             errorMsg = responseData['booking_for'].toString();
+//           } else if (responseData.containsKey('non_field_errors')) {
+//             errorMsg = responseData['non_field_errors'].toString();
+//           } else {
+//             errorMsg = responseData.toString();
+//           }
+//         } else {
+//           errorMsg = e.response?.data?.toString() ?? errorMsg;
+//         }
 //       }
       
 //       Get.snackbar(
@@ -245,46 +428,226 @@
 //   }
 // }
 
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gotrip/model/booking_model/booking_model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class CreateBookingController extends GetxController {
   // Observable fields for booking data
   var pickupLocation = ''.obs;
   var isLoading = false.obs;
   var isLoadingLocations = false.obs;
-
-  // Store the date and time as strings
   var bookingDate = ''.obs;
-  var bookingTime = ''.obs; // Added for time selection
-
+  var bookingTime = ''.obs;
+  
+  // Map related observables
+  var currentLocation = const LatLng(0, 0).obs;
+  var selectedLocation = const LatLng(0, 0).obs;
+  var isLoadingCurrentLocation = false.obs;
+  var markers = <Marker>{}.obs;
+  GoogleMapController? mapController;
+  
   // Store locations from the API
   var locations = <LocationModel>[].obs;
-
-  // Store selected location
-  Rx<LocationModel?> selectedLocation = Rx<LocationModel?>(null);
-
+  
+  // Store selected destination
+  Rx<LocationModel?> selectedDestination = Rx<LocationModel?>(null);
+  
   // Controller for the date text field
   final TextEditingController dateController = TextEditingController();
-
+  
   // Setup Dio with your backend URL
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'http://10.0.2.2:8000', // Update with your backend URL
+      baseUrl: 'http://10.0.2.2:8000',
       connectTimeout: Duration(seconds: 20),
       receiveTimeout: Duration(seconds: 20),
     ),
   );
-
+  
   final box = GetStorage();
 
   @override
   void onInit() {
     super.onInit();
-    fetchLocations(); // Fetch locations when controller initializes
+    fetchLocations();
+    getCurrentLocation();
+  }
+  
+  // Get current location
+  Future<void> getCurrentLocation() async {
+    isLoadingCurrentLocation.value = true;
+    try {
+      // Check location permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar(
+            'Error',
+            'Location permission denied',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
+          return;
+        }
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition();
+      
+      // Pokhara bounds
+      const LatLng pokharaSW = LatLng(28.1496, 83.9256);
+      const LatLng pokharaNE = LatLng(28.2696, 84.0456);
+      
+      // Check if current position is within Pokhara
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
+      bool isInPokhara = userLocation.latitude >= pokharaSW.latitude &&
+                         userLocation.latitude <= pokharaNE.latitude &&
+                         userLocation.longitude >= pokharaSW.longitude &&
+                         userLocation.longitude <= pokharaNE.longitude;
+      
+      if (!isInPokhara) {
+        // If not in Pokhara, use Pokhara center instead
+        currentLocation.value = const LatLng(28.2096, 83.9856); // Pokhara center
+        selectedLocation.value = currentLocation.value;
+        
+        Get.snackbar(
+          'Notice',
+          'You are not currently in Pokhara. Using Pokhara city center.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+      } else {
+        // Use actual location if within Pokhara
+        currentLocation.value = userLocation;
+        selectedLocation.value = currentLocation.value;
+      }
+      
+      // Update marker
+      updateMarker(selectedLocation.value);
+      
+      // Get address from coordinates
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        selectedLocation.value.latitude,
+        selectedLocation.value.longitude,
+      );
+      
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        List<String> addressParts = [
+          place.street ?? '',
+          place.subLocality ?? '',
+          place.locality ?? '',
+          'Pokhara, Nepal',
+        ].where((element) => element.isNotEmpty).toList();
+        
+        pickupLocation.value = addressParts.join(', ');
+      } else {
+        pickupLocation.value = 'Selected location in Pokhara';
+      }
+      
+      // Move camera to location
+      if (mapController != null) {
+        mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: selectedLocation.value,
+              zoom: 15,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error getting location: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to get location',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      
+      // Set default to Pokhara center
+      currentLocation.value = const LatLng(28.2096, 83.9856);
+      selectedLocation.value = currentLocation.value;
+      updateMarker(selectedLocation.value);
+      
+      // Move camera to Pokhara center
+      if (mapController != null) {
+        mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation.value,
+              zoom: 15,
+            ),
+          ),
+        );
+      }
+    } finally {
+      isLoadingCurrentLocation.value = false;
+    }
+  }
+  
+  // Update marker on map
+  void updateMarker(LatLng position) {
+    markers.clear();
+    markers.add(
+      Marker(
+        markerId: const MarkerId('selected_location'),
+        position: position,
+        draggable: true,
+        onDragEnd: (newPosition) async {
+          // Check if the dragged position is within Pokhara bounds
+          const LatLng pokharaSW = LatLng(28.1496, 83.9256);
+          const LatLng pokharaNE = LatLng(28.2696, 84.0456);
+          bool isInPokhara = newPosition.latitude >= pokharaSW.latitude &&
+                             newPosition.latitude <= pokharaNE.latitude &&
+                             newPosition.longitude >= pokharaSW.longitude &&
+                             newPosition.longitude <= pokharaNE.longitude;
+          
+          if (!isInPokhara) {
+            Get.snackbar(
+              'Location outside Pokhara',
+              'Please select a location within Pokhara city limits.',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white,
+            );
+            
+            // Reset marker to previous position
+            updateMarker(selectedLocation.value);
+            return;
+          }
+          
+          selectedLocation.value = newPosition;
+          // Update address when marker is dragged
+          List<Placemark> placemarks = await placemarkFromCoordinates(
+            newPosition.latitude,
+            newPosition.longitude,
+          );
+          if (placemarks.isNotEmpty) {
+            Placemark place = placemarks[0];
+            List<String> addressParts = [
+              place.street ?? '',
+              place.subLocality ?? '',
+              place.locality ?? '',
+              'Pokhara, Nepal',
+            ].where((element) => element.isNotEmpty).toList();
+            
+            pickupLocation.value = addressParts.join(', ');
+          }
+        },
+      ),
+    );
   }
 
   // Fetch locations from the backend
@@ -387,7 +750,7 @@ class CreateBookingController extends GetxController {
 
   // Set the selected location
   void setSelectedLocation(LocationModel? location) {
-    selectedLocation.value = location;
+    selectedDestination.value = location;
   }
 
   // Check if selected date is in the past
@@ -420,7 +783,7 @@ class CreateBookingController extends GetxController {
   }
 
   Future<void> createBooking() async {
-    if (selectedLocation.value == null) {
+    if (selectedDestination.value == null) {
       Get.snackbar(
         'Error',
         'Please select a destination',
@@ -497,7 +860,7 @@ class CreateBookingController extends GetxController {
       // Send separate date and time fields to match Django API expectations
       final response = await _dio.post('/bookings/createbooking/', data: {
         'pickup_location': pickupLocation.value,
-        'dropoff_location': selectedLocation.value!.name, // Send the name as a string
+        'dropoff_location': selectedDestination.value!.name, // Send the name as a string
         'booking_for': bookingDate.value,     // Send date as separate field
         'booking_time': bookingTime.value,    // Send time as separate field
       });
@@ -512,7 +875,7 @@ class CreateBookingController extends GetxController {
         );
         // Clear fields after success
         pickupLocation.value = '';
-        selectedLocation.value = null;
+        selectedDestination.value = null;
         bookingDate.value = '';
         bookingTime.value = '';
         dateController.clear();

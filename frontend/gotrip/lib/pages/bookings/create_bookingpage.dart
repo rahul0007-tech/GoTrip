@@ -3,6 +3,7 @@
 // import 'package:gotrip/model/booking_model/booking_model.dart';
 // import '../../controllers/create_booking_controller.dart';
 // import '../../utils/app_colors.dart';
+// import '../../widgets/location_map_widget.dart';  // Add this import
 
 // class CreateBookingPage extends StatelessWidget {
 //   final CreateBookingController controller = Get.put(CreateBookingController());
@@ -13,7 +14,6 @@
 //   Widget build(BuildContext context) {
 //     // Define consistent colors
 //     final Color primaryColor = AppColors.primary;
-//     final Color secondaryColor = Colors.teal.shade50;
 //     final Color accentColor = Colors.amber.shade600;
     
 //     return Scaffold(
@@ -103,12 +103,23 @@
 //                     ),
 //                     const SizedBox(height: 20),
                     
+//                     // Map widget for location selection
+//                     Text(
+//                       'Select Location on Map',
+//                       style: Theme.of(context).textTheme.titleMedium,
+//                     ),
+//                     const SizedBox(height: 8),
+//                     LocationMapWidget(controller: controller),
+//                     const SizedBox(height: 20),
+                    
 //                     // Pickup Location field with icon
 //                     _buildTextField(
 //                       label: 'Pickup Location',
 //                       icon: Icons.location_on,
 //                       onChanged: (value) => controller.pickupLocation.value = value,
 //                       hintText: 'Enter your pickup location',
+//                       controller: TextEditingController(text: controller.pickupLocation.value),
+//                       readOnly: true,
 //                     ),
 //                     const SizedBox(height: 20),
                     
@@ -137,7 +148,7 @@
 //                                   'Select Destination',
 //                                   style: TextStyle(color: Colors.grey.shade600),
 //                                 ),
-//                                 value: controller.selectedLocation.value,
+//                                 value: controller.selectedDestination.value,
 //                                 icon: const Icon(Icons.keyboard_arrow_down),
 //                                 elevation: 16,
 //                                 onChanged: (LocationModel? location) {
@@ -249,12 +260,90 @@
 //                       ),
 //                     ),
 //                     const SizedBox(height: 20),
+                    
+//                     // Time selection field
+//                     _buildSectionTitle('Booking Time', Icons.access_time),
+//                     const SizedBox(height: 10),
+                    
+//                     InkWell(
+//                       onTap: () async {
+//                         // Use current time as default
+//                         final TimeOfDay initialTime = TimeOfDay.now();
+                        
+//                         // Show time picker
+//                         final TimeOfDay? pickedTime = await showTimePicker(
+//                           context: context,
+//                           initialTime: controller.bookingTime.value.isNotEmpty
+//                               ? TimeOfDay(
+//                                   hour: int.parse(controller.bookingTime.value.split(':')[0]),
+//                                   minute: int.parse(controller.bookingTime.value.split(':')[1])
+//                                 )
+//                               : initialTime,
+//                           builder: (context, child) {
+//                             return Theme(
+//                               data: Theme.of(context).copyWith(
+//                                 colorScheme: ColorScheme.light(
+//                                   primary: primaryColor,
+//                                 ),
+//                               ),
+//                               child: child!,
+//                             );
+//                           },
+//                         );
+                        
+//                         if (pickedTime != null) {
+//                           // Format the time as HH:MM
+//                           final formattedTime = 
+//                             '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
+                          
+//                           // Update the booking time
+//                           controller.bookingTime.value = formattedTime;
+//                         }
+//                       },
+//                       child: Container(
+//                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+//                         decoration: BoxDecoration(
+//                           color: Colors.grey.shade50,
+//                           borderRadius: BorderRadius.circular(12),
+//                           border: Border.all(color: Colors.grey.shade200),
+//                         ),
+//                         child: Row(
+//                           children: [
+//                             Icon(
+//                               Icons.access_time,
+//                               color: primaryColor,
+//                             ),
+//                             const SizedBox(width: 10),
+//                             Expanded(
+//                               child: Obx(() => Text(
+//                                 controller.bookingTime.value.isEmpty
+//                                     ? 'Select Booking Time'
+//                                     : controller.bookingTime.value,
+//                                 style: TextStyle(
+//                                   color: controller.bookingTime.value.isEmpty
+//                                       ? Colors.grey.shade600
+//                                       : Colors.black,
+//                                   fontWeight: controller.bookingTime.value.isEmpty
+//                                       ? FontWeight.normal
+//                                       : FontWeight.w500,
+//                                 ),
+//                               )),
+//                             ),
+//                             Icon(
+//                               Icons.arrow_drop_down,
+//                               color: Colors.grey.shade600,
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                     const SizedBox(height: 20),
 //                   ],
 //                 ),
 //               ),
               
 //               // Selected location details card
-//               if (controller.selectedLocation.value != null)
+//               if (controller.selectedDestination.value != null)
 //                 Container(
 //                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
 //                   padding: const EdgeInsets.all(20),
@@ -296,7 +385,7 @@
 //                       const SizedBox(height: 8),
 //                       _buildSummaryItem(
 //                         'To:',
-//                         controller.selectedLocation.value!.name,
+//                         controller.selectedDestination.value!.name,
 //                       ),
 //                       const SizedBox(height: 8),
 //                       Obx(() => _buildSummaryItem(
@@ -304,6 +393,13 @@
 //                         controller.bookingDate.value.isEmpty
 //                             ? 'Not selected'
 //                             : controller.bookingDate.value,
+//                       )),
+//                       const SizedBox(height: 8),
+//                       Obx(() => _buildSummaryItem(
+//                         'Time:',
+//                         controller.bookingTime.value.isEmpty
+//                             ? 'Not selected'
+//                             : controller.bookingTime.value,
 //                       )),
 //                       const SizedBox(height: 16),
 //                       Row(
@@ -324,7 +420,7 @@
 //                               borderRadius: BorderRadius.circular(20),
 //                             ),
 //                             child: Text(
-//                               '₹${controller.selectedLocation.value!.fare.toStringAsFixed(2)}',
+//                               '₹${controller.selectedDestination.value!.fare.toStringAsFixed(2)}',
 //                               style: const TextStyle(
 //                                 color: Colors.white,
 //                                 fontWeight: FontWeight.bold,
@@ -346,6 +442,17 @@
 //                   height: 56,
 //                   child: ElevatedButton(
 //                     onPressed: () {
+//                       // Validate that time is selected
+//                       if (controller.bookingTime.value.isEmpty) {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           SnackBar(
+//                             content: Text('Please select booking time'),
+//                             backgroundColor: Colors.red,
+//                           ),
+//                         );
+//                         return;
+//                       }
+                      
 //                       // Show confirmation dialog before creating booking
 //                       _showConfirmationDialog(context, primaryColor);
 //                     },
@@ -514,17 +621,19 @@
 //               ),
 //             ),
 //           ],
-//         );
+//         ); 
 //       },
 //     );
 //   }
 // }
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/model/booking_model/booking_model.dart';
 import '../../controllers/create_booking_controller.dart';
 import '../../utils/app_colors.dart';
+import '../../widgets/pokhara_map_widget.dart';  // Updated import for Pokhara map
 
 class CreateBookingPage extends StatelessWidget {
   final CreateBookingController controller = Get.put(CreateBookingController());
@@ -535,7 +644,6 @@ class CreateBookingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Define consistent colors
     final Color primaryColor = AppColors.primary;
-    final Color secondaryColor = Colors.teal.shade50;
     final Color accentColor = Colors.amber.shade600;
     
     return Scaffold(
@@ -625,12 +733,24 @@ class CreateBookingPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     
+                    // Map widget for location selection in Pokhara
+                    Text(
+                      'Select Location on Map',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    // Using the new Pokhara-specific map widget
+                    PokharaMapWidget(controller: controller),
+                    const SizedBox(height: 20),
+                    
                     // Pickup Location field with icon
                     _buildTextField(
                       label: 'Pickup Location',
                       icon: Icons.location_on,
                       onChanged: (value) => controller.pickupLocation.value = value,
                       hintText: 'Enter your pickup location',
+                      controller: TextEditingController(text: controller.pickupLocation.value),
+                      readOnly: true,
                     ),
                     const SizedBox(height: 20),
                     
@@ -659,7 +779,7 @@ class CreateBookingPage extends StatelessWidget {
                                   'Select Destination',
                                   style: TextStyle(color: Colors.grey.shade600),
                                 ),
-                                value: controller.selectedLocation.value,
+                                value: controller.selectedDestination.value,
                                 icon: const Icon(Icons.keyboard_arrow_down),
                                 elevation: 16,
                                 onChanged: (LocationModel? location) {
@@ -854,96 +974,100 @@ class CreateBookingPage extends StatelessWidget {
               ),
               
               // Selected location details card
-              if (controller.selectedLocation.value != null)
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [primaryColor, primaryColor.withOpacity(0.8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+              Obx(() {
+                if (controller.selectedDestination.value != null) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Trip Summary',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.white.withOpacity(0.9),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSummaryItem(
-                        'From:',
-                        controller.pickupLocation.value.isEmpty
-                            ? 'Not specified'
-                            : controller.pickupLocation.value,
-                      ),
-                      const SizedBox(height: 8),
-                      _buildSummaryItem(
-                        'To:',
-                        controller.selectedLocation.value!.name,
-                      ),
-                      const SizedBox(height: 8),
-                      Obx(() => _buildSummaryItem(
-                        'Date:',
-                        controller.bookingDate.value.isEmpty
-                            ? 'Not selected'
-                            : controller.bookingDate.value,
-                      )),
-                      const SizedBox(height: 8),
-                      Obx(() => _buildSummaryItem(
-                        'Time:',
-                        controller.bookingTime.value.isEmpty
-                            ? 'Not selected'
-                            : controller.bookingTime.value,
-                      )),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Total Fare:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: accentColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '₹${controller.selectedLocation.value!.fare.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Trip Summary',
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildSummaryItem(
+                          'From:',
+                          controller.pickupLocation.value.isEmpty
+                              ? 'Not specified'
+                              : controller.pickupLocation.value,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSummaryItem(
+                          'To:',
+                          controller.selectedDestination.value!.name,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSummaryItem(
+                          'Date:',
+                          controller.bookingDate.value.isEmpty
+                              ? 'Not selected'
+                              : controller.bookingDate.value,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSummaryItem(
+                          'Time:',
+                          controller.bookingTime.value.isEmpty
+                              ? 'Not selected'
+                              : controller.bookingTime.value,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total Fare:',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '₹${controller.selectedDestination.value!.fare.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
               
               // Book Now button
               Padding(
@@ -956,7 +1080,7 @@ class CreateBookingPage extends StatelessWidget {
                       // Validate that time is selected
                       if (controller.bookingTime.value.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Please select booking time'),
                             backgroundColor: Colors.red,
                           ),
@@ -1137,3 +1261,6 @@ class CreateBookingPage extends StatelessWidget {
     );
   }
 }
+
+
+

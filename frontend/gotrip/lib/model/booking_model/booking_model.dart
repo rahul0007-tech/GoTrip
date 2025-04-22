@@ -8,22 +8,37 @@ class LocationModel {
   final int id;
   final String name;
   final double fare;
+  final String? locationImage;  // Add this field
 
   LocationModel({
     required this.id,
     required this.name,
     required this.fare,
+    this.locationImage,  // Add this parameter
   });
 
-  // factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
-  // Map<String, dynamic> toJson() => _$LocationModelToJson(this);
   factory LocationModel.fromJson(Map<String, dynamic> json) {
-  return LocationModel(
-    id: int.parse(json['id'].toString()),  // Convert string to int
-    name: json['name'],
-    fare: double.parse(json['fare'].toString()),  // Convert to double if needed
-  );
-}
+    return LocationModel(
+      id: json['id'],
+      name: json['name'],
+      fare: (json['fare'] is int) 
+          ? (json['fare'] as int).toDouble()
+          : json['fare'],
+      locationImage: json['location_image'] as String?,  // Add this field
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'fare': fare,
+      'location_image': locationImage,  // Add this field
+    };
+  }
+
+  @override
+  String toString() => name;
 }
 
 @JsonSerializable(explicitToJson: true)

@@ -282,14 +282,27 @@ class HomePage extends StatelessWidget {
                             // Image with rounded corners
                             ClipRRect(
                               borderRadius: BorderRadius.circular(16),
-                              child: Image.network(
-                                location.locationImage != null
-                                    ? ApiConstants.baseUrl +
-                                        location.locationImage!
-                                    : 'https://via.placeholder.com/160x190',
+                              child: CachedNetworkImage(
+                                imageUrl: location.locationImage != null 
+                                    ? '${ApiConstants.baseUrl}${location.locationImage}'
+                                    : 'asset/images/destination1.jpg',
                                 width: 160,
                                 height: 190,
                                 fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Image.asset(
+                                  'asset/images/destination1.jpg',
+                                  width: 160,
+                                  height: 190,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             // Gradient overlay
