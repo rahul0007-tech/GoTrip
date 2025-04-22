@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gotrip/utils/app_colors.dart';
-import '../../controllers/passenger_home_page_controller.dart';
+import '../../controllers/passenger_upcoming_bookings_controller.dart';
 import '../../model/booking_model/passenger_upcoming_booking.dart';
 
-class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController> {
+class PassengerUpcomingBookingsPage extends GetView<PassengerUpcomingBookingsController> {
   const PassengerUpcomingBookingsPage({Key? key}) : super(key: key);
 
   @override
@@ -15,19 +15,19 @@ class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController>
         backgroundColor: AppColors.primary,
       ),
       body: RefreshIndicator(
-        onRefresh: controller.refreshData,
+        onRefresh: controller.refresh,
         child: Obx(() {
-          if (controller.isBookingsLoading.value) {
+          if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (controller.hasBookingsError.value) {
+          if (controller.hasError.value) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    controller.bookingsErrorMessage.value,
+                    controller.errorMessage.value,
                     style: TextStyle(color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
@@ -42,7 +42,7 @@ class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController>
             );
           }
 
-          if (controller.upcomingBookings.isEmpty) {
+          if (controller.bookings.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -68,9 +68,9 @@ class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController>
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: controller.upcomingBookings.length,
+            itemCount: controller.bookings.length,
             itemBuilder: (context, index) {
-              final booking = controller.upcomingBookings[index];
+              final booking = controller.bookings[index];
               return buildBookingCard(booking);
             },
           );
@@ -167,7 +167,8 @@ class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController>
                     ),
                   ],
                 ),
-                if (booking.status == 'pending') 
+                if (booking.status.toLowerCase() != 'completed' && 
+                    booking.status.toLowerCase() != 'canceled') ...[
                   TextButton(
                     onPressed: () => controller.cancelBooking(booking.id),
                     style: TextButton.styleFrom(
@@ -175,6 +176,7 @@ class PassengerUpcomingBookingsPage extends GetView<PassengerHomePageController>
                     ),
                     child: const Text('Cancel'),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 8),

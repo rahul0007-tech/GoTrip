@@ -2,13 +2,13 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
-import '../model/booking_model/passenger_upcoming_booking.dart';
+import '../model/booking_model/upcomming_booking.dart';
 
 class PassengerHomePageController extends GetxController {
   final isLoading = false.obs;
   
   // Add upcoming bookings using the specialized model
-  final RxList<PassengerUpcomingBooking> upcomingBookings = <PassengerUpcomingBooking>[].obs;
+  final RxList<UpcomingBooking> upcomingBookings = <UpcomingBooking>[].obs;
   final isBookingsLoading = true.obs;
   final hasBookingsError = false.obs;
   final bookingsErrorMessage = ''.obs;
@@ -17,7 +17,7 @@ class PassengerHomePageController extends GetxController {
   final _storage = GetStorage();
   
   // API endpoints
-  final String upcomingBookingsEndpoint = '/bookings/passengerupcomingbooking/';
+  final String upcomingBookingsEndpoint = '/bookings/passengerupcomingbookings/';
   
   // Create a Dio instance directly in the controller
   late final Dio _dio;
@@ -79,6 +79,7 @@ class PassengerHomePageController extends GetxController {
     try {
       isBookingsLoading.value = true;
       hasBookingsError.value = false;
+      bookingsErrorMessage.value = '';
       
       if (_getToken() == null) {
         hasBookingsError.value = true;
@@ -89,46 +90,85 @@ class PassengerHomePageController extends GetxController {
       final response = await _dio.get(upcomingBookingsEndpoint);
       
       if (response.statusCode == 200) {
-        if (response.data is Map<String, dynamic> && 
-            response.data.containsKey('status') && 
-            response.data.containsKey('data')) {
+        final responseData = response.data as Map<String, dynamic>;
+        final status = responseData['status'] as String;
+        final message = responseData['message'] as String;
+        
+        if (status == 'success') {
+          final List<dynamic> bookingsData = responseData['data'] as List<dynamic>;
+          final List<UpcomingBooking> parsedBookings = bookingsData
+              .map((booking) => UpcomingBooking(
+                    id: booking['id'],
+                    passenger: Passenger(name: ''), // We don't need passenger info in passenger view
+                    pickupLocation: booking['pickup_location'],
+                    dropoffLocation: DropoffLocation(
+                      name: (booking['dropoff_location'] as Map<String, dynamic>)['name'],
+                    ),
+                    fare: booking['fare'].toString(),
+                    bookingFor: booking['booking_for'],
+                    bookingTime: booking['booking_time'],
+                    status: booking['status'] ?? 'pending',
+                    paymentStatus: booking['payment_status'] ?? 'pending',
+                    driver: booking['driver'] != null
+                        ? Driver(
+                            id: booking['driver']['id'],
+                            name: booking['driver']['name'],
+                            vehicle: booking['driver']['vehicle'] != null
+                                ? Vehicle(
+                                    vehicleColor: booking['driver']['vehicle']['vehicle_color'],
+                                    vehicleCompany: booking['driver']['vehicle']['vehicle_company'],
+                                    vehicleNumber: booking['driver']['vehicle']['vehicle_number'],
+                                    sittingCapacity: booking['driver']['vehicle']['sitting_capacity'],
+                                    vehicleType: booking['driver']['vehicle']['vehicle_type'] != null
+                                        ? VehicleType(
+                                            id: booking['driver']['vehicle']['vehicle_type']['id'],
+                                            name: booking['driver']['vehicle']['vehicle_type']['name'],
+                                            displayName: booking['driver']['vehicle']['vehicle_type']['display_name'],
+                                          )
+                                        : null,
+                                    vehicleFuelType: booking['driver']['vehicle']['vehicle_fuel_type'] != null
+                                        ? VehicleFuelType(
+                                            id: booking['driver']['vehicle']['vehicle_fuel_type']['id'],
+                                            name: booking['driver']['vehicle']['vehicle_fuel_type']['name'],
+                                            displayName: booking['driver']['vehicle']['vehicle_fuel_type']['display_name'],
+                                          )
+                                        : null,
+                                    images: (booking['driver']['vehicle']['images'] as List<dynamic>?)
+                                        ?.map((image) => VehicleImage(
+                                              id: image['id'],
+                                              image: image['image'],
+                                            ))
+                                        .toList(),
+                                  )
+                                : null,
+                          )
+                        : null,
+                  ))
+              .toList();
           
-          upcomingBookings.clear();
-          
-          final responseStatus = response.data['status'] as String;
-          final responseMessage = response.data['message'] as String;
-          
-          if (responseStatus == 'success') {
-            final List<dynamic> rawBookings = response.data['data'];
-            
-            List<PassengerUpcomingBooking> parsedBookings = [];
-            for (var booking in rawBookings) {
-              try {
-                parsedBookings.add(PassengerUpcomingBooking.fromJson(booking));
-              } catch (e) {
-                print('Error parsing booking: $e');
-              }
-            }
-            
-            upcomingBookings.assignAll(parsedBookings);
-          } else {
-            hasBookingsError.value = true;
-            bookingsErrorMessage.value = responseMessage;
-          }
+          upcomingBookings.assignAll(parsedBookings);
+          hasBookingsError.value = false;
+          bookingsErrorMessage.value = '';
         } else {
           hasBookingsError.value = true;
-          bookingsErrorMessage.value = 'Invalid response format';
+          bookingsErrorMessage.value = message;
+          upcomingBookings.clear();
         }
       }
-    } catch (e) {
+    } on DioException catch (e) {
       hasBookingsError.value = true;
-      
-      if (e is DioException && e.response?.statusCode == 404) {
-        bookingsErrorMessage.value = 'No upcoming bookings found';
-        upcomingBookings.clear();
+      if (e.response?.statusCode == 404) {
+        final responseData = e.response?.data as Map<String, dynamic>?;
+        bookingsErrorMessage.value = responseData?['message'] ?? 'No upcoming bookings found';
       } else {
         bookingsErrorMessage.value = 'Failed to load upcoming bookings';
       }
+      upcomingBookings.clear();
+    } catch (e) {
+      print('Error fetching bookings: $e');
+      hasBookingsError.value = true;
+      bookingsErrorMessage.value = 'An unexpected error occurred';
+      upcomingBookings.clear();
     } finally {
       isBookingsLoading.value = false;
     }

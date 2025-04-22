@@ -112,12 +112,16 @@ class _KhaltiSDKDemoState extends State<KhaltiSDKDemo> {
             // This is expected due to localhost URL, proceed with verification
             _addDebug("Return URL load failed (expected), proceeding with verification");
             await _verifyPayment();
+                Get.offAll(() => HomePage());
+
             return;
           }
           
           if (needsPaymentConfirmation == true) {
             _addDebug("Payment needs confirmation, verifying...");
             await _verifyPayment();
+            Get.offAll(() => HomePage());
+
           }
         },
         onReturn: () {

@@ -34,6 +34,8 @@ UpcomingBooking _$UpcomingBookingFromJson(Map<String, dynamic> json) =>
       fare: json['fare'] as String,
       bookingFor: json['booking_for'] as String,
       bookingTime: json['booking_time'] as String?,
+      status: json['status'] as String? ?? 'pending',
+      paymentStatus: json['payment_status'] as String? ?? 'pending',
       driver: json['driver'] == null
           ? null
           : Driver.fromJson(json['driver'] as Map<String, dynamic>),
@@ -48,6 +50,8 @@ Map<String, dynamic> _$UpcomingBookingToJson(UpcomingBooking instance) =>
       'fare': instance.fare,
       'booking_for': instance.bookingFor,
       'booking_time': instance.bookingTime,
+      'status': instance.status,
+      'payment_status': instance.paymentStatus,
       'driver': instance.driver,
     };
 

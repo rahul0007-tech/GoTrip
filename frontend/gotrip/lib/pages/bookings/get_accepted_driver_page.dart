@@ -605,8 +605,13 @@ class AcceptedDriversPage extends StatelessWidget {
                       Get.back(); // Close dialog
                       khaltiPaymentController.clearPaymentData();
                       
-                      // Initialize payment with just bookingId
-                      khaltiPaymentController.initiatePayment(bookingId);
+                      // Get the driver from the booking data
+                      final driver = controller.bookingsWithDrivers
+                          .firstWhere((booking) => booking['booking_id'] == bookingId)['drivers']
+                          .first as DriverModel;
+                      
+                      // Initialize payment with both bookingId and driverId
+                      khaltiPaymentController.initiatePayment(bookingId, driver.id);
                       
                       // Navigate to payment screen
                       Get.to(

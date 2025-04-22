@@ -3,14 +3,15 @@ import 'package:get/get.dart';
 import 'package:gotrip/controllers/auth_controller.dart';
 import 'package:gotrip/controllers/location_controller.dart';
 import 'package:gotrip/controllers/passenger_profile_controller.dart';
-import 'package:gotrip/controllers/passenger_upcoming_bookings_controller.dart';
+import 'package:gotrip/controllers/passenger_home_page_controller.dart';
+import 'package:gotrip/model/booking_model/upcomming_booking.dart';
 import 'package:gotrip/utils/app_colors.dart';
-import 'package:gotrip/network/http_client.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../constants/api_constants.dart';  // Add this import
 
 class HomePage extends StatelessWidget {
   final PassengerProfileController profileController = Get.put(PassengerProfileController());
-  final PassengerUpcomingBookingsController bookingsController = Get.put(PassengerUpcomingBookingsController());
+  final PassengerHomePageController bookingsController = Get.put(PassengerHomePageController());
   final LocationController locationController = Get.put(LocationController());
 
   HomePage({super.key});
@@ -19,7 +20,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthController authController = Get.put(AuthController());
     
-    return Scaffold(
+    return Scaffold( 
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -85,7 +86,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => bookingsController.refresh(),
+        onRefresh: () => bookingsController.refreshData(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
@@ -278,7 +279,7 @@ class HomePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
                                 location.locationImage != null
-                                    ? baseUrl + location.locationImage!
+                                    ? ApiConstants.baseUrl + location.locationImage!
                                     : 'https://via.placeholder.com/160x190',
                                 width: 160,
                                 height: 190,
@@ -389,7 +390,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => bookingsController.refresh(),
+                      onPressed: () => bookingsController.refreshData(),
                       child: Text(
                         'Refresh',
                         style: TextStyle(
@@ -404,7 +405,7 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 10),
               
               Obx(() {
-                if (bookingsController.isLoading.value) {
+                if (bookingsController.isBookingsLoading.value) {
                   return Center(
                     child: CircularProgressIndicator(
                       color: AppColors.primary,
@@ -412,7 +413,7 @@ class HomePage extends StatelessWidget {
                   );
                 }
 
-                if (bookingsController.hasError.value) {
+                if (bookingsController.hasBookingsError.value) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -424,7 +425,7 @@ class HomePage extends StatelessWidget {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          bookingsController.errorMessage.value,
+                          bookingsController.bookingsErrorMessage.value,
                           style: TextStyle(
                             color: Colors.red[700],
                             fontSize: 16,
@@ -433,7 +434,7 @@ class HomePage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         TextButton.icon(
-                          onPressed: () => bookingsController.refresh(),
+                          onPressed: () => bookingsController.refreshData(),
                           icon: Icon(Icons.refresh),
                           label: Text('Try Again'),
                         ),
@@ -442,7 +443,7 @@ class HomePage extends StatelessWidget {
                   );
                 }
 
-                if (bookingsController.bookings.isEmpty) {
+                if (bookingsController.upcomingBookings.isEmpty) {
                   return Center(
                     child: Column(
                       children: [
@@ -464,150 +465,15 @@ class HomePage extends StatelessWidget {
                   );
                 }
 
+                // Display the actual bookings
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: bookingsController.bookings.length,
+                  itemCount: bookingsController.upcomingBookings.length,
                   itemBuilder: (context, index) {
-                    final booking = bookingsController.bookings[index];
-                    
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 15),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
-                              child: Icon(Icons.directions_car, color: AppColors.primary),
-                            ),
-                            title: Text(
-                              booking.dropoffLocation.name,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              'From: ${booking.pickupLocation}',
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.green[50],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                'Rs. ${booking.fare}',
-                                style: TextStyle(
-                                  color: Colors.green[700],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(),
-                          Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.person, size: 18, color: Colors.grey[600]),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Driver: ${booking.driver?.name ?? 'Unknown'}',
-                                      style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.car_rental, size: 18, color: Colors.grey[600]),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        '${booking.driver?.vehicle?.vehicleCompany ?? 'Unknown'} - ${booking.driver?.vehicle?.vehicleColor ?? 'Unknown'}',
-                                        style: TextStyle(color: Colors.grey[800]),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.numbers, size: 18, color: Colors.grey[600]),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      booking.driver?.vehicle?.vehicleNumber ?? 'Unknown',
-                                      style: TextStyle(color: Colors.grey[800]),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.event_seat, size: 18, color: Colors.grey[600]),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          '${booking.driver?.vehicle?.sittingCapacity ?? 'Unknown'} seats',
-                                          style: TextStyle(color: Colors.grey[800]),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.local_gas_station, size: 18, color: Colors.grey[600]),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          booking.driver?.vehicle?.vehicleFuelType?.displayName ?? 'Unknown',
-                                          style: TextStyle(color: Colors.grey[800]),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      booking.getFormattedDate(),
-                                      style: TextStyle(color: Colors.grey[800]),
-                                    ),
-                                    SizedBox(width: 16),
-                                    Icon(Icons.access_time, size: 18, color: Colors.grey[600]),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      booking.getFormattedTime(),
-                                      style: TextStyle(color: Colors.grey[800]),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    final booking = bookingsController.upcomingBookings[index];
+                    return buildBookingCard(booking);
                   },
                 );
               }),
@@ -659,6 +525,151 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildBookingCard(UpcomingBooking booking) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Booking #${booking.id}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      if (booking.driver != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Driver: ${booking.driver!.name}',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '₹${booking.fare}',
+                    style: TextStyle(
+                      color: Colors.green[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'From: ${booking.pickupLocation}',
+                        style: TextStyle(color: Colors.grey[800]),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'To: ${booking.dropoffLocation.name}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (booking.driver?.vehicle != null) ...[
+              const Divider(height: 24),
+              Row(
+                children: [
+                  Icon(Icons.directions_car, size: 18, color: Colors.grey[600]),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${booking.driver!.vehicle!.vehicleCompany} - ${booking.driver!.vehicle!.vehicleColor}',
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Number: ${booking.driver!.vehicle!.vehicleNumber}',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const Divider(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      booking.getFormattedDate(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 18, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      booking.getFormattedTime(),
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

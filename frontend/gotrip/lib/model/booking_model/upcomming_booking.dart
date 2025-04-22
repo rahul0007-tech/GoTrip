@@ -32,6 +32,10 @@ class UpcomingBooking {
   final String bookingFor;
   @JsonKey(name: "booking_time")
   final String? bookingTime;
+  @JsonKey(defaultValue: 'pending')
+  final String status;
+  @JsonKey(name: 'payment_status', defaultValue: 'pending')
+  final String paymentStatus;
   final Driver? driver;
 
   UpcomingBooking({
@@ -42,12 +46,14 @@ class UpcomingBooking {
     required this.fare,
     required this.bookingFor,
     this.bookingTime,
+    required this.status,
+    required this.paymentStatus,
     this.driver,
   });
 
   factory UpcomingBooking.fromJson(Map<String, dynamic> json) => _$UpcomingBookingFromJson(json);
   Map<String, dynamic> toJson() => _$UpcomingBookingToJson(this);
-  
+
   String getFormattedDate() {
     try {
       final parts = bookingFor.split('-');

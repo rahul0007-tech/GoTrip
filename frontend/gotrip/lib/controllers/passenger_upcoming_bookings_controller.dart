@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import '../network/http_client.dart';
-import '../model/booking_model/upcomming_booking.dart';
+import '../model/booking_model/passenger_upcoming_booking.dart';
 
 class PassengerUpcomingBookingsController extends GetxController {
-  final RxList<UpcomingBooking> bookings = <UpcomingBooking>[].obs;
+  final RxList<PassengerUpcomingBooking> bookings = <PassengerUpcomingBooking>[].obs;
   final RxBool isLoading = true.obs;
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
@@ -24,46 +25,16 @@ class PassengerUpcomingBookingsController extends GetxController {
       final response = await httpClient.get('/bookings/passengerupcomingbookings/');
       
       if (response.statusCode == 200 && response.data != null) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData['status'] == 'success' && responseData['data'] != null) {
-          final List<dynamic> bookingsData = responseData['data'] ?? [];
-          final List<UpcomingBooking> parsedBookings = [];
-          
-          for (var bookingData in bookingsData) {
-            try {
-              if (bookingData != null) {
-                final booking = UpcomingBooking(
-                  id: bookingData['booking_id'] ?? 0,
-                  passenger: Passenger(name: ''), // We don't need passenger info in passenger view
-                  pickupLocation: bookingData['pickup_location'] ?? '',
-                  dropoffLocation: DropoffLocation(
-                    name: (bookingData['dropoff_location'] as Map<String, dynamic>?)?['name'] ?? ''
-                  ),
-                  fare: (bookingData['fare'] ?? '').toString(),
-                  bookingFor: bookingData['booking_for'] ?? '',
-                  bookingTime: bookingData['booking_time'],
-                  driver: bookingData['driver'] != null ? 
-                    Driver(
-                      id: bookingData['driver']['id'] ?? 0,
-                      name: bookingData['driver']['name'] ?? '',
-                      vehicle: null // Vehicle info not needed for now
-                    ) : null
-                );
-                parsedBookings.add(booking);
-              }
-            } catch (e) {
-              print('Error parsing booking: $e');
-              print('Problematic booking data: $bookingData');
-            }
-          }
-          
-          bookings.assignAll(parsedBookings);
+        final responseData = PassengerUpcomingBookingsResponse.fromJson(response.data);
+        
+        if (responseData.status == 'success') {
+          bookings.assignAll(responseData.data);
           hasError(false);
           errorMessage('');
         } else {
           bookings.clear();
           hasError(true);
-          errorMessage(responseData['message'] ?? 'No bookings found');
+          errorMessage(responseData.message);
         }
       } else {
         bookings.clear();
@@ -85,6 +56,36 @@ class PassengerUpcomingBookingsController extends GetxController {
       }
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> cancelBooking(int bookingId) async {
+    try {
+      final response = await httpClient.post(
+        '/bookings/cancel-booking/',
+        data: {'booking_id': bookingId},
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar(
+          'Success',
+          'Booking cancelled successfully',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        
+        await fetchUpcomingBookings();
+      }
+    } catch (e) {
+      print('Error cancelling booking: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to cancel booking. Please try again.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 

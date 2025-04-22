@@ -19,21 +19,22 @@ class KhaltiPaymentController extends GetxController {
     isPaymentInitialized.value = false;
   }
 
-  Future<bool> initiatePayment(int bookingID) async {
+  Future<bool> initiatePayment(int bookingID, int driverId) async {
     isLoading.value = true;
     errorMessage.value = '';
     
     try {
       clearPaymentData();
       
-      print("Initiating payment for booking ID: $bookingID");
+      print("Initiating payment for booking ID: $bookingID with driver ID: $driverId");
       
       final response = await httpClient.post(
         '/payments/khalti-initiate/', 
         data: {
           "return_url": "http://localhost:8000/payments/khalti-verify/",
           "website_url": "http://localhost:8000",
-          "booking_id": bookingID
+          "booking_id": bookingID,
+          "driver_id": driverId
         },
       );
 

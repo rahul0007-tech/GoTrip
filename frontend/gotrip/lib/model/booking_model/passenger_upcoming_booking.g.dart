@@ -32,14 +32,14 @@ PassengerUpcomingBooking _$PassengerUpcomingBookingFromJson(
       driver: json['driver'] == null
           ? null
           : Driver.fromJson(json['driver'] as Map<String, dynamic>),
-      pickupLocation: json['pickupLocation'] as String,
+      pickupLocation: json['pickup_location'] as String,
       dropoffLocation: DropoffLocation.fromJson(
-          json['dropoffLocation'] as Map<String, dynamic>),
+          json['dropoff_location'] as Map<String, dynamic>),
       fare: json['fare'] as String,
-      bookingFor: json['bookingFor'] as String,
-      bookingTime: json['bookingTime'] as String?,
+      bookingFor: json['booking_for'] as String,
+      bookingTime: json['booking_time'] as String?,
       status: json['status'] as String,
-      paymentStatus: json['paymentStatus'] as String,
+      paymentStatus: json['payment_status'] as String,
     );
 
 Map<String, dynamic> _$PassengerUpcomingBookingToJson(
@@ -47,19 +47,21 @@ Map<String, dynamic> _$PassengerUpcomingBookingToJson(
     <String, dynamic>{
       'id': instance.id,
       'driver': instance.driver,
-      'pickupLocation': instance.pickupLocation,
-      'dropoffLocation': instance.dropoffLocation,
+      'pickup_location': instance.pickupLocation,
+      'dropoff_location': instance.dropoffLocation,
       'fare': instance.fare,
-      'bookingFor': instance.bookingFor,
-      'bookingTime': instance.bookingTime,
+      'booking_for': instance.bookingFor,
+      'booking_time': instance.bookingTime,
       'status': instance.status,
-      'paymentStatus': instance.paymentStatus,
+      'payment_status': instance.paymentStatus,
     };
 
 Driver _$DriverFromJson(Map<String, dynamic> json) => Driver(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
-      vehicle: Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
+      vehicle: json['vehicle'] == null
+          ? null
+          : Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DriverToJson(Driver instance) => <String, dynamic>{
