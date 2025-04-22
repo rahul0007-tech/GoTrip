@@ -333,7 +333,7 @@ class PassengerUpcommingBookingsView(APIView):
 
         passenger_Bookings = Booking.objects.filter(status='confirmed',passenger=passenger,booking_for__gte=timezone.now().date()).order_by('booking_for')
 
-        serializer = PassengerHistorySerializer(passenger_Bookings, many=True)
+        serializer = PassengerHistorySerializer(passenger_Bookings, many=True, context={'request': request})
         if not passenger_Bookings.exists():
             return Response({'status':'failed','message': 'No trip history found'}, status=status.HTTP_404_NOT_FOUND)
 

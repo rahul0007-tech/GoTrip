@@ -49,7 +49,12 @@ class VehicleImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleImage
         fields = ['id', 'image']
-
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+    
 class VehicleSerializer(serializers.ModelSerializer):
     vehicle_type = ShowVehicleTypeSerializer()
     vehicle_fuel_type = ShowFuelTypeSerializer()
@@ -57,6 +62,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = ['vehicle_color', 'vehicle_company', 'vehicle_number', 'sitting_capacity', 'vehicle_type', 'vehicle_fuel_type', 'images']
+
 
 class DriverWithVehicleSerializer(serializers.ModelSerializer):
     vehicle=VehicleSerializer()

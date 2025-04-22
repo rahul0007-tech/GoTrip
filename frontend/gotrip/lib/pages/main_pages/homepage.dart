@@ -7,11 +7,13 @@ import 'package:gotrip/controllers/passenger_home_page_controller.dart';
 import 'package:gotrip/model/booking_model/upcomming_booking.dart';
 import 'package:gotrip/utils/app_colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../constants/api_constants.dart';  // Add this import
+import '../../constants/api_constants.dart'; // Add this import
 
 class HomePage extends StatelessWidget {
-  final PassengerProfileController profileController = Get.put(PassengerProfileController());
-  final PassengerHomePageController bookingsController = Get.put(PassengerHomePageController());
+  final PassengerProfileController profileController =
+      Get.put(PassengerProfileController());
+  final PassengerHomePageController bookingsController =
+      Get.put(PassengerHomePageController());
   final LocationController locationController = Get.put(LocationController());
 
   HomePage({super.key});
@@ -19,8 +21,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.put(AuthController());
-    
-    return Scaffold( 
+
+    return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -33,7 +35,7 @@ class HomePage extends StatelessWidget {
             Text(
               'GoTrip',
               style: TextStyle(
-                fontWeight: FontWeight.bold, 
+                fontWeight: FontWeight.bold,
                 color: AppColors.primary,
                 fontSize: 22,
               ),
@@ -48,7 +50,8 @@ class HomePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: Icon(Icons.notifications_outlined, color: AppColors.primary),
+              icon:
+                  Icon(Icons.notifications_outlined, color: AppColors.primary),
               onPressed: () {
                 // Notification logic here
               },
@@ -134,11 +137,13 @@ class HomePage extends StatelessWidget {
                                       width: 56,
                                       height: 56,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => CircularProgressIndicator(
+                                      placeholder: (context, url) =>
+                                          CircularProgressIndicator(
                                         color: AppColors.primary,
                                         strokeWidth: 2,
                                       ),
-                                      errorWidget: (context, url, error) => Image.asset(
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset(
                                         'asset/images/profile_placeholder.png',
                                         width: 56,
                                         height: 56,
@@ -232,7 +237,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              
+
               Obx(() {
                 if (locationController.isLoading.value) {
                   return Center(
@@ -279,7 +284,8 @@ class HomePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
                                 location.locationImage != null
-                                    ? ApiConstants.baseUrl + location.locationImage!
+                                    ? ApiConstants.baseUrl +
+                                        location.locationImage!
                                     : 'https://via.placeholder.com/160x190',
                                 width: 160,
                                 height: 190,
@@ -311,7 +317,8 @@ class HomePage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: Text(
@@ -331,7 +338,8 @@ class HomePage extends StatelessWidget {
                                           ),
                                           decoration: BoxDecoration(
                                             color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: Text(
                                             '\$${location.fare}',
@@ -373,7 +381,7 @@ class HomePage extends StatelessWidget {
                 );
               }),
               SizedBox(height: 15),
-              
+
               SizedBox(height: 25),
 
               // Upcoming Bookings Section
@@ -403,7 +411,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              
+
               Obx(() {
                 if (bookingsController.isBookingsLoading.value) {
                   return Center(
@@ -495,7 +503,7 @@ class HomePage extends StatelessWidget {
       // Removed bottomNavigationBar
     );
   }
-  
+
   // Helper method to build quick action buttons
   Widget _buildQuickActionButton({
     required IconData icon,
@@ -637,12 +645,121 @@ class HomePage extends StatelessWidget {
               ),
             ],
             const Divider(height: 24),
+
+            /// Replace your current single image implementation with this:
+            if (booking.driver?.vehicle?.images != null &&
+                booking.driver!.vehicle!.images!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 60,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: booking.driver!.vehicle!.images!.length > 3
+                            ? 3
+                            : booking.driver!.vehicle!.images!.length,
+                        itemBuilder: (context, imageIndex) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: _getFullImageUrl(booking.driver!
+                                    .vehicle!.images![imageIndex].image),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) {
+                                  return Container(
+                                    width: 60,
+                                    height: 60,
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: Colors.grey[600],
+                                      size: 24,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (booking.driver!.vehicle!.images!.length > 3)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                width: 60,
+                                height: 60,
+                                color: Colors.grey[200],
+                                child: Opacity(
+                                  opacity: 0.5,
+                                  child: CachedNetworkImage(
+                                    imageUrl: _getFullImageUrl(booking
+                                        .driver!.vehicle!.images![3].image),
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "+${booking.driver!.vehicle!.images!.length - 3}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+            const Divider(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
+                    Icon(Icons.calendar_today,
+                        size: 18, color: Colors.grey[600]),
                     const SizedBox(width: 8),
                     Text(
                       booking.getFormattedDate(),
@@ -671,5 +788,21 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL starting with http:// or https://, return as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+
+    // If it starts with a slash, ensure we don't get double slashes
+    String path = imagePath;
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+
+    // Use the ApiConstants.baseUrl to create the full URL
+    return '${ApiConstants.baseUrl}/$path';
   }
 }
