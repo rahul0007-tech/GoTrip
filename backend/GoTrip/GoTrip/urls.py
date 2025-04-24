@@ -19,13 +19,13 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import path, include
 from django.views.generic import RedirectView
-from .admin import admin_site
+# from .admin import admin_site
 from django.views.generic import TemplateView
 # from .admin import custom_admin_site
 
 urlpatterns = [
     # path('jet/', include('jet.urls', 'jet')),  # Add this line before admin urls
-    path('admin/', admin_site.urls),
+    path('admin/', admin.site.urls),
     path('api/bookings/', include('bookings.urls')),
     path('api/users/', include('users.urls')),
     path('api/vehicles/', include('vehicles.urls')),

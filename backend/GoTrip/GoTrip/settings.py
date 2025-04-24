@@ -21,8 +21,8 @@ ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     # 'jet',
     # 'jet.dashboard',
-    'adminlte3',
-    'adminlte3_theme',
+    # 'adminlte3',
+    # 'adminlte3_theme',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -183,14 +183,14 @@ USE_TZ = True
 APPEND_SLASH = True
 
 
-ADMINLTE_STATIC = os.path.join(os.path.dirname(adminlte3.__file__), 'static')
+# ADMINLTE_STATIC = os.path.join(os.path.dirname(adminlte3.__file__), 'static')
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'static'),
-#     ADMINLTE_STATIC,  # Add AdminLTE static files
+#     # ADMINLTE_STATIC,  # Add AdminLTE static files
 # ]
 
 # # Static files (CSS, JavaScript, Images)
