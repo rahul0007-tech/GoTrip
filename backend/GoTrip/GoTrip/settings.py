@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from decouple import config
 from datetime import timedelta
+import adminlte3
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,13 +19,17 @@ ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
-    'jet',
+    # 'jet',
+    # 'jet.dashboard',
+    'adminlte3',
+    'adminlte3_theme',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dashboard',
     'users',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -37,65 +42,76 @@ INSTALLED_APPS = [
 ]
 
 
-JET_DEFAULT_THEME = 'light-blue'
-JET_THEMES = [
-    {
-        'theme': 'default',
-        'color': '#47bac1',
-        'title': 'Default'
-    },
-    {
-        'theme': 'green',
-        'color': '#44b78b',
-        'title': 'Green'
-    },
-    {
-        'theme': 'light-blue',
-        'color': '#5EADDE',
-        'title': 'Light Blue'
-    },
-    {
-        'theme': 'light-violet',
-        'color': '#a464c4',
-        'title': 'Light Violet'
-    },
-]
+# JET_DEFAULT_THEME = 'light-blue'
+# JET_THEMES = [
+#     {
+#         'theme': 'default',
+#         'color': '#47bac1',
+#         'title': 'Default'
+#     },
+#     {
+#         'theme': 'green',
+#         'color': '#44b78b',
+#         'title': 'Green'
+#     },
+#     {
+#         'theme': 'light-blue',
+#         'color': '#5EADDE',
+#         'title': 'Light Blue'
+#     },
+#     {
+#         'theme': 'light-violet',
+#         'color': '#a464c4',
+#         'title': 'Light Violet'
+#     },
+#     {
+#         'theme': 'light-green',
+#         'color': '#2faa60',
+#         'title': 'Light Green'
+#     },
+#     {
+#         'theme': 'light-gray',
+#         'color': '#222',
+#         'title': 'Light Gray'
+#     }
+# ]
 
-JET_SIDE_MENU_ITEMS = [
-    {
-        'label': 'Users & Accounts',
-        'items': [
-            {'name': 'users.passenger'},
-            {'name': 'users.driver'},
-            {'name': 'auth.group'},
-        ]
-    },
-    {
-        'label': 'Vehicles',
-        'items': [
-            {'name': 'vehicles.vehicle'},
-            {'name': 'vehicles.vehicletype'},
-            {'name': 'vehicles.fueltype'},
-            {'name': 'vehicles.vehicleimage'},
-        ]
-    },
-    {
-        'label': 'Bookings & Locations',
-        'items': [
-            {'name': 'bookings.booking'},
-            {'name': 'bookings.location'},
-        ]
-    },
-    {
-        'label': 'Payments',
-        'items': [
-            {'name': 'payments.payment'},
-        ]
-    },
-]
+# JET_SIDE_MENU_ITEMS = [
+#     {
+#         'label': 'Users & Accounts',
+#         'items': [
+#             {'name': 'users.passenger'},
+#             {'name': 'users.driver'},
+#             {'name': 'auth.group'},
+#         ]
+#     },
+#     {
+#         'label': 'Vehicles',
+#         'items': [
+#             {'name': 'vehicles.vehicle'},
+#             {'name': 'vehicles.vehicletype'},
+#             {'name': 'vehicles.fueltype'},
+#             {'name': 'vehicles.vehicleimage'},
+#         ]
+#     },
+#     {
+#         'label': 'Bookings & Locations',
+#         'items': [
+#             {'name': 'bookings.booking'},
+#             {'name': 'bookings.location'},
+#         ]
+#     },
+#     {
+#         'label': 'Payments',
+#         'items': [
+#             {'name': 'payments.payment'},
+#         ]
+#     },
+# ]
 
-# Optional dashboard configuration
-JET_INDEX_DASHBOARD = 'goTrip.dashboard.CustomDashboard'
+# # Optional dashboard configuration
+# JET_INDEX_DASHBOARD = 'goTrip.dashboard.CustomDashboard'
+# JET_SIDE_MENU_COMPACT = True
 
 
 MIDDLEWARE = [
@@ -167,8 +183,23 @@ USE_TZ = True
 APPEND_SLASH = True
 
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+ADMINLTE_STATIC = os.path.join(os.path.dirname(adminlte3.__file__), 'static')
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+#     ADMINLTE_STATIC,  # Add AdminLTE static files
+# ]
+
+# # Static files (CSS, JavaScript, Images)
+# STATIC_URL = 'static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -226,9 +257,9 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework.simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework.simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework.simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework.simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework.simplejwt.serializers.TokenRefreshSlidingSerializer",
 }

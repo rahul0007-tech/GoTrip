@@ -1,0 +1,1268 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <!-- Content Header -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3>{{ users_count }}</h3>
+              <p>Total Users</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3>{{ passengers_count }}</h3>
+              <p>Passengers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3>{{ drivers_count }}</h3>
+              <p>Drivers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-id-card"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3>{{ bookings_count }}</h3>
+              <p>Bookings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-bookmark"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-4 col-6">
+          <div class="small-box bg-primary">
+            <div class="inner">
+              <h3>${{ total_earnings|floatformat:2 }}</h3>
+              <p>Total Earnings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Line Chart -->
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Monthly Earnings</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="earningsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Bar Chart -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">User Registrations</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="userChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Pie Chart -->
+          <div class="card card-danger">
+            <div class="card-header">
+              <h3 class="card-title">Vehicles by Type</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="vehicleTypeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Recent Bookings -->
+          <div class="card card-warning">
+            <div class="card-header">
+              <h3 class="card-title">Recent Bookings</h3>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Passenger</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for booking in recent_bookings %}
+                  <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.passenger }}</td>
+                    <td>{{ booking.dropoff_location }}</td>
+                    <td>{{ booking.booking_for }}</td>
+                    <td>
+                      {% if booking.status == 'pending' %}
+                      <span class="badge bg-warning">{{ booking.status }}</span>
+                      {% elif booking.status == 'confirmed' %}
+                      <span class="badge bg-info">{{ booking.status }}</span>
+                      {% elif booking.status == 'completed' %}
+                      <span class="badge bg-success">{{ booking.status }}</span>
+                      {% elif booking.status == 'canceled' %}
+                      <span class="badge bg-danger">{{ booking.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="{% url 'admin:index' %}" class="brand-link">
+    <img src="{% static 'adminlte/dist/img/AdminLTELogo.png' %}" alt="GoTrip Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">GoTrip Admin</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        <img src="{% static 'adminlte/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+      </div>
+      <div class="info">
+        <a href="#" class="d-block">{{ request.user.get_full_name|default:request.user.username }}</a>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item">
+          <a href="{% url 'admin:index' %}" class="nav-link {% if request.path == '/admin/' %}active{% endif %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link {% if 'user' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-users"></i>
+            <p>
+              Users
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/admin/users/passenger/" class="nav-link {% if 'passenger' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Passengers</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/admin/users/driver/" class="nav-link {% if 'driver' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Drivers</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="/admin/bookings/booking/" class="nav-link {% if 'booking' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-book"></i>
+            <p>Bookings</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/admin/bookings/location/" class="nav-link {% if 'location' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-map-marker-alt"></i>
+            <p>Locations</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link {% if 'vehicle' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-car"></i>
+            <p>
+              Vehicles
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/admin/vehicles/vehicle/" class="nav-link {% if 'vehicles/vehicle' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>All Vehicles</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/admin/vehicles/vehicletype/" class="nav-link {% if 'vehicletype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Vehicle Types</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/admin/vehicles/fueltype/" class="nav-link {% if 'fueltype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Fuel Types</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="/admin/payments/payment/" class="nav-link {% if 'payment' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-credit-card"></i>
+            <p>Payments</p>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</aside>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'adminlte/plugins/chart.js/Chart.min.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Earnings Line Chart
+    var earningsCtx = document.getElementById('earningsChart').getContext('2d');
+    var earningsChart = new Chart(earningsCtx, {
+      type: 'line',
+      data: {
+        labels: JSON.parse('{{ months|safe }}'),
+        datasets: [{
+          label: 'Monthly Earnings',
+          data: JSON.parse('{{ earnings_data|safe }}'),
+          backgroundColor: 'rgba(60,141,188,0.5)',
+          borderColor: 'rgba(60,141,188,1)',
+          borderWidth: 1,
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(60,141,188,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(60,141,188,1)',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return '$' + value;
+              }
+            }
+          }]
+        }
+      }
+    });
+    
+    // User Registrations Bar Chart
+    var userCtx = document.getElementById('userChart').getContext('2d');
+    var userChart = new Chart(userCtx, {
+      type: 'bar',
+      data: {
+        labels: JSON.parse('{{ user_months|safe }}'),
+        datasets: [{
+          label: 'New Users',
+          data: JSON.parse('{{ user_counts|safe }}'),
+          backgroundColor: 'rgba(40, 167, 69, 0.5)',
+          borderColor: 'rgba(40, 167, 69, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1
+            }
+          }]
+        }
+      }
+    });
+    
+    // Vehicle Types Pie Chart
+    var vehicleTypeCtx = document.getElementById('vehicleTypeChart').getContext('2d');
+    var vehicleTypeChart = new Chart(vehicleTypeCtx, {
+      type: 'pie',
+      data: {
+        labels: JSON.parse('{{ vehicle_type_labels|safe }}'),
+        datasets: [{
+          data: JSON.parse('{{ vehicle_type_data|safe }}'),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} {% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3>{{ users_count }}</h3>
+              <p>Total Users</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <a href="{% url 'admin:users_user_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3>{{ passengers_count }}</h3>
+              <p>Passengers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <a href="{% url 'admin:users_passenger_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3>{{ drivers_count }}</h3>
+              <p>Drivers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <a href="{% url 'admin:users_driver_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3>{{ bookings_count }}</h3>
+              <p>Bookings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-bookmark"></i>
+            </div>
+            <a href="{% url 'admin:bookings_booking_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-4 col-6">
+          <!-- small box -->
+          <div class="small-box bg-primary">
+            <div class="inner">
+              <h3>${{ total_earnings|floatformat:2 }}</h3>
+              <p>Total Earnings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <a href="{% url 'admin:payments_payment_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- /.row -->
+
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Line Chart -->
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Monthly Earnings</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="earningsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Bar Chart -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">User Registrations</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="userChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Pie Chart -->
+          <div class="card card-danger">
+            <div class="card-header">
+              <h3 class="card-title">Vehicles by Type</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="vehicleTypeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Recent Bookings -->
+          <div class="card card-warning">
+            <div class="card-header">
+              <h3 class="card-title">Recent Bookings</h3>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Passenger</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for booking in recent_bookings %}
+                  <tr>
+                    <td><a href="{% url 'admin:bookings_booking_change' booking.id %}">{{ booking.id }}</a></td>
+                    <td>{{ booking.passenger }}</td>
+                    <td>{{ booking.dropoff_location }}</td>
+                    <td>{{ booking.booking_for }}</td>
+                    <td>
+                      {% if booking.status == 'pending' %}
+                      <span class="badge bg-warning">{{ booking.status }}</span>
+                      {% elif booking.status == 'confirmed' %}
+                      <span class="badge bg-info">{{ booking.status }}</span>
+                      {% elif booking.status == 'completed' %}
+                      <span class="badge bg-success">{{ booking.status }}</span>
+                      {% elif booking.status == 'canceled' %}
+                      <span class="badge bg-danger">{{ booking.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer clearfix">
+              <a href="{% url 'admin:bookings_booking_changelist' %}" class="btn btn-sm btn-info float-right">View All Bookings</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="{% url 'admin:index' %}" class="brand-link">
+    <img src="{% static 'admin/img/logo.png' %}" alt="GoTrip Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">GoTrip Admin</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        <img src="{% static 'adminlte/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+      </div>
+      <div class="info">
+        <a href="#" class="d-block">{{ request.user.get_full_name|default:request.user.username }}</a>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item">
+          <a href="{% url 'admin:index' %}" class="nav-link {% if request.path == '/admin/' %}active{% endif %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+        <li class="nav-item {% if 'user' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'user' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-users"></i>
+            <p>
+              Users
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'admin:users_passenger_changelist' %}" class="nav-link {% if 'passenger' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Passengers</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:users_driver_changelist' %}" class="nav-link {% if 'driver' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Drivers</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:bookings_booking_changelist' %}" class="nav-link {% if 'booking' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-book"></i>
+            <p>Bookings</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:bookings_location_changelist' %}" class="nav-link {% if 'location' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-map-marker-alt"></i>
+            <p>Locations</p>
+          </a>
+        </li>
+        <li class="nav-item {% if 'vehicle' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'vehicle' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-car"></i>
+            <p>
+              Vehicles
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_vehicle_changelist' %}" class="nav-link {% if 'vehicles_vehicle' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>All Vehicles</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_vehicletype_changelist' %}" class="nav-link {% if 'vehicletype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Vehicle Types</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_fueltype_changelist' %}" class="nav-link {% if 'fueltype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Fuel Types</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:payments_payment_changelist' %}" class="nav-link {% if 'payment' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-credit-card"></i>
+            <p>Payments</p>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Earnings Line Chart
+    var earningsCtx = document.getElementById('earningsChart').getContext('2d');
+    var earningsChart = new Chart(earningsCtx, {
+      type: 'line',
+      data: {
+        labels: JSON.parse('{{ months|safe }}'),
+        datasets: [{
+          label: 'Monthly Earnings',
+          data: JSON.parse('{{ earnings_data|safe }}'),
+          backgroundColor: 'rgba(60,141,188,0.5)',
+          borderColor: 'rgba(60,141,188,1)',
+          borderWidth: 1,
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(60,141,188,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(60,141,188,1)',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return '$' + value;
+              }
+            }
+          }]
+        }
+      }
+    });
+    
+    // User Registrations Bar Chart
+    var userCtx = document.getElementById('userChart').getContext('2d');
+    var userChart = new Chart(userCtx, {
+      type: 'bar',
+      data: {
+        labels: JSON.parse('{{ user_months|safe }}'),
+        datasets: [{
+          label: 'New Users',
+          data: JSON.parse('{{ user_counts|safe }}'),
+          backgroundColor: 'rgba(40, 167, 69, 0.5)',
+          borderColor: 'rgba(40, 167, 69, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1
+            }
+          }]
+        }
+      }
+    });
+    
+    // Vehicle Types Pie Chart
+    var vehicleTypeCtx = document.getElementById('vehicleTypeChart').getContext('2d');
+    var vehicleTypeChart = new Chart(vehicleTypeCtx, {
+      type: 'pie',
+      data: {
+        labels: JSON.parse('{{ vehicle_type_labels|safe }}'),
+        datasets: [{
+          data: JSON.parse('{{ vehicle_type_data|safe }}'),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+{% comment %} {% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3>{{ users_count }}</h3>
+              <p>Total Users</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <a href="{% url 'admin:users_user_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3>{{ passengers_count }}</h3>
+              <p>Passengers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <a href="{% url 'admin:users_passenger_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3>{{ drivers_count }}</h3>
+              <p>Drivers</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <a href="{% url 'admin:users_driver_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3>{{ bookings_count }}</h3>
+              <p>Bookings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-bookmark"></i>
+            </div>
+            <a href="{% url 'admin:bookings_booking_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-4 col-6">
+          <!-- small box -->
+          <div class="small-box bg-primary">
+            <div class="inner">
+              <h3>${{ total_earnings|floatformat:2 }}</h3>
+              <p>Total Earnings</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <a href="{% url 'admin:payments_payment_changelist' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- /.row -->
+
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Line Chart -->
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Monthly Earnings</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="earningsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Bar Chart -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">User Registrations</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="userChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Pie Chart -->
+          <div class="card card-danger">
+            <div class="card-header">
+              <h3 class="card-title">Vehicles by Type</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="vehicleTypeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <!-- Recent Bookings -->
+          <div class="card card-warning">
+            <div class="card-header">
+              <h3 class="card-title">Recent Bookings</h3>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Passenger</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for booking in recent_bookings %}
+                  <tr>
+                    <td><a href="{% url 'admin:bookings_booking_change' booking.id %}">{{ booking.id }}</a></td>
+                    <td>{{ booking.passenger }}</td>
+                    <td>{{ booking.dropoff_location }}</td>
+                    <td>{{ booking.booking_for }}</td>
+                    <td>
+                      {% if booking.status == 'pending' %}
+                      <span class="badge bg-warning">{{ booking.status }}</span>
+                      {% elif booking.status == 'confirmed' %}
+                      <span class="badge bg-info">{{ booking.status }}</span>
+                      {% elif booking.status == 'completed' %}
+                      <span class="badge bg-success">{{ booking.status }}</span>
+                      {% elif booking.status == 'canceled' %}
+                      <span class="badge bg-danger">{{ booking.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer clearfix">
+              <a href="{% url 'admin:bookings_booking_changelist' %}" class="btn btn-sm btn-info float-right">View All Bookings</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="{% url 'admin:index' %}" class="brand-link">
+    <img src="{% static 'admin/img/logo.png' %}" alt="GoTrip Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">GoTrip Admin</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        <img src="{% static 'adminlte/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+      </div>
+      <div class="info">
+        <a href="#" class="d-block">{{ request.user.get_full_name|default:request.user.username }}</a>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item">
+          <a href="{% url 'admin:index' %}" class="nav-link {% if request.path == '/admin/' %}active{% endif %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+        <li class="nav-item {% if 'user' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'user' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-users"></i>
+            <p>
+              Users
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'admin:users_passenger_changelist' %}" class="nav-link {% if 'passenger' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Passengers</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:users_driver_changelist' %}" class="nav-link {% if 'driver' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Drivers</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:bookings_booking_changelist' %}" class="nav-link {% if 'booking' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-book"></i>
+            <p>Bookings</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:bookings_location_changelist' %}" class="nav-link {% if 'location' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-map-marker-alt"></i>
+            <p>Locations</p>
+          </a>
+        </li>
+        <li class="nav-item {% if 'vehicle' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'vehicle' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-car"></i>
+            <p>
+              Vehicles
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_vehicle_changelist' %}" class="nav-link {% if 'vehicles_vehicle' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>All Vehicles</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_vehicletype_changelist' %}" class="nav-link {% if 'vehicletype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Vehicle Types</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin:vehicles_fueltype_changelist' %}" class="nav-link {% if 'fueltype' in request.path %}active{% endif %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Fuel Types</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'admin:payments_payment_changelist' %}" class="nav-link {% if 'payment' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-credit-card"></i>
+            <p>Payments</p>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Earnings Line Chart
+    var earningsCtx = document.getElementById('earningsChart').getContext('2d');
+    var earningsChart = new Chart(earningsCtx, {
+      type: 'line',
+      data: {
+        labels: JSON.parse('{{ months|safe }}'),
+        datasets: [{
+          label: 'Monthly Earnings',
+          data: JSON.parse('{{ earnings_data|safe }}'),
+          backgroundColor: 'rgba(60,141,188,0.5)',
+          borderColor: 'rgba(60,141,188,1)',
+          borderWidth: 1,
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(60,141,188,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(60,141,188,1)',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return '$' + value;
+              }
+            }
+          }]
+        }
+      }
+    });
+    
+    // User Registrations Bar Chart
+    var userCtx = document.getElementById('userChart').getContext('2d');
+    var userChart = new Chart(userCtx, {
+      type: 'bar',
+      data: {
+        labels: JSON.parse('{{ user_months|safe }}'),
+        datasets: [{
+          label: 'New Users',
+          data: JSON.parse('{{ user_counts|safe }}'),
+          backgroundColor: 'rgba(40, 167, 69, 0.5)',
+          borderColor: 'rgba(40, 167, 69, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1
+            }
+          }]
+        }
+      }
+    });
+    
+    // Vehicle Types Pie Chart
+    var vehicleTypeCtx = document.getElementById('vehicleTypeChart').getContext('2d');
+    var vehicleTypeChart = new Chart(vehicleTypeCtx, {
+      type: 'pie',
+      data: {
+        labels: JSON.parse('{{ vehicle_type_labels|safe }}'),
+        datasets: [{
+          data: JSON.parse('{{ vehicle_type_data|safe }}'),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
+{% endblock %} {% endcomment %}
+
+
+{% comment %} {% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <!-- Small boxes (Stat box) -->
+  <div class="row">
+    <div class="col-lg-2 col-6">
+      <!-- small box -->
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>{{ users_count }}</h3>
+          <p>Total Users</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+    </div>
+    <!-- Similar boxes for other stats -->
+  </div>
+  
+  <!-- Charts -->
+  <!-- Similar chart divs from the previous template -->
+  
+  {{ block.super }}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{{ block.super }}
+{% endblock %} {% endcomment %}

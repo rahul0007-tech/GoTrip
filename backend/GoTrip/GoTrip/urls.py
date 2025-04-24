@@ -18,13 +18,19 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import path, include
+from django.views.generic import RedirectView
+from .admin import admin_site
+from django.views.generic import TemplateView
+# from .admin import custom_admin_site
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    # path('dashboard/', include('dashboard.urls')), 
-    path('users/', include('users.urls',namespace='users')),
-    path('bookings/', include('bookings.urls', namespace='bookings')),
-    path('vehicles/', include('vehicles.urls', namespace='vehicles')),
-    path('payments/', include('payments.urls')),
-    path('jet/', include('jet.urls', 'jet')),  
-]+  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+    # path('jet/', include('jet.urls', 'jet')),  # Add this line before admin urls
+    path('admin/', admin_site.urls),
+    path('api/bookings/', include('bookings.urls')),
+    path('api/users/', include('users.urls')),
+    path('api/vehicles/', include('vehicles.urls')),
+    path('api/payments/', include('payments.urls')),
+    path('logout/', RedirectView.as_view(url='/admin/logout/')),
+    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
+    path('admin-test/', TemplateView.as_view(template_name='admin_test.html')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

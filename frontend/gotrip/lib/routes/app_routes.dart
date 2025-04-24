@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:gotrip/pages/profile/passenger_profile_page.dart';
 import 'package:gotrip/controllers/passenger_profile_controller.dart';
-import 'package:gotrip/pages/bookings/create_booking_page.dart';
+// import 'package:gotrip/pages/bookings/create_booking_page.dart';
 import 'package:gotrip/controllers/create_booking_controller.dart';
 
 class AppRoutes {
