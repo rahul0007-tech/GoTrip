@@ -19,7 +19,6 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import path, include
 from django.views.generic import RedirectView
-# from .admin import admin_site
 from django.views.generic import TemplateView
 # from .admin import custom_admin_site
 
@@ -31,6 +30,5 @@ urlpatterns = [
     path('api/vehicles/', include('vehicles.urls')),
     path('api/payments/', include('payments.urls')),
     path('logout/', RedirectView.as_view(url='/admin/logout/')),
-    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
     path('admin-test/', TemplateView.as_view(template_name='admin_test.html')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

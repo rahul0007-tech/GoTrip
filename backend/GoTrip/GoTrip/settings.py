@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from decouple import config
 from datetime import timedelta
-import adminlte3
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,17 +18,12 @@ ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
-    # 'jet',
-    # 'jet.dashboard',
-    # 'adminlte3',
-    # 'adminlte3_theme',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard',
     'users',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -187,11 +181,11 @@ APPEND_SLASH = True
 
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-#     # ADMINLTE_STATIC,  # Add AdminLTE static files
-# ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    # ADMINLTE_STATIC,  # Add AdminLTE static files
+]
 
 # # Static files (CSS, JavaScript, Images)
 # STATIC_URL = 'static/'
