@@ -1,0 +1,125 @@
+
+
+
+
+
+
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}GoTrip Admin Panel{% endblock %}</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+
+    <!-- Internal CSS to improve the UI -->
+    <style>
+        /* Reset body margin and padding */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        /* Main container */
+        .login-box {
+            width: 360px;
+            margin: 10% auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-logo h1 {
+            font-size: 36px;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Adjust the message text */
+        .login-box-msg {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        /* Content area styling */
+        .login-box-body {
+            padding: 20px;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            height: 40px;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            width: 100%;
+            height: 40px;
+            font-size: 16px;
+            color: white;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Add responsiveness */
+        @media (max-width: 768px) {
+            .login-box {
+                width: 90%;
+                padding: 30px;
+            }
+
+            .login-logo h1 {
+                font-size: 30px;
+            }
+
+            .login-box-msg {
+                font-size: 16px;
+            }
+        }
+    </style>
+
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <h1>GoTrip Admin Panel</h1>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg">Hello Admin! Let's View stats of GoTrip</p>
+
+        {% block content %}
+            {% block object-tools %}{% endblock %}
+            {{ content }}
+        {% endblock %}
+    </div>
+    <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>
+
