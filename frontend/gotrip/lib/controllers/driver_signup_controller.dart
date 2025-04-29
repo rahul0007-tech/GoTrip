@@ -1,28 +1,54 @@
-import 'package:dio/dio.dart';
-import 'package:get/get.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import'package:dio/dio.dart' as dio;
+import 'package:dio/src/multipart_file.dart';
 
 class DriverSignupController extends GetxController {
   var username = ''.obs;
   var email = ''.obs;
   var phoneNumber = ''.obs;
   var password = ''.obs;
+  Rx<File?> licenseImage = Rx<File?>(null);
+  var isImageUploading = false.obs;
 
+  final ImagePicker _picker = ImagePicker();
+  
   final Dio _dio = Dio(BaseOptions(
-    // Use your local backend URL. For Android emulator, 10.0.2.2 is used.
     baseUrl: 'http://10.0.2.2:8000',
-    connectTimeout: Duration(seconds: 20),
-    receiveTimeout: Duration(seconds: 20),
+    connectTimeout: const Duration(seconds: 20),
+    receiveTimeout: const Duration(seconds: 20),
   ));
+
+  Future<void> pickLicenseImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        licenseImage.value = File(image.path);
+      }
+    } catch (e) {
+      print("Error picking image: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to pick image',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    }
+  }
 
   void signup() async {
     if (username.isEmpty ||
         email.isEmpty ||
         phoneNumber.isEmpty ||
-        password.isEmpty) {
+        password.isEmpty ||
+        licenseImage.value == null) {
       Get.snackbar(
         'Error',
-        'All fields are required',
+        'All fields including license image are required',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
@@ -30,28 +56,39 @@ class DriverSignupController extends GetxController {
       return;
     }
 
-    // Debug prints for user input
-    print("User Input:");
-    print("Username: ${username.value}");
-    print("Email: ${email.value}");
-    print("Phone Number: ${phoneNumber.value}");
-    print("Password: ${password.value}");
-
+    isImageUploading.value = true;
+    
     try {
+      // Create the FormData object manually to avoid type issues
+      final formData = dio.FormData();
+      
+      // Add text fields
+      formData.fields.add(MapEntry('name', username.value.trim()));
+      formData.fields.add(MapEntry('email', email.value.trim()));
+      formData.fields.add(MapEntry('phone', phoneNumber.value.trim()));
+      formData.fields.add(MapEntry('password', password.value.trim()));
+      formData.fields.add(MapEntry('status', 'busy')); // Default status
+      
+      // Add the license file
+      final licenseFile = await dio.MultipartFile.fromFile(
+        licenseImage.value!.path,
+        filename: 'license.jpg',
+      );
+      formData.files.add(MapEntry('license', licenseFile));
+
       final response = await _dio.post(
         '/users/driver/',
-        data: {
-          'name': username.value.trim(),
-          'email': email.value.trim(),
-          'phone': phoneNumber.value.trim(),
-          'password': password.value.trim(),
-        },
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
       );
 
       print("Response Data: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Use the backend's message if provided; else a default message.
         String successMessage =
             response.data['message'] ?? 'Driver registered successfully!';
         Get.snackbar(
@@ -61,8 +98,7 @@ class DriverSignupController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        // Navigate to the next page (for example, a login or dashboard page)
-        Get.toNamed('/driver_dashboard');
+        Get.toNamed('/driver_login');
       } else {
         String errorMessage = response.data['message'] ?? 'Signup failed';
         Get.snackbar(
@@ -102,6 +138,8 @@ class DriverSignupController extends GetxController {
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );
+    } finally {
+      isImageUploading.value = false;
     }
   }
 }

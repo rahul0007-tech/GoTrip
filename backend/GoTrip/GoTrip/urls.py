@@ -22,15 +22,23 @@ from django.views.generic import RedirectView
 # from .admin import admin_site
 from django.views.generic import TemplateView
 # from .admin import custom_admin_site
+from django.contrib.admin.sites import AdminSite
+from dashboard.admin import admin_dashboard
 
 urlpatterns = [
     # path('jet/', include('jet.urls', 'jet')),  # Add this line before admin urls
     path('admin/', admin.site.urls),
-    path('api/bookings/', include('bookings.urls')),
-    path('api/users/', include('users.urls')),
-    path('api/vehicles/', include('vehicles.urls')),
-    path('api/payments/', include('payments.urls')),
+    path('bookings/', include('bookings.urls')),
+    path('users/', include('users.urls')),
+    path('vehicles/', include('vehicles.urls')),
+    path('payments/', include('payments.urls')),
     path('logout/', RedirectView.as_view(url='/admin/logout/')),
-    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
+    # path('dashboard/', include('dashboard.urls', namespace='dashboard')),
     path('admin-test/', TemplateView.as_view(template_name='admin_test.html')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('custom-admin/', include('dashboard.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+
+AdminSite.index = lambda self, request, extra_context=None: self.app_index(
+    request, 
+    extra_context=admin_dashboard(request) if extra_context is None else {**admin_dashboard(request), **extra_context}
+)

@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from .models import Booking, Location
 from users.models import Passenger, Driver
 from .serializers import AvailableBookingSerializer, CreateBookingSerializer, DriverHistorySerializer, PassengerHistorySerializer, ShowBookingLocationSerializer, DriverSerializer
@@ -8,6 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.utils import timezone
 from payments.models import Payment, OrderStatus
+from django.db.models import Sum
+from decimal import Decimal
+
 
 
 
@@ -37,7 +40,7 @@ class ShowBookingLocationView(APIView):
             location = Location.objects.filter(is_active=True)
             if not location.exists():
                 return Response({"status":"failed", "message":"No such location found" })
-            serializer = ShowBookingLocationSerializer(location, many=True)
+            serializer = ShowBookingLocationSerializer(location, many=True, context={'request': request})
             
             # Return the serialized data
             return Response(serializer.data, status=200)
@@ -118,7 +121,7 @@ class AcceptBookingView(APIView):
             return Response({'message': 'Sorry This Booking is no more available'}, status=status.HTTP_400_BAD_REQUEST)
 
         if driver in booking.accepted_drivers.all():
-            return Response({'message': 'You have already accepted this booking'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data':{'message': 'You have already accepted this booking'}}, status=status.HTTP_400_BAD_REQUEST)
 
         booking.accepted_drivers.add(driver)
         booking.save()
@@ -175,17 +178,6 @@ class SelectDriverView(APIView):
 
         booking = get_object_or_404(Booking, id=booking_id, passenger=passenger, booking_for__gte=timezone.now().date())
         
-        # Check if payment is completed for this booking
-        # from payments.models import Payment, OrderStatus
-        # payment = Payment.objects.filter(
-        #     user=user, 
-        #     status=OrderStatus.COMPLETED,
-        #     response_data__booking_id=booking_id
-        # ).first()
-        
-        # if not payment:
-        #     return Response({'error': 'Payment is required before selecting a driver', 'payment_required': True}, 
-        #                   status=status.HTTP_400_BAD_REQUEST)
         
         selected_driver = get_object_or_404(Driver, id=driver_id)
         
@@ -269,7 +261,7 @@ class GetLocation(APIView):
         location = Location.objects.filter(is_active=True)
         if not location.exists():
             return Response({"status":"failed", "message":"No such location found" })
-        serializer = ShowBookingLocationSerializer(location, many=True)
+        serializer = ShowBookingLocationSerializer(location, many=True, context={'request': request})
         
         # Return the serialized data
         return Response(serializer.data, status=200)
@@ -409,9 +401,57 @@ class DriverBookingHistory(APIView):
 
         return Response({'status':'success','message': 'Driver trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)
     
-        
-        
-        
-                
 
+class PassengerBookingHistory(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        passenger = get_object_or_404(Passenger, id=request.user.id)
+
+        if not passenger:
+            return Response({'error': 'Invalid Token or Token has expired'}, status=status.HTTP_404_NOT_FOUND)
+
+        passenger_Bookings = Booking.objects.filter(passenger=passenger).order_by('booking_for')
+
+        serializer = PassengerHistorySerializer(passenger_Bookings, many=True, context={'request': request})
+        if not passenger_Bookings.exists():
+            return Response({'status':'failed','message': 'No trip history found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status':'success','message': 'Passenger trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)     
+        
+# def total_rides_view(request):
+#     total_rides = Booking.objects.count()
+#     return render(request, 'admin/index.html', {'total_rides': total_rides})
+
+
+# class DriverTotalEarningsView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         driver = get_object_or_404(Driver, id=request.user.id)
+
+#         if not driver:
+#             return Response({'error': 'Invalid Token or Token has expired'}, status=status.HTTP_404_NOT_FOUND)
+
+#         total_earnings = Booking.objects.filter(driver=driver, status='completed').aggregate(total_earnings=Sum('fare'))['total_earnings'] or 0
+
+#         return Response({'status': 'success', 'message': 'Total earnings fetched successfully', 'data': {'total_earnings': total_earnings}}, status=status.HTTP_200_OK)
+
+                
+class DriverTotalEarningsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        driver = get_object_or_404(Driver, id=request.user.id)
+
+        # Calculate the total fare from confirmed bookings
+        total_fare = Booking.objects.filter(driver=driver, status='confirmed').aggregate(total_fare=Sum('fare'))['total_fare'] or 0
+        
+        # Calculate driver earnings as 10% of the total fare
+        driver_earnings = total_fare * Decimal('0.1')
+
+        return Response({
+            'status': 'success', 
+            'message': 'Total earnings fetched successfully', 
+            'data': {'total_earnings': driver_earnings}
+        }, status=status.HTTP_200_OK)
 

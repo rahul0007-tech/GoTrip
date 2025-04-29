@@ -1,10 +1,4 @@
-
-
-
-
-
-
-{% load i18n static %}
+{% comment %} {% load i18n static %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
@@ -102,6 +96,7 @@
 <body class="hold-transition login-page">
 <div class="login-box">
     <div class="login-logo">
+        <img src="{% static 'media/GoTrip Logo.jpg' %}" alt="">
         <h1>GoTrip Admin Panel</h1>
     </div>
     <!-- /.login-logo -->
@@ -122,4 +117,426 @@
 
 </body>
 </html>
+ {% endcomment %}
 
+ {% load i18n static %}
+ <!DOCTYPE html>
+ {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+ <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+ <head>
+     <meta charset="utf-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <title>{% block title %}GoTrip - Ride Booking Admin{% endblock %}</title>
+     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+     <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+     <link rel="stylesheet" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ 
+     <!-- Internal CSS for the completely redesigned UI -->
+     <style>
+         :root {
+             --primary: #1e8a4c;
+             --primary-dark: #156835;
+             --primary-light: #e6f7ed;
+             --secondary: #2d3748;
+             --accent: #ffc107;
+             --text-dark: #1a202c;
+             --text-light: #718096;
+             --white: #ffffff;
+             --gray-100: #f7fafc;
+             --gray-200: #edf2f7;
+             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+         }
+ 
+         * {
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+         }
+ 
+         body {
+             font-family: 'Poppins', sans-serif;
+             background-color: var(--gray-100);
+             min-height: 100vh;
+             display: flex;
+             margin: 0;
+             padding: 0;
+             overflow-x: hidden;
+         }
+ 
+         /* Split screen layout */
+         .login-container {
+             display: flex;
+             width: 100%;
+             height: 100vh;
+         }
+ 
+         /* Left side - Illustration */
+         .login-illustration {
+             flex: 1;
+             background-color: var(--primary-light);
+             display: flex;
+             flex-direction: column;
+             justify-content: center;
+             align-items: center;
+             padding: 2rem;
+             position: relative;
+             overflow: hidden;
+         }
+ 
+         .illustration-content {
+             position: relative;
+             z-index: 2;
+             text-align: center;
+             max-width: 500px;
+         }
+ 
+         .illustration-content h2 {
+             font-family: 'Montserrat', sans-serif;
+             font-weight: 700;
+             font-size: 2.5rem;
+             color: var(--primary);
+             margin-bottom: 1rem;
+         }
+ 
+         .illustration-content p {
+             color: var(--text-dark);
+             font-size: 1.1rem;
+             margin-bottom: 2rem;
+             line-height: 1.6;
+         }
+ 
+         .illustration-bg {
+             position: absolute;
+             bottom: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%231e8a4c' fill-opacity='0.1' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+             background-size: cover;
+             background-position: center bottom;
+             opacity: 0.8;
+             z-index: 1;
+         }
+ 
+         .car-animation {
+             position: absolute;
+             bottom: 80px;
+             left: -100px;
+             z-index: 3;
+             animation: driveCar 15s linear infinite;
+         }
+ 
+         @keyframes driveCar {
+             0% {
+                 left: -100px;
+             }
+             100% {
+                 left: calc(100% + 100px);
+             }
+         }
+ 
+         /* Right side - Login form */
+         .login-form-container {
+             flex: 1;
+             display: flex;
+             flex-direction: column;
+             justify-content: center;
+             align-items: center;
+             padding: 2rem;
+             background-color: var(--white);
+         }
+ 
+         .login-box {
+             width: 100%;
+             max-width: 400px;
+             padding: 2.5rem;
+             background-color: var(--white);
+             border-radius: 12px;
+             box-shadow: var(--shadow-lg);
+         }
+ 
+         .login-logo {
+             text-align: center;
+             margin-bottom: 2rem;
+         }
+ 
+         .login-logo img {
+             height: 60px;
+             margin-bottom: 1rem;
+         }
+ 
+         .login-logo h1 {
+             font-family: 'Montserrat', sans-serif;
+             font-size: 1.8rem;
+             font-weight: 700;
+             color: var(--primary);
+             margin: 0;
+         }
+ 
+         .login-logo span {
+             display: block;
+             font-size: 0.9rem;
+             color: var(--text-light);
+             margin-top: 0.5rem;
+         }
+ 
+         .login-box-msg {
+             text-align: center;
+             color: var(--text-light);
+             margin-bottom: 2rem;
+             font-size: 1rem;
+         }
+ 
+         .form-group {
+             margin-bottom: 1.5rem;
+             position: relative;
+         }
+ 
+         .form-group label {
+             display: block;
+             margin-bottom: 0.5rem;
+             font-weight: 500;
+             color: var(--text-dark);
+             font-size: 0.9rem;
+         }
+ 
+         .form-control {
+             width: 100%;
+             height: 50px;
+             padding: 0.75rem 1rem 0.75rem 3rem;
+             font-size: 1rem;
+             border: 1px solid var(--gray-200);
+             border-radius: 8px;
+             transition: all 0.3s ease;
+             background-color: var(--gray-100);
+         }
+ 
+         .form-control:focus {
+             border-color: var(--primary);
+             box-shadow: 0 0 0 3px rgba(30, 138, 76, 0.15);
+             outline: none;
+             background-color: var(--white);
+         }
+ 
+         .form-icon {
+             position: absolute;
+             left: 1rem;
+             top: 2.4rem;
+             color: var(--text-light);
+         }
+ 
+         .btn-primary {
+             display: block;
+             width: 100%;
+             padding: 0.75rem 1.5rem;
+             background-color: var(--primary);
+             color: var(--white);
+             border: none;
+             border-radius: 8px;
+             font-size: 1rem;
+             font-weight: 600;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             box-shadow: var(--shadow);
+             margin-top: 1.5rem;
+         }
+ 
+         .btn-primary:hover {
+             background-color: var(--primary-dark);
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+ 
+         .btn-primary:active {
+             transform: translateY(0);
+         }
+ 
+         .login-footer {
+             margin-top: 2rem;
+             text-align: center;
+             font-size: 0.9rem;
+             color: var(--text-light);
+         }
+ 
+         .login-footer a {
+             color: var(--primary);
+             text-decoration: none;
+             font-weight: 500;
+         }
+ 
+         .login-footer a:hover {
+             text-decoration: underline;
+         }
+ 
+         /* Responsive design */
+         @media (max-width: 992px) {
+             .login-container {
+                 flex-direction: column;
+                 height: auto;
+             }
+ 
+             .login-illustration {
+                 display: none;
+             }
+ 
+             .login-form-container {
+                 padding: 2rem 1rem;
+             }
+ 
+             .login-box {
+                 box-shadow: none;
+                 padding: 1.5rem;
+             }
+         }
+ 
+         /* Animation for the login form */
+         @keyframes fadeInUp {
+             from {
+                 opacity: 0;
+                 transform: translateY(20px);
+             }
+             to {
+                 opacity: 1;
+                 transform: translateY(0);
+             }
+         }
+ 
+         .login-box {
+             animation: fadeInUp 0.6s ease-out forwards;
+         }
+ 
+         /* Error messages styling */
+         .errorlist {
+             color: #e53e3e;
+             list-style: none;
+             padding: 0;
+             margin-bottom: 1rem;
+             font-size: 0.9rem;
+         }
+ 
+         /* Custom checkbox styling */
+         .form-check {
+             display: flex;
+             align-items: center;
+             margin-top: 1rem;
+         }
+ 
+         .form-check-input {
+             width: 18px;
+             height: 18px;
+             margin-right: 0.5rem;
+             accent-color: var(--primary);
+         }
+ 
+         .form-check-label {
+             font-size: 0.9rem;
+             color: var(--text-light);
+         }
+     </style>
+ </head>
+ <body>
+ <div class="login-container">
+     <!-- Left side - Illustration -->
+     <div class="login-illustration">
+         <div class="illustration-content">
+             <h2>Welcome to GoTrip</h2>
+             <p>Manage your ride booking platform efficiently. Track rides, drivers, and customers all in one place.</p>
+             
+             <!-- SVG Car Icon -->
+             <svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M170 80H30C25.5817 80 22 76.4183 22 72V50C22 45.5817 25.5817 42 30 42H170C174.418 42 178 45.5817 178 50V72C178 76.4183 174.418 80 170 80Z" fill="#1e8a4c"/>
+                 <path d="M178 60H22V72C22 76.4183 25.5817 80 30 80H170C174.418 80 178 76.4183 178 72V60Z" fill="#156835"/>
+                 <circle cx="50" cy="80" r="15" fill="#333333"/>
+                 <circle cx="50" cy="80" r="8" fill="#666666"/>
+                 <circle cx="150" cy="80" r="15" fill="#333333"/>
+                 <circle cx="150" cy="80" r="8" fill="#666666"/>
+                 <path d="M40 50H160L170 65H30L40 50Z" fill="#1e8a4c"/>
+                 <rect x="60" y="50" width="30" height="15" fill="#e6f7ed"/>
+                 <rect x="110" y="50" width="30" height="15" fill="#e6f7ed"/>
+             </svg>
+         </div>
+         <div class="illustration-bg"></div>
+         
+         <!-- Animated car -->
+         <div class="car-animation">
+             <svg width="100" height="40" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M85 40H15C12.7909 40 11 38.2091 11 36V25C11 22.7909 12.7909 21 15 21H85C87.2091 21 89 22.7909 89 25V36C89 38.2091 87.2091 40 85 40Z" fill="#1e8a4c"/>
+                 <circle cx="25" cy="40" r="7.5" fill="#333333"/>
+                 <circle cx="25" cy="40" r="4" fill="#666666"/>
+                 <circle cx="75" cy="40" r="7.5" fill="#333333"/>
+                 <circle cx="75" cy="40" r="4" fill="#666666"/>
+                 <path d="M20 25H80L85 32.5H15L20 25Z" fill="#1e8a4c"/>
+                 <rect x="30" y="25" width="15" height="7.5" fill="#e6f7ed"/>
+                 <rect x="55" y="25" width="15" height="7.5" fill="#e6f7ed"/>
+             </svg>
+         </div>
+     </div>
+     
+     <!-- Right side - Login form -->
+     <div class="login-form-container">
+         <div class="login-box">
+             <div class="login-logo">
+                 <!-- Car icon as logo -->
+                 <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M50 40H10C7.79086 40 6 38.2091 6 36V25C6 22.7909 7.79086 21 10 21H50C52.2091 21 54 22.7909 54 25V36C54 38.2091 52.2091 40 50 40Z" fill="#1e8a4c"/>
+                     <circle cx="20" cy="40" r="7.5" fill="#333333"/>
+                     <circle cx="20" cy="40" r="4" fill="#666666"/>
+                     <circle cx="40" cy="40" r="7.5" fill="#333333"/>
+                     <circle cx="40" cy="40" r="4" fill="#666666"/>
+                     <path d="M15 25H45L50 32.5H10L15 25Z" fill="#1e8a4c"/>
+                     <rect x="20" y="25" width="8" height="7.5" fill="#e6f7ed"/>
+                     <rect x="32" y="25" width="8" height="7.5" fill="#e6f7ed"/>
+                 </svg>
+                 <h1>GoTrip Admin</h1>
+                 <span>Ride Booking Management</span>
+             </div>
+             
+             <p class="login-box-msg">Sign in to manage your ride booking platform</p>
+             
+             <div class="login-box-body">
+                 {% block content %}
+                     {% block object-tools %}{% endblock %}
+                     
+                     <!-- Custom form styling for Django's default login form -->
+                     <div id="content-main">
+                         <form method="post" id="login-form">
+                             {% csrf_token %}
+                             
+                             <div class="form-group">
+                                 <label for="id_username">Username</label>
+                                 <i class="fas fa-user form-icon"></i>
+                                 <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required>
+                             </div>
+                             
+                             <div class="form-group">
+                                 <label for="id_password">Password</label>
+                                 <i class="fas fa-lock form-icon"></i>
+                                 <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+                             </div>
+                             
+                             <div class="form-check">
+                                 <input type="checkbox" name="remember_me" id="id_remember_me" class="form-check-input">
+                                 <label for="id_remember_me" class="form-check-label">Remember me</label>
+                             </div>
+                             
+                             <button type="submit" class="btn-primary">
+                                 <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+                             </button>
+                         </form>
+                     </div>
+                     
+                     {{ content }}
+                 {% endblock %}
+             </div>
+         </div>
+     </div>
+ </div>
+ 
+ <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+ <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+ 
+ </body>
+ </html>

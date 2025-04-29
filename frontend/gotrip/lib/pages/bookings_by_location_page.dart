@@ -471,7 +471,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to accept booking'),
+            content: Text('You Have Already Accepted This Booking'),
             backgroundColor: Colors.red,
           ),
         );

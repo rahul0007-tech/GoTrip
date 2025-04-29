@@ -313,7 +313,7 @@ class AddVehicleController extends GetxController {
       );
     } catch (e) {
       print("Unexpected Error: $e");
-      errorMessage.value = 'An unexpected error occurred.';
+      errorMessage.value = 'You already have a vehicle registered. You cannot add another one.';
       Get.snackbar(
         'Error',
         errorMessage.value,

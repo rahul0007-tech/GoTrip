@@ -40,6 +40,7 @@ import 'package:gotrip/bindings/passenger_profile_binding.dart';
 import 'package:gotrip/bindings/driver_profile_binding.dart';
 import 'package:gotrip/bindings/main_bindings.dart';
 import 'package:gotrip/pages/driver_main_pages.dart/driver_history_page.dart';
+import 'package:gotrip/pages/main_pages/passenger_historypage.dart';
 
 class AppPages {
   // static const initial = '/signup_choice'; // Start from signup page
@@ -84,6 +85,12 @@ class AppPages {
       page: () => const DriversPage(),
       binding: DriverBinding(),
     ),
+      GetPage(
+    name: '/trip_history',
+    page: () => PassengerHistoryPage(),
+    transition: Transition.rightToLeft,
+    transitionDuration: Duration(milliseconds: 250),
+  ),
   ];
 }
 

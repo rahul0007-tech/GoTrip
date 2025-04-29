@@ -7,6 +7,9 @@
 # from .models import Booking, Location
 
 from datetime import datetime
+from urllib.parse import urljoin
+from django.conf import settings
+from django.http import HttpRequest
 from django.utils.timezone import now, make_aware
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -77,6 +80,26 @@ class ShowBookingLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ['id','name', 'fare','location_image']
+    def get_location_image(self, obj):
+        if obj.location_image:
+            return obj.location_image.url
+
+
+# class ShowBookingLocationSerializer(serializers.ModelSerializer):
+#     location_image = serializers.SerializerMethodField()
+    
+#     class Meta:
+#         model = Location
+#         fields = ['id', 'name', 'fare', 'location_image']
+    
+#     def get_location_image(self, obj):
+#         request = self.context.get('request')
+#         if obj.location_image and request:
+#             return request.build_absolute_uri(obj.location_image.url)
+#         return obj.location_image.url if obj.location_image else None
+
+
+
 
 class AvailableBookingSerializer(serializers.ModelSerializer):
     class Meta:

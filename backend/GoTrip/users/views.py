@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from datetime import datetime, timedelta
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from bookings.models import Booking
 
@@ -96,8 +97,7 @@ class ResendOTPView(APIView):
             else:
                 return Response({
                     'error': 'Failed to send OTP email'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)                
         except Passenger.DoesNotExist:
             return Response({
                 'error': 'User not found or already verified'
@@ -116,8 +116,8 @@ class VerifyOTPView(APIView):
             try:
                 passenger = Passenger.objects.get(email=email, otp=otp)
                 # Check if OTP is expired
-                if datetime.now() > passenger.otp_created_at + timedelta(minutes=5):
-                    return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+                # if datetime.now() > passenger.otp_created_at + timedelta(minutes=5):
+                #     return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 passenger.isVerified = True
                 passenger.otp = None  # Clear OTP after verification
@@ -140,6 +140,8 @@ class LoginPassengerView(APIView):
                 passenger = get_object_or_404(Passenger, id = user.id)
                 if not passenger:
                     return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+                if passenger.isVerified == False:
+                    return Response({'error':'Sorry you are still not verified please verify your email first'})
                 token = get_tokens_for_user(user)
                 return Response({'token':token,'msg':'Login success'}, status= status.HTTP_200_OK)
             else:
@@ -253,6 +255,7 @@ class ChnagePasswordView(APIView):
 
 
 class CreateDriverView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     def post(self, request):
         serializer = CreateDriverSerializer(data=request.data)
         if serializer.is_valid():

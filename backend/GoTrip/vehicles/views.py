@@ -150,32 +150,24 @@ class GetDriversByVehicleTypeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):  # Use POST instead of GET
-        # Retrieve vehicle_type_id from the body
         vehicle_type_id = request.data.get('vehicle_type_id')
 
         if not vehicle_type_id:
             return Response({"error": "Vehicle type ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get the authenticated user
         user = request.user
 
-        # Fetch the passenger object associated with the user
         passenger = get_object_or_404(Passenger, id=user.id)
 
         if not passenger:
             return Response({'error': 'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the vehicle type exists
         vehicle_type = get_object_or_404(VehicleType, id=vehicle_type_id)
 
-        # Retrieve all vehicles that match the vehicle type
         vehicles = Vehicle.objects.filter(vehicle_type=vehicle_type)
 
         if not vehicles.exists():
             return Response({"message": "No drivers found for this vehicle type."}, status=status.HTTP_404_NOT_FOUND)
-
-        # Get the drivers associated with these vehicles
-        # drivers = [vehicle.driver for vehicle in vehicles]  # Retrieve the driver for each vehicle
 
         drivers = []
 

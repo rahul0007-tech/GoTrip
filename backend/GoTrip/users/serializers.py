@@ -53,7 +53,7 @@ class PassengerProfileSerializer(serializers.ModelSerializer):
 class CreateDriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
-        fields = ['name', 'phone','email','password','status']
+        fields = ['name', 'phone','email','password','status', 'license']
         
     def create(self, validated_data):
         password = validated_data.pop('password', None)

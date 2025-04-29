@@ -50,8 +50,10 @@ class PassengerResource(resources.ModelResource):
         fields = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
         export_order = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
 
+
+@admin.register(Passenger)
 class PassengerAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone', 'email', 'photo_preview', 'isVerified', 'Created_at', 'updated_at')
+    list_display = ('id', 'name', 'phone', 'email', 'photo_preview', 'isVerified', 'Created_at', 'updated_at', 'otp')
     list_filter = ('isVerified', 'Created_at', 'updated_at')
     search_fields = ('email', 'name', 'id')
     readonly_fields = ('Created_at', 'updated_at', 'photo_preview')
@@ -69,7 +71,15 @@ class PassengerAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     photo_preview.short_description = "Photo Preview"
 
 
-class DriverAdmin(admin.ModelAdmin):
+
+class DriverResource(resources.ModelResource):
+    class Meta:
+        model = Driver
+        fields = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
+        export_order = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at', 'license')
+
+@admin.register(Driver)
+class DriverAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'name', 'phone', 'email', 'license_preview', 'photo_preview', 'status_badge', 'isVerified', 'Created_at', 'updated_at')
     list_filter = ('isVerified', 'status', 'Created_at', 'updated_at')
     search_fields = ('email', 'name', 'id')
@@ -80,6 +90,7 @@ class DriverAdmin(admin.ModelAdmin):
         ("Driver info", {"fields": ["status", "license", "license_preview"]}),
         ("Verification", {"fields": ["isVerified"]})
     ]
+    resource_classes = [DriverResource]
     
     def status_badge(self, obj):
         status_colors = {
@@ -107,6 +118,8 @@ class DriverAdmin(admin.ModelAdmin):
 
 from django.contrib import admin
 from vehicles.models import Vehicle, VehicleImage, VehicleType, FuelType
+
+
 
 class VehicleImageInline(admin.TabularInline):
     model = VehicleImage
@@ -152,12 +165,21 @@ class FuelTypeAdmin(admin.ModelAdmin):
 from django.contrib import admin
 from payments.models import Payment
 
+class PaymentResource(resources.ModelResource):
+    class Meta:
+        model = Payment
+        fields = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status', 'user')
+        export_order = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status', 'user')
+
+
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status_badge', 'booking_link', 'user_link')
     list_filter = ('status', 'created_at')
     search_fields = ('transaction_id', 'pidx', 'booking__id', 'user__email')
     readonly_fields = ('created_at', 'updated_at')
+
+    resource_classes = [PaymentResource]
     
     def status_badge(self, obj):
         status_colors = {
