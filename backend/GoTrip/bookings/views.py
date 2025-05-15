@@ -57,49 +57,7 @@ class ShowBookingLocationView(APIView):
             )
 
 
-class BookingWithDriver(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        user = request.user
-        passenger = get_object_or_404(Passenger, id=user.id) 
-
-        if not passenger:   
-            return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST) 
-
-        driver = request.data.get('driver_id')
-        if not driver:
-            return Response({'error': 'Driver ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-
-        # serializer = CreateBookingSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     booking = serializer.save(passenger=passenger)
-        #     booking_data = serializer.to_representation(booking)
-        #     return Response({"message": "Booking created successfully", "data": booking_data}, status=200)
-
-        # return Response(serializer.errors, status=400)
-
-
-# class CreateBookingView(APIView):
-#     permission_classes = [IsAuthenticated] 
-
-#     def post(self, request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id=user.id)  
-
-#         serializer = CreateBookingSerializer(data=request.data)
-#         if serializer.is_valid():
-#             booking = serializer.save(passenger=passenger)
-            
-#             booking_data = serializer.to_representation(booking)
-#             return Response({
-#                 "message": "Booking created successfully", 
-#                 "data": booking_data
-#             }, status=200)
-
-#         return Response(serializer.errors, status=400)
-    
+ 
 
     
 
@@ -235,18 +193,6 @@ class CancelBookingView(APIView):
             return Response({"error":"Sorry no such bboking found"}, status=status.HTTP_400_BAD_REQUEST)
         
 
-# class GetVehiclesCategoryView(APIView):
-#     permission_classes=[IsAuthenticated]
-#     def get(self,request):
-#         user = request.user
-#         passenger = get_object_or_404(Passenger, id=user.id)
-#         vehicle_type = VehicleType.objects
-#         if not passenger:
-#             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
-#         if not vehicle_type.exists():
-#             return Response({"message":"Sorry No vehicles found"})
-#         serializer = ShowVehicleTypeSerializer(vehicle_type, many=True)
-#         return Response({"status":"success", "data":{"vehicle_type":serializer.data}, "message":"vehicle Fetched Successfully"})
 
 
 class GetLocation(APIView):
@@ -418,23 +364,6 @@ class PassengerBookingHistory(APIView):
 
         return Response({'status':'success','message': 'Passenger trip history fetched successfully','data': serializer.data}, status=status.HTTP_200_OK)     
         
-# def total_rides_view(request):
-#     total_rides = Booking.objects.count()
-#     return render(request, 'admin/index.html', {'total_rides': total_rides})
-
-
-# class DriverTotalEarningsView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         driver = get_object_or_404(Driver, id=request.user.id)
-
-#         if not driver:
-#             return Response({'error': 'Invalid Token or Token has expired'}, status=status.HTTP_404_NOT_FOUND)
-
-#         total_earnings = Booking.objects.filter(driver=driver, status='completed').aggregate(total_earnings=Sum('fare'))['total_earnings'] or 0
-
-#         return Response({'status': 'success', 'message': 'Total earnings fetched successfully', 'data': {'total_earnings': total_earnings}}, status=status.HTTP_200_OK)
 
                 
 class DriverTotalEarningsView(APIView):

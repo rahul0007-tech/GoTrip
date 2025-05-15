@@ -20,12 +20,12 @@ class DriversPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Obx(() => Text(
-          'Available Drivers',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        )),
+        // title: Obx(() => Text(
+        //   'Available Drivers',
+        //   style: const TextStyle(
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // )),
         elevation: 0,
         backgroundColor: primaryColor,
         actions: [
@@ -133,7 +133,7 @@ class DriversPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Unable to Load Drivers',
+                          'Sorry there are no Drivers Registered of This Vehicle Type',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -141,11 +141,11 @@ class DriversPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          driverController.errorMessage.value,
-                          style: TextStyle(color: Colors.grey.shade600),
-                          textAlign: TextAlign.center,
-                        ),
+                        // Text(
+                        //   driverController.errorMessage.value,
+                        //   style: TextStyle(color: Colors.grey.shade600),
+                        //   textAlign: TextAlign.center,
+                        // ),
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
                           onPressed: () => driverController.retryLoading(),

@@ -65,7 +65,7 @@ class Driver(User):
         ('free', 'Free')
     ]
     
-    license = models.ImageField(upload_to='license',blank=True, null=True)
+    license = models.ImageField(upload_to='license')
     photo = models.ImageField(upload_to='drivers',blank=True, null=True)
     status = models.CharField(max_length=5, choices=DRIVER_STATUS_CHOICES, default='free')
 

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'khalti',
     'payments',
     'import_export',
+    'ratings',
 ]
 
 

@@ -6,6 +6,7 @@ import 'package:gotrip/bindings/display_driver_by_vehicle_type.dart';
 import 'package:gotrip/bindings/display_vehicle_type_binding.dart';
 import 'package:gotrip/bindings/get_accpeted_driver_binding.dart';
 import 'package:gotrip/bindings/get_booking_binding.dart';
+import 'package:gotrip/bindings/history_bindings.dart';
 import 'package:gotrip/bindings/passenger_login_binding.dart';
 import 'package:gotrip/bindings/driver_login_binding.dart';
 import 'package:gotrip/bindings/passenger_signup_binding.dart';
@@ -87,7 +88,8 @@ class AppPages {
     ),
       GetPage(
     name: '/trip_history',
-    page: () => PassengerHistoryPage(),
+    page: () => HistoryScreen(),
+    binding: HistoryBinding(),
     transition: Transition.rightToLeft,
     transitionDuration: Duration(milliseconds: 250),
   ),

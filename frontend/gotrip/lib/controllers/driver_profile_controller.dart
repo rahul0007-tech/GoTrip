@@ -96,7 +96,7 @@ class DriverProfileController extends GetxController {
       colorText: Colors.white,
     );
 
-    Get.offAllNamed('/login');
+    Get.offAllNamed('/login_choice');
     print("Navigated to login screen.");
   }
 
