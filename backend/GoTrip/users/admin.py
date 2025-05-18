@@ -1,43 +1,3 @@
-# from django.contrib import admin
-# from .models import Passenger, Driver
-# from import_export.admin import ImportExportModelAdmin
-# from import_export import resources
-
-
-# class PassengerResource(resources.ModelResource):
-#     class Meta:
-#         model = Passenger
-#         fields = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
-#         export_order = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
-
-# class PassengerAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-#     list_display=('id','name','phone','email','password','photo','isVerified', 'Created_at', 'updated_at')
-#     list_filter=('isVerified','email','Created_at','updated_at')
-#     search_fields = ('email', 'name','id')
-#     fieldsets = [
-#         ('Passengher Credentials', {"fields": ["email", "password"]}),
-#         ("Personal info", {"fields": ["name","phone","photo"]}),
-#         ("Verification",{"fields":["isVerified","otp"]})
-#     ]
-#     resource_classes = [PassengerResource] 
-#     # ordering = ("Created_at","updated_at","id")
-
-
-# class DriverAdmin(admin.ModelAdmin):
-#     list_display=('id','name','phone','email','password','license','isVerified', 'Created_at', 'updated_at')
-#     list_filter=('isVerified','email','Created_at','updated_at')
-
-
-
-
-
-
-
-# admin.site.register(Passenger,PassengerAdmin)
-# admin.site.register(Driver,DriverAdmin)
-
-
-
 from django.contrib import admin
 from .models import Passenger, Driver
 from import_export.admin import ImportExportModelAdmin
@@ -51,18 +11,38 @@ class PassengerResource(resources.ModelResource):
         export_order = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
 
 
-@admin.register(Passenger)
+# Registration moved to dashboard/admin.py
 class PassengerAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone', 'email', 'photo_preview', 'isVerified', 'Created_at', 'updated_at', 'otp')
+    list_display = ('id', 'name', 'phone', 'email', 'photo_preview', 'isVerified', 'otp', 'Created_at', 'updated_at')
     list_filter = ('isVerified', 'Created_at', 'updated_at')
-    search_fields = ('email', 'name', 'id')
+    search_fields = ('email', 'name', 'id', 'phone')
     readonly_fields = ('Created_at', 'updated_at', 'photo_preview')
+    ordering = ('-Created_at',)
+    list_per_page = 25
+    date_hierarchy = 'Created_at'
+    
     fieldsets = [
-        ('Passenger Credentials', {"fields": ["email", "password"]}),
-        ("Personal info", {"fields": ["name", "phone", "photo", "photo_preview"]}),
-        ("Verification", {"fields": ["isVerified", "otp"]})
+        ('Passenger Credentials', {
+            "fields": ["email", "password"],
+            "description": "Login credentials for the passenger"
+        }),
+        ("Personal Information", {
+            "fields": ["name", "phone", "photo", "photo_preview"],
+            "description": "Personal details and profile photo"
+        }),
+        ("Verification", {
+            "fields": ["isVerified", "otp"],
+            "description": "Account verification status and OTP"
+        }),
+        ("System Information", {
+            "fields": ["Created_at", "updated_at"],
+            "classes": ("collapse",),
+            "description": "System timestamps"
+        })
     ]
     resource_classes = [PassengerResource]
+    
+    actions = ['verify_selected_passengers', 'unverify_selected_passengers']
     
     def photo_preview(self, obj):
         if obj.photo:
@@ -70,6 +50,35 @@ class PassengerAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         return "No Photo"
     photo_preview.short_description = "Photo Preview"
 
+    def verify_selected_passengers(self, request, queryset):
+        queryset.update(isVerified=True)
+    verify_selected_passengers.short_description = "Mark selected passengers as verified"
+    
+    def unverify_selected_passengers(self, request, queryset):
+        queryset.update(isVerified=False)
+    unverify_selected_passengers.short_description = "Mark selected passengers as unverified"
+    
+    def has_delete_permission(self, request, obj=None):
+        # Only superusers can delete passengers
+        return request.user.is_superuser
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # If this is a new passenger
+            if not obj.password.startswith(('pbkdf2_sha256$', 'bcrypt$', 'argon2')):
+                obj.set_password(obj.password)
+        super().save_model(request, obj, form, change)
+
+    def has_view_permission(self, request, obj=None):
+        # All staff members can view passengers
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        # Staff members can modify passenger details
+        return request.user.is_staff
+
+    def has_add_permission(self, request):
+        # Staff members can add passengers
+        return request.user.is_staff
 
 
 class DriverResource(resources.ModelResource):
@@ -78,19 +87,42 @@ class DriverResource(resources.ModelResource):
         fields = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at')
         export_order = ('id', 'name', 'phone', 'email', 'password', 'photo', 'isVerified', 'Created_at', 'updated_at', 'license')
 
-@admin.register(Driver)
+# Registration moved to dashboard/admin.py
 class DriverAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'name', 'phone', 'email', 'license_preview', 'photo_preview', 'status_badge', 'isVerified', 'Created_at', 'updated_at')
     list_filter = ('isVerified', 'status', 'Created_at', 'updated_at')
-    search_fields = ('email', 'name', 'id')
+    search_fields = ('email', 'name', 'id', 'phone')
     readonly_fields = ('Created_at', 'updated_at', 'license_preview', 'photo_preview')
+    ordering = ('-Created_at',)
+    list_per_page = 25
+    date_hierarchy = 'Created_at'
+    
     fieldsets = [
-        ('Driver Credentials', {"fields": ["email", "password"]}),
-        ("Personal info", {"fields": ["name", "phone", "photo", "photo_preview"]}),
-        ("Driver info", {"fields": ["status", "license", "license_preview"]}),
-        ("Verification", {"fields": ["isVerified"]})
+        ('Driver Credentials', {
+            "fields": ["email", "password"],
+            "description": "Login credentials for the driver"
+        }),
+        ("Personal Information", {
+            "fields": ["name", "phone", "photo", "photo_preview"],
+            "description": "Personal details and profile photo"
+        }),
+        ("Driver Information", {
+            "fields": ["status", "license", "license_preview"],
+            "description": "Driver's license and current status"
+        }),
+        ("Verification", {
+            "fields": ["isVerified"],
+            "description": "Account verification status"
+        }),
+        ("System Information", {
+            "fields": ["Created_at", "updated_at"],
+            "classes": ("collapse",),
+            "description": "System timestamps"
+        })
     ]
     resource_classes = [DriverResource]
+    
+    actions = ['verify_selected_drivers', 'unverify_selected_drivers', 'set_status_free', 'set_status_busy']
     
     def status_badge(self, obj):
         status_colors = {
@@ -112,6 +144,44 @@ class DriverAdmin(ImportExportModelAdmin, admin.ModelAdmin):
             return format_html('<img src="{}" width="50" height="50" style="border-radius: 50%;" />', obj.photo.url)
         return "No Photo"
     photo_preview.short_description = "Photo Preview"
+    
+    def verify_selected_drivers(self, request, queryset):
+        queryset.update(isVerified=True)
+    verify_selected_drivers.short_description = "Mark selected drivers as verified"
+    
+    def unverify_selected_drivers(self, request, queryset):
+        queryset.update(isVerified=False)
+    unverify_selected_drivers.short_description = "Mark selected drivers as unverified"
+    
+    def set_status_free(self, request, queryset):
+        queryset.update(status='free')
+    set_status_free.short_description = "Set selected drivers as free"
+    
+    def set_status_busy(self, request, queryset):
+        queryset.update(status='busy')
+    set_status_busy.short_description = "Set selected drivers as busy"
+    
+    def has_delete_permission(self, request, obj=None):
+        # Only superusers can delete drivers
+        return request.user.is_superuser
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # If this is a new driver
+            if not obj.password.startswith(('pbkdf2_sha256$', 'bcrypt$', 'argon2')):
+                obj.set_password(obj.password)
+        super().save_model(request, obj, form, change)
+
+    def has_view_permission(self, request, obj=None):
+        # All staff members can view drivers
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        # Staff members can modify driver details
+        return request.user.is_staff
+
+    def has_add_permission(self, request):
+        # Staff members can add drivers
+        return request.user.is_staff
 
 
 ### Enhanced Vehicle Admin
@@ -165,56 +235,4 @@ class FuelTypeAdmin(admin.ModelAdmin):
 from django.contrib import admin
 from payments.models import Payment
 
-class PaymentResource(resources.ModelResource):
-    class Meta:
-        model = Payment
-        fields = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status', 'user')
-        export_order = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status', 'user')
-
-
-@admin.register(Payment)
-class PaymentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('id', 'amount', 'transaction_id', 'pidx', 'created_at', 'status_badge', 'booking_link', 'user_link')
-    list_filter = ('status', 'created_at')
-    search_fields = ('transaction_id', 'pidx', 'booking__id', 'user__email')
-    readonly_fields = ('created_at', 'updated_at')
-
-    resource_classes = [PaymentResource]
-    
-    def status_badge(self, obj):
-        status_colors = {
-            'started': 'info',
-            'initiated': 'primary',
-            'completed': 'success',
-            'canceled': 'danger',
-            'user_canceled': 'warning',
-            'expired': 'secondary',
-            'refunded': 'light',
-            'partially_refunded': 'dark',
-            'pending': 'warning'
-        }
-        color = status_colors.get(obj.status, 'secondary')
-        return format_html('<span class="badge badge-{}">{}</span>', color, obj.status.title())
-    status_badge.short_description = 'Status'
-    
-    def booking_link(self, obj):
-        if obj.booking:
-            return format_html('<a href="{}">{}</a>', 
-                               f'/admin/bookings/booking/{obj.booking.id}/change/', 
-                               f'Booking #{obj.booking.id}')
-        return "No Booking"
-    booking_link.short_description = "Booking"
-    
-    def user_link(self, obj):
-        if obj.user:
-            if hasattr(obj.user, 'passenger'):
-                return format_html('<a href="{}">{}</a>', 
-                                  f'/admin/users/passenger/{obj.user.passenger.id}/change/', 
-                                  obj.user.email)
-            elif hasattr(obj.user, 'driver'):
-                return format_html('<a href="{}">{}</a>', 
-                                  f'/admin/users/driver/{obj.user.driver.id}/change/', 
-                                  obj.user.email)
-            return obj.user.email
-        return "No User"
-    user_link.short_description = "User"
+# Payment admin has been moved to payments/admin.py

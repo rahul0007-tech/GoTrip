@@ -4,6 +4,1251 @@
 
 {% block extrastyle %}
 {{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    /* 
+    * Design Theory Improvements:
+    * 1. Using 8-point grid system for consistent spacing
+    * 2. Improved color contrast for accessibility (WCAG 2.1 compliant)
+    * 3. Better typography with proper hierarchy
+    * 4. Refined visual hierarchy to guide user attention
+    * 5. Improved whitespace for better readability
+    * 6. Consistent component styling
+    * 7. Added ride-booking specific design elements
+    */
+
+    :root {
+        /* Primary Colors - Keeping the green theme */
+        --primary-50: #e6f7ed;
+        --primary-100: #c3ebd3;
+        --primary-200: #9ddeb8;
+        --primary-300: #70d09c;
+        --primary-400: #4dc283;
+        --primary-500: #2ab06a;
+        --primary-600: #1e8a4c; /* Main brand color */
+        --primary-700: #156835;
+        --primary-800: #0d4623;
+        --primary-900: #052311;
+
+        /* Neutral Colors */
+        --neutral-50: #f8fafc;
+        --neutral-100: #f1f5f9;
+        --neutral-200: #e2e8f0;
+        --neutral-300: #cbd5e1;
+        --neutral-400: #94a3b8;
+        --neutral-500: #64748b;
+        --neutral-600: #475569;
+        --neutral-700: #334155;
+        --neutral-800: #1e293b;
+        --neutral-900: #0f172a;
+
+        /* Semantic Colors */
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+
+        /* UI Elements */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 6px 10px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+        /* Spacing (8-point grid) */
+        --space-1: 0.25rem;  /* 4px */
+        --space-2: 0.5rem;   /* 8px */
+        --space-3: 0.75rem;  /* 12px */
+        --space-4: 1rem;     /* 16px */
+        --space-5: 1.25rem;  /* 20px */
+        --space-6: 1.5rem;   /* 24px */
+        --space-8: 2rem;     /* 32px */
+        --space-10: 2.5rem;  /* 40px */
+        --space-12: 3rem;    /* 48px */
+        --space-16: 4rem;    /* 64px */
+
+        /* Border Radius */
+        --radius-sm: 0.125rem;  /* 2px */
+        --radius: 0.25rem;      /* 4px */
+        --radius-md: 0.375rem;  /* 6px */
+        --radius-lg: 0.5rem;    /* 8px */
+        --radius-xl: 0.75rem;   /* 12px */
+        --radius-2xl: 1rem;     /* 16px */
+        --radius-3xl: 1.5rem;   /* 24px */
+        --radius-full: 9999px;  /* Full rounded */
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background-color: var(--neutral-100);
+        color: var(--neutral-800);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 0;
+        color: var(--neutral-900);
+        font-weight: 600;
+        line-height: 1.2;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h1 { font-size: 2.25rem; } /* 36px */
+    h2 { font-size: 1.875rem; } /* 30px */
+    h3 { font-size: 1.5rem; } /* 24px */
+    h4 { font-size: 1.25rem; } /* 20px */
+    h5 { font-size: 1.125rem; } /* 18px */
+    h6 { font-size: 1rem; } /* 16px */
+
+    p {
+        margin-top: 0;
+        margin-bottom: var(--space-4);
+    }
+
+    a {
+        color: var(--primary-600);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: var(--primary-700);
+        text-decoration: none;
+    }
+
+    /* Header and Breadcrumbs */
+    .content-header {
+        padding: var(--space-6) var(--space-4);
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+        border-bottom: 1px solid var(--primary-700);
+        margin-bottom: var(--space-6);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+
+    .content-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,0.05)' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0;
+        letter-spacing: -0.025em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        color: rgba(255, 255, 255, 0.7);
+        padding: 0 var(--space-2);
+    }
+
+    .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+    .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .breadcrumb-item a i {
+        margin-right: var(--space-2);
+    }
+
+    .breadcrumb-item.active {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+    }
+
+    /* Cards */
+    .card {
+        border: none;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow);
+        margin-bottom: var(--space-6);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        background-color: white;
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        background-color: white;
+        border-bottom: 1px solid var(--neutral-200);
+        padding: var(--space-5) var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 0;
+        color: var(--neutral-800);
+        display: flex;
+        align-items: center;
+    }
+
+    .card-title i {
+        margin-right: var(--space-2);
+        color: var(--primary-600);
+    }
+
+    .card-title a {
+        color: var(--primary-600);
+    }
+
+    .card-body {
+        padding: var(--space-6);
+        background-color: white;
+    }
+
+    /* Stats Cards */
+    .stats-container {
+        margin-bottom: var(--space-6);
+    }
+
+    .stat-card {
+        background-color: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow);
+        padding: var(--space-6);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--primary-600);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, transparent 50%, rgba(30, 138, 76, 0.1) 50%);
+        border-radius: 0 0 var(--radius-xl) 0;
+    }
+
+    .stat-card .icon {
+        position: absolute;
+        top: var(--space-4);
+        right: var(--space-4);
+        font-size: 2.5rem;
+        color: var(--primary-600);
+        opacity: 0.15;
+        z-index: 1;
+    }
+
+    .stat-card .stat-title {
+        font-size: 0.875rem;
+        color: var(--neutral-500);
+        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--neutral-900);
+        margin-bottom: var(--space-2);
+        line-height: 1.2;
+    }
+
+    .stat-card .stat-desc {
+        font-size: 0.875rem;
+        color: var(--neutral-600);
+        display: flex;
+        align-items: center;
+        background-color: var(--neutral-50);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-full);
+        display: inline-flex;
+    }
+
+    .stat-card .stat-desc i {
+        margin-right: var(--space-1);
+    }
+
+    .text-success {
+        color: var(--success) !important;
+    }
+
+    .text-danger {
+        color: var(--danger) !important;
+    }
+
+    /* Model Boxes */
+    .model-box {
+        margin-bottom: var(--space-4);
+    }
+
+    .info-box {
+        display: flex;
+        min-height: 120px;
+        background-color: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        margin-bottom: 0;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: 1px solid var(--neutral-200);
+        position: relative;
+    }
+
+    .info-box:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-200);
+    }
+
+    .info-box-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+        color: white;
+        border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-box-icon::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='rgba(255,255,255,0.1)' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .info-box-icon a {
+        color: white;
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-box-content {
+        padding: var(--space-4);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-box-text {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: var(--space-2);
+        color: var(--neutral-800);
+    }
+
+    .info-box-content a {
+        text-decoration: none;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        padding: var(--space-2) var(--space-4);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.5;
+        font-size: 0.875rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+
+    .btn:active::after {
+        animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(20, 20);
+            opacity: 0;
+        }
+    }
+
+    .btn i {
+        margin-right: var(--space-2);
+    }
+
+    .btn-xs {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.75rem;
+        border-radius: var(--radius);
+    }
+
+    .btn-default {
+        background-color: var(--neutral-200);
+        color: var(--neutral-700);
+        border: none;
+    }
+
+    .btn-default:hover {
+        background-color: var(--neutral-300);
+        color: var(--neutral-800);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-tool {
+        background-color: transparent;
+        color: var(--neutral-500);
+        padding: var(--space-1);
+        font-size: 0.875rem;
+    }
+
+    .btn-tool:hover {
+        color: var(--neutral-700);
+    }
+
+    .btn-group {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--neutral-200);
+        left: 14px;
+        margin: 0;
+        border-radius: var(--radius-full);
+    }
+
+    .timeline > div {
+        position: relative;
+        margin-bottom: var(--space-4);
+        margin-right: var(--space-2);
+    }
+
+    .timeline > div:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .timeline > div > i {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        line-height: 30px;
+        position: absolute;
+        color: white;
+        background: var(--primary-600);
+        border-radius: var(--radius-full);
+        text-align: center;
+        left: 0;
+        top: 0;
+        box-shadow: 0 0 0 4px rgba(30, 138, 76, 0.1);
+    }
+
+    .timeline > div > i.bg-blue {
+        background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .timeline > div > i.bg-green {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .timeline > div > i.bg-red {
+        background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+
+    .timeline-item {
+        margin-left: 45px;
+        padding: var(--space-4);
+        background: white;
+        border-radius: var(--radius-lg);
+        position: relative;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--neutral-200);
+    }
+
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -10px;
+        top: 15px;
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid white;
+    }
+
+    .timeline-item .time {
+        color: var(--neutral-500);
+        font-size: 0.75rem;
+        display: block;
+        margin-bottom: var(--space-2);
+    }
+
+    .timeline-item .time i {
+        margin-right: var(--space-1);
+    }
+
+    .timeline-body {
+        color: var(--neutral-800);
+        font-size: 0.875rem;
+    }
+
+    .timeline-body a {
+        color: var(--primary-600);
+        font-weight: 500;
+    }
+
+    .mini {
+        font-size: 0.75rem;
+        color: var(--neutral-500);
+    }
+
+    /* Quick Actions */
+    .list-group {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .list-group-item {
+        border: 1px solid var(--neutral-200);
+        padding: var(--space-3) var(--space-4);
+        color: var(--neutral-700);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .list-group-item:first-child {
+        border-top-left-radius: var(--radius-lg);
+        border-top-right-radius: var(--radius-lg);
+    }
+
+    .list-group-item:last-child {
+        border-bottom-left-radius: var(--radius-lg);
+        border-bottom-right-radius: var(--radius-lg);
+    }
+
+    .list-group-item::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        transition: transform 0.3s ease-out;
+    }
+
+    .list-group-item:hover::before {
+        transform: scaleX(1);
+    }
+
+    .list-group-item:hover {
+        color: var(--primary-700);
+        border-color: var(--primary-200);
+    }
+
+    .list-group-item i {
+        margin-right: var(--space-2);
+        transition: transform 0.2s ease;
+    }
+
+    .list-group-item:hover i {
+        transform: translateX(2px);
+    }
+
+    .list-group-item-action {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: var(--space-8);
+        color: var(--neutral-500);
+    }
+
+    .empty-state svg {
+        margin-bottom: var(--space-4);
+        opacity: 0.5;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Ride Booking Specific Styles */
+    .ride-map-container {
+        position: relative;
+        height: 200px;
+        background-color: var(--neutral-100);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: var(--space-4);
+    }
+
+    .ride-map-placeholder {
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23f1f5f9' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/svg%3E");
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ride-map-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(30, 138, 76, 0.1) 0%, rgba(30, 138, 76, 0.2) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ride-map-pin {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-600);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        margin-top: -20px;
+        box-shadow: var(--shadow-md);
+        position: relative;
+    }
+
+    .ride-map-pin::after {
+        content: '';
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+
+    .ride-route {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        right: 20px;
+        height: 4px;
+        background-color: var(--primary-600);
+        border-radius: var(--radius-full);
+        transform: translateY(-50%);
+    }
+
+    .ride-route::before, .ride-route::after {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--primary-600);
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .ride-route::before {
+        left: 0;
+    }
+
+    .ride-route::after {
+        right: 0;
+    }
+
+    .car-animation {
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 15px;
+        background-color: var(--neutral-800);
+        border-radius: 3px;
+        animation: drive 8s linear infinite;
+    }
+
+    .car-animation::before, .car-animation::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background-color: var(--neutral-400);
+        border-radius: 50%;
+        bottom: -3px;
+    }
+
+    .car-animation::before {
+        left: 4px;
+    }
+
+    .car-animation::after {
+        right: 4px;
+    }
+
+    @keyframes drive {
+        0% {
+            left: 5%;
+        }
+        100% {
+            left: 95%;
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .content-header {
+            padding: var(--space-4) var(--space-4);
+        }
+        
+        .card-header {
+            padding: var(--space-4);
+        }
+        
+        .card-body {
+            padding: var(--space-4);
+        }
+        
+        .stat-card {
+            padding: var(--space-4);
+        }
+        
+        .stat-card .stat-value {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .info-box {
+            min-height: 100px;
+        }
+        
+        .info-box-icon {
+            width: 60px;
+        }
+        
+        .timeline-item {
+            padding: var(--space-3);
+            margin-left: 40px;
+        }
+        
+        .stat-card {
+            margin-bottom: var(--space-4);
+        }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--neutral-100);
+        border-radius: var(--radius-full);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-600);
+        border-radius: var(--radius-full);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-700);
+    }
+
+    /* Animation for cards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    .card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    /* Accessibility improvements */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+
+    /* Focus styles for keyboard navigation */
+    a:focus, button:focus, input:focus, select:focus, textarea:focus {
+        outline: 2px solid var(--primary-600);
+        outline-offset: 2px;
+    }
+
+    /* Skip to content link for accessibility */
+    .skip-to-content {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: var(--primary-600);
+        color: white;
+        padding: var(--space-2) var(--space-4);
+        z-index: 100;
+        transition: top 0.2s;
+    }
+
+    .skip-to-content:focus {
+        top: 0;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% if not is_popup %}
+{% block breadcrumbs %}
+<!-- Skip to content link for accessibility -->
+<a href="#content-main" class="skip-to-content">Skip to content</a>
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h2 class="page-title">{{title}}</h2>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'admin:index' %}">
+                            <i class="fas fa-tachometer-alt"></i> {% trans 'Dashboard' %}
+                        </a>
+                    </li>
+                    {% for app in app_list %}
+                    <li class="breadcrumb-item active">{{ app.name }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="content-main" class="container-fluid">
+    <!-- Dashboard Stats - Using real data from context -->
+     <div class="row stats-container">
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card">
+                <div class="icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-title">Total Rides</div>
+                <div class="stat-value">{{ total_rides|default:"58" }}</div>
+                <div class="stat-desc">
+                    {% if ride_trend > 0 %}
+                    <i class="fas fa-arrow-up text-success"></i> {{ ride_trend }}% increase
+                    {% elif ride_trend < 0 %}
+                    <i class="fas fa-arrow-down text-danger"></i> {{ ride_trend|cut:"-" }}% decrease
+                    {% else %}
+                    <i class="fas fa-minus text-muted"></i> No change
+                    {% endif %}
+                    this week
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card">
+                <div class="icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="stat-title">Active Drivers</div>
+                <div class="stat-value">{{ active_drivers|default:"2" }}</div>
+                <div class="stat-desc">
+                    {% if driver_trend > 0 %}
+                    <i class="fas fa-arrow-up text-success"></i> {{ driver_trend }}% increase
+                    {% elif driver_trend < 0 %}
+                    <i class="fas fa-arrow-down text-danger"></i> {{ driver_trend|cut:"-" }}% decrease
+                    {% else %}
+                    <i class="fas fa-minus text-muted"></i> No change
+                    {% endif %}
+                    this month
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card">
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-title">Registered Users</div>
+                <div class="stat-value">{{ registered_users|default:"16" }}</div>
+                <div class="stat-desc">
+                    {% if user_trend > 0 %}
+                    <i class="fas fa-arrow-up text-success"></i> {{ user_trend }}% increase
+                    {% elif user_trend < 0 %}
+                    <i class="fas fa-arrow-down text-danger"></i> {{ user_trend|cut:"-" }}% decrease
+                    {% else %}
+                    <i class="fas fa-minus text-muted"></i> No change
+                    {% endif %}
+                    this month
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card">
+                <div class="icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-title">Revenue</div>
+                <div class="stat-value">{{ revenue_formatted|default:"$1009" }}</div>
+                <div class="stat-desc">
+                    {% if revenue_trend > 0 %}
+                    <i class="fas fa-arrow-up text-success"></i> {{ revenue_trend }}% increase
+                    {% elif revenue_trend < 0 %}
+                    <i class="fas fa-arrow-down text-danger"></i> {{ revenue_trend|cut:"-" }}% decrease
+                    {% else %}
+                    <i class="fas fa-minus text-muted"></i> No change
+                    {% endif %}
+                    this month
+                </div>
+            </div>
+        </div> 
+    </div>
+
+    <!-- Ride Activity Map Preview -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-map-marked-alt"></i> Live Ride Activity
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" aria-label="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="ride-map-container">
+                        <div class="ride-map-placeholder">
+                            <div class="ride-map-overlay">
+                                <div class="ride-route"></div>
+                                <div class="car-animation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            {% if app_list %}
+            {% for app in app_list %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <a href="{{ app.app_url }}" class="nav-link"
+                            title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">
+                            <i class="fas fa-cubes"></i>{{ app.name }}
+                        </a>
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" aria-label="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for model in app.models %}
+                        <div class="col-md-6 col-lg-4 model-box">
+                            <div class="info-box">
+                                <span class="info-box-icon">
+                                    <a href="{{ model.admin_url }}" aria-label="View {{ model.name }}">
+                                        {% autoescape off %}{% icon %}{% endautoescape %}
+                                    </a>
+                                </span>
+                                <div class="info-box-content">
+                                    <a href="{{ model.admin_url }}">
+                                        <span class="info-box-text">{{ model.name }}</span>
+                                    </a>
+                                    <div class="btn-group mt-2">
+                                        {% if model.add_url %}
+                                        <a href="{{ model.add_url }}" class="btn btn-default btn-xs">
+                                            <i class="fas fa-plus"></i> {%trans 'Add' %}
+                                        </a>
+                                        {% endif %}
+                                        {% if model.admin_url %}
+                                        <a href="{{ model.admin_url }}" class="btn btn-warning btn-xs">
+                                            <i class="fas fa-edit"></i> {%trans 'Change' %}
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="card">
+                <div class="card-body empty-state">
+                    <svg width="100" height="60" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M85 60H15C12.7909 60 11 58.2091 11 56V35C11 32.7909 12.7909 31 15 31H85C87.2091 31 89 32.7909 89 35V56C89 58.2091 87.2091 60 85 60Z" fill="#1e8a4c"/>
+                        <circle cx="25" cy="60" r="7.5" fill="#333333"/>
+                        <circle cx="25" cy="60" r="4" fill="#666666"/>
+                        <circle cx="75" cy="60" r="7.5" fill="#333333"/>
+                        <circle cx="75" cy="60" r="4" fill="#666666"/>
+                        <path d="M20 35H80L85 47.5H15L20 35Z" fill="#1e8a4c"/>
+                        <rect x="30" y="35" width="15" height="12.5" fill="#e6f7ed"/>
+                        <rect x="55" y="35" width="15" height="12.5" fill="#e6f7ed"/>
+                    </svg>
+                    <p>{% trans "You don't have permission to edit anything." %}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            {% block sidebar %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history"></i> {% trans 'Recent actions' %}
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" aria-label="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% load log %}
+                    {% get_admin_log 10 as admin_log for_user user %}
+                    {% if not admin_log %}
+                    <div class="empty-state p-4">
+                        <i class="fas fa-clock fa-3x mb-3 text-muted"></i>
+                        <p>{% trans 'No recent actions' %}</p>
+                    </div>
+                    {% else %}
+                    <div class="timeline p-3">
+                        {% for entry in admin_log %}
+                        <div>
+                            <i class="fas fa-{% if entry.is_addition %}plus bg-blue{% endif %}{% if entry.is_change %}edit bg-green{% endif %}{% if entry.is_deletion %}minus bg-red{% endif %}"></i>
+                            <div class="timeline-item">
+                                <span class="time">
+                                    <i class="fas fa-clock"></i> {{entry.action_time|date:"M d, H:i"}}
+                                </span>
+                                <div class="timeline-body">
+                                    <a href="#">{{entry.user}}</a>
+                                    {% if entry.is_addition %}added{% endif %}{% if entry.is_change %}edited{% endif %}{% if entry.is_deletion %}deleted{% endif %}
+                                    {% if entry.is_deletion or not entry.get_admin_url %}
+                                    {{ entry.object_repr }}
+                                    {% else %}
+                                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                                    {% endif %}
+                                    <br />
+                                    {% if entry.content_type %}
+                                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+                                    {% else %}
+                                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" aria-label="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'admin:index' %}?model=ride" class="list-group-item list-group-item-action">
+                            <i class="fas fa-car text-primary"></i> Add New Ride
+                        </a>
+                        <a href="{% url 'admin:index' %}?model=driver" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-plus text-success"></i> Register New Driver
+                        </a>
+                        <a href="{% url 'admin:index' %}?report=analytics" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-line text-info"></i> View Analytics
+                        </a>
+                        <a href="{% url 'admin:index' %}?settings=system" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog text-secondary"></i> System Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+<!-- Add this to your template to pass real data to the dashboard -->
+<script>
+    // This is just a placeholder to show how you would integrate real data
+    // In a real implementation, you would pass this data from your Django view
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard loaded. To display real statistics, pass the following context variables:');
+        console.log('- total_rides: Total number of rides in the system');
+        console.log('- active_drivers: Number of currently active drivers');
+        console.log('- registered_users: Total number of registered users');
+        console.log('- revenue_formatted: Formatted revenue string (e.g. "$12,486")');
+        console.log('- ride_trend: Percentage change in rides (e.g. 12 for 12% increase)');
+        console.log('- driver_trend: Percentage change in active drivers');
+        console.log('- user_trend: Percentage change in registered users');
+        console.log('- revenue_trend: Percentage change in revenue');
+    });
+</script>
+{% endblock %}
+
+
+
+{% comment %} {% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% load admin_menu %}
+
+{% block extrastyle %}
+{{ block.super }}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     /* 
@@ -969,4 +2214,5 @@
         console.log('- revenue_trend: Percentage change in revenue');
     });
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}
+

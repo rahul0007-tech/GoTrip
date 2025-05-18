@@ -1,0 +1,167 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Rides</h5>
+                <p class="card-text display-4">{{ total_rides }}</p>
+                <p class="card-text {% if ride_trend >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ ride_trend }}% from last week
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Active Drivers</h5>
+                <p class="card-text display-4">{{ active_drivers }}</p>
+                <p class="card-text {% if driver_trend >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ driver_trend }}% from last month
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Registered Users</h5>
+                <p class="card-text display-4">{{ registered_users }}</p>
+                <p class="card-text {% if user_trend >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ user_trend }}% from last month
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Revenue</h5>
+                <p class="card-text display-4">{{ revenue_formatted }}</p>
+                <p class="card-text {% if revenue_trend >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ revenue_trend }}% from last month
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rides Over Time</h5>
+                <canvas id="ridesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Revenue Trends</h5>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">User Registration Trends</h5>
+                <canvas id="usersChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Driver Activity</h5>
+                <canvas id="driversChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Rides Chart
+        new Chart(document.getElementById('ridesChart'), {
+            type: 'line',
+            data: {
+                labels: {{ rides_labels|safe }},
+                datasets: [{
+                    label: 'Number of Rides',
+                    data: {{ rides_data }},
+                    borderColor: '#007bff',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Revenue Chart
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ revenue_labels|safe }},
+                datasets: [{
+                    label: 'Revenue',
+                    data: {{ revenue_data }},
+                    backgroundColor: '#28a745'
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Users Chart
+        new Chart(document.getElementById('usersChart'), {
+            type: 'line',
+            data: {
+                labels: {{ users_labels|safe }},
+                datasets: [{
+                    label: 'New Users',
+                    data: {{ users_data }},
+                    borderColor: '#17a2b8',
+                    tension: 0.1
+                }]
+            }
+        });
+
+        // Drivers Chart
+        new Chart(document.getElementById('driversChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Active', 'Inactive'],
+                datasets: [{
+                    data: {{ drivers_data }},
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+    </script>
+{% endblock %}
