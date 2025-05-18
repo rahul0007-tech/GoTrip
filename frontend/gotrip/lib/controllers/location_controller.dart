@@ -12,7 +12,6 @@ class LocationController extends GetxController {
     super.onInit();
     fetchLocations();
   }
-
   Future<void> fetchLocations() async {
     try {
       isLoading(true);
@@ -20,12 +19,19 @@ class LocationController extends GetxController {
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
+        print('Location data received: $data'); // Debug print
         locations.value = data.map((json) => Location.fromJson(json)).toList();
+        print('Locations parsed: ${locations.length}'); // Debug print
+        // Print first location details if available
+        if (locations.isNotEmpty) {
+          print('First location details: ${locations[0].name}, Image: ${locations[0].locationImage}');
+        }
       } else {
         error.value = 'Failed to load locations';
       }
     } catch (e) {
       error.value = 'Error: $e';
+      print('Error fetching locations: $e'); // Debug print
     } finally {
       isLoading(false);
     }

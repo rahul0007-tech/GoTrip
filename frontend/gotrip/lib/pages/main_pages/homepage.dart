@@ -182,8 +182,7 @@ class HomePage extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
-                            ),
-                          ),
+                            ),                          ),
                         ],
                       );
                     }),
@@ -299,156 +298,125 @@ class HomePage extends StatelessWidget {
                         width: 180,
                         margin: EdgeInsets.only(right: 16),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 12,
-                              offset: Offset(0, 5),
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Stack(
                           children: [
-                            // Image with rounded corners
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
-                              child: CachedNetworkImage(
-                                imageUrl: location.locationImage != null 
-                                    ? '${ApiConstants.baseUrl}${location.locationImage}'
-                                    : 'asset/images/destination1.jpg',
-                                width: 180,
-                                height: 210,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  color: Colors.grey[200],
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                                      strokeWidth: 2,
+                              borderRadius: BorderRadius.circular(16),
+                              child: location.locationImage != null
+                                  ? CachedNetworkImage(
+                                      imageUrl: location.locationImage!.startsWith('http')
+                                          ? location.locationImage!
+                                          : '${ApiConstants.baseUrl}${location.locationImage!.startsWith('/') ? '' : '/'}${location.locationImage}',
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey[200],
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) {
+                                        print('Image error: $error for URL: $url');
+                                        return Container(
+                                          color: Colors.grey[200],
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.image_not_supported,
+                                                color: Colors.grey[400],
+                                                size: 32,
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                'Image not available',
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 12,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Container(
+                                      color: Colors.grey[200],
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            color: Colors.grey[400],
+                                            size: 40,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            'No image',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Image.asset(
-                                  'asset/images/destination1.jpg',
-                                  width: 180,
-                                  height: 210,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
                             ),
-                            // Gradient overlay with improved gradient
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.3),
-                                    Colors.black.withOpacity(0.8),
-                                  ],
-                                  stops: [0.5, 0.75, 1.0],
-                                ),
-                              ),
-                            ),
-                            // Content
+                            // Location Info Overlay
                             Positioned(
                               bottom: 0,
                               left: 0,
                               right: 0,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
+                              child: Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(16),
+                                    bottomRight: Radius.circular(16),
+                                  ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.8),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 5,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            '\$${location.fare}',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
                                     Text(
                                       location.name,
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.bold,
                                         fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                          size: 14,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          '4.8',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          '(120+)',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.8),
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
+                                    Text(
+                                      'Fare: \$${location.fare}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ],
-                                ),
-                              ),
-                            ),
-                            // Favorite button with improved UI
-                            Positioned(
-                              top: 12,
-                              right: 12,
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red[400],
-                                  size: 16,
                                 ),
                               ),
                             ),

@@ -397,7 +397,7 @@ class DriverHomePageController extends GetxController {
       }
 
       final response = await _dio.post(
-        '/bookings/update-payment-status/',
+        '/bookings/changebookingpaymentstatus/',
         data: {'booking_id': bookingId},
       );
 
