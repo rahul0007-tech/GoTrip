@@ -328,4 +328,26 @@ class ChangeDriverStatusView(APIView):
         return Response({'status':'success','message': 'Driver status updated successfully','data': driver.status}, status=status.HTTP_200_OK)
 
 
+class ChangeDriverProfilePicture(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    def post(self, request):
+        driver = get_object_or_404(Driver, id=request.user.id)
+        serializer = DriverProfileSerializer(driver, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status':'success','message': 'Profile picture updated successfully','data': serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ChangePassengerProfilePicture(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
 
+    def post(self, request):
+        passenger = get_object_or_404(Passenger, id=request.user.id)
+        serializer = PassengerProfileSerializer(passenger, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status':'success','message': 'Profile picture updated successfully','data': serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

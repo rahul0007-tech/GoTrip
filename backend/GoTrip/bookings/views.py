@@ -282,16 +282,17 @@ class ChangeBookingStatus(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        passenger = get_object_or_404(passenger, id=request.user.id)
+        # Get the passenger from the User model
+        passenger = get_object_or_404(Passenger, user=request.user)
         if not passenger:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
         booking_id = request.data.get('booking_id')
-
         if not booking_id:
             return Response({'error': 'Booking ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        booking = get_object_or_404(Booking, id=booking_id, driver=passenger)
+        # Get the booking where the user is the passenger
+        booking = get_object_or_404(Booking, id=booking_id, passenger=passenger)
 
         if booking.status == 'confirmed':
             booking.status = 'completed'
@@ -299,8 +300,8 @@ class ChangeBookingStatus(APIView):
             return Response({"error": "This booking is already completed"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error": "This booking is not confirmed yet"}, status=status.HTTP_400_BAD_REQUEST)
+        
         booking.save()
-
         return Response({"message": "Booking status updated successfully"}, status=status.HTTP_200_OK)
     
 

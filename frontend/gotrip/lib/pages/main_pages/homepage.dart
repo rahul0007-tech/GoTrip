@@ -995,15 +995,11 @@ Widget _buildQuickActionButton({
                 ],
 
                 SizedBox(height: 20),
-                
-                // Status change button (new addition)
+                  // Status change button
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // Will call API later as requested
-                    print('Change status button pressed for booking ${booking.id}');
-                  },
+                  onPressed: () => bookingsController.changeBookingStatus(booking.id),
                   icon: Icon(Icons.update),
-                  label: Text('Change Booking Status'),
+                  label: Text('Complete Booking'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
