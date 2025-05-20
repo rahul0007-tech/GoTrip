@@ -283,11 +283,12 @@ class ChangeBookingStatus(APIView):
 
     def post(self, request):
         # Get the passenger from the User model
-        passenger = get_object_or_404(Passenger, user=request.user)
+        passenger = get_object_or_404(Passenger, id=request.user.id)
         if not passenger:
             return Response({'error':'Invalid token or token has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
         booking_id = request.data.get('booking_id')
+        # booking_id = int(booking_id)
         if not booking_id:
             return Response({'error': 'Booking ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -319,17 +320,30 @@ class ChangeBookingPaymentStatus(APIView):
         if not booking_id:
             return Response({"error":"Booking ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         
-        booking = get_object_or_404(Booking, id=booking_id, passenger=driver)
+        booking = get_object_or_404(Booking, id=booking_id, driver=driver)
 
         if booking.payment_status == 'partial':
-            booking.status = 'confirmed'
+            booking.status = 'completed'
+        elif booking.status == 'completed':
+            return Response({"error": "This booking is already completed"}, status=status.HTTP_400_BAD_REQUEST)
         elif booking.status == 'confirmed':
-            return Response({"error": "This booking is already confirmed"}, status=status.HTTP_400_BAD_REQUEST)
+            Payment.objects.create(
+                amount=booking.fare,
+                transaction_id="cash",
+                status=OrderStatus.COMPLETED,
+                booking=booking,
+                user=request.user
+            )
+            booking.status = 'completed'
+            booking.save()
+            return Response({"message": "Booking status updated successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "This booking is not partially paid yet"}, status=status.HTTP_400_BAD_REQUEST)
-        booking.save()
+        
 
-        return Response({"message": "Booking status updated successfully"}, status=status.HTTP_200_OK)
+
+
+        
     
 
 class DriverBookingHistory(APIView):

@@ -3,7 +3,7 @@ from .views import (
     ChangeDriverStatusView, ChnagePasswordView, CreatePassengerView, 
      LoginPassengerView, 
     PassengerProfileView, ResendOTPView, SendPasswordEmailView, 
-    VerifyOTPView, CreateDriverView, LoginDriverView, DriverProfileView
+    VerifyOTPView, CreateDriverView, LoginDriverView, DriverProfileView, ChangeDriverProfilePicture, ChangePassengerProfilePicture
 )
 
 app_name = 'users'
@@ -21,4 +21,6 @@ urlpatterns = [
     path('driverprofile/', DriverProfileView.as_view(), name='driverprofile'),
     path('driverstatus/', ChangeDriverStatusView.as_view(), name='driverstatus'),
     path('resend-otp/', ResendOTPView.as_view(), name='resend-otp'),
+    path('change-passenger-profile-picture/', ChangePassengerProfilePicture.as_view(), name='change_passenger_profile_picture'),
+    path('change-driver-profile-picture/', ChangeDriverProfilePicture.as_view(), name='change_driver_profile_picture'),
 ]

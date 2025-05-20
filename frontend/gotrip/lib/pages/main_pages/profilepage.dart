@@ -88,12 +88,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gotrip/controllers/passenger_profile_controller.dart';
+import 'package:gotrip/controllers/profile_image_update_passenger_controller.dart';
 import 'package:gotrip/helper/date_format.dart';
-import '../../controllers/passenger_profile_controller.dart';
+
 import '../../utils/app_colors.dart';
 
 class ProfilePage extends StatelessWidget {
   final ProfileController controller = Get.find<ProfileController>();
+
+ final PassengerProfileImageController profileImageChange = Get.put(PassengerProfileImageController());
+
 
   ProfilePage({super.key});
 
@@ -121,28 +126,43 @@ class ProfilePage extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              // Profile header section
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Column(
                   children: [
-                    // Profile avatar
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFEAE4FF), // Light purple background
-                        shape: BoxShape.circle,
+                    // Profile avatar with onTap to change photo
+                    GestureDetector(
+                      onTap: () async {
+                        final imageFile = await profileImageChange.pickImageFromGallery();
+                        if (imageFile != null) {
+                          await profileImageChange.uploadProfileImage(imageFile);
+                          // Optionally update the main profile photo observable if needed
+                          if (profileImageChange.photo.value.isNotEmpty) {
+                            controller.photo.value = profileImageChange.photo.value;
+                          }
+                        }
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFEAE4FF),
+                          shape: BoxShape.circle,
+                        ),
+                        child: controller.photo.value.isNotEmpty
+                            ? CircleAvatar(
+                                radius: 60,
+                                backgroundImage: NetworkImage(controller.photo.value),
+                              )
+                            : Icon(Icons.person, size: 60, color: Colors.white),
                       ),
-                      child: controller.photo.value.isNotEmpty
-                          ? CircleAvatar(
-                              radius: 60,
-                              backgroundImage: NetworkImage(controller.photo.value),
-                            )
-                          : Icon(Icons.person, size: 60, color: Colors.white),
                     ),
+                    SizedBox(height: 12),
+                    Text('Tap the image to change profile picture',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                     SizedBox(height: 16),
+
                     // User name
                     Text(
                       controller.username.value,

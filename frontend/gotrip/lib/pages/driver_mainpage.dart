@@ -59,12 +59,11 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gotrip/pages/driver_main_pages.dart/driver_bookingpage.dart';
+
 import 'package:gotrip/pages/driver_main_pages.dart/driver_homepage.dart';
 import 'package:gotrip/pages/driver_main_pages.dart/driver_profilepage.dart';
 import 'package:gotrip/pages/driver_main_pages.dart/driver_searchpage.dart';
-
+import 'package:gotrip/pages/bookings/get_bookingpage.dart';
 class DriverMainPage extends StatefulWidget {
   @override
   _DriverMainPageState createState() => _DriverMainPageState();
@@ -75,9 +74,9 @@ class _DriverMainPageState extends State<DriverMainPage> {
 
   final List<Widget> _pages = [
     DriverHomePage(),
-    DriverBookingsPage(), // Document/list page
+    AvailableBookingPage(), // Bookings page
     SearchPage(),         // Search/discovery page (now in middle)
-    DriverProfilepage(),  // Profile page
+    DriverProfilePage(),  // Profile page
   ];
 
   @override

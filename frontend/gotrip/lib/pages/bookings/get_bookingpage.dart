@@ -438,10 +438,7 @@ class AvailableBookingPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Get.back(),
-        ),
+    
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

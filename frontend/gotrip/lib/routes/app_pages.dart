@@ -61,7 +61,7 @@ class AppPages {
     // GetPage(name: '/search', page: () => SearchPage()),
     GetPage(name: '/bookings', page: () => BookingsPage()),
     GetPage(name: '/profile', page: () => ProfilePage(), binding: ProfileBinding()),
-    GetPage(name: '/driver_profile', page: () => DriverProfilepage(), binding: DriverProfileBinding(),),
+    GetPage(name: '/driver_profile', page: () => DriverProfilePage(), binding: DriverProfileBinding(),),
     GetPage(name: '/change_password', page: () => ChangePasswordPage(), binding: ChangePasswordBinding(),),
     GetPage(name: '/create_booking_page', page: ()=> CreateBookingPage(),binding: CreateBookingBinding()),
     GetPage(name: '/accept_booking', page: () => AcceptBookingPage(
